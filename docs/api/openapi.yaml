@@ -1,0 +1,1663 @@
+openapi: 3.1.0
+info:
+  title: Linkloom Creator API
+  version: 0.1.0-draft
+  summary: Backend contract for the Linkloom landing page and creator dashboard.
+  description: |
+    Derived from what the creator frontend does today, where all of this is simulated in the browser
+    with sample data. **This is a draft for review.** Paths and shapes are a proposal to agree with the
+    backend developer. The field rules, limits and state machines are taken from the frontend code.
+
+    ## Conventions
+    - **Money** is always integer paise (₹1 = 100). Never send floats or rupees.
+    - **Dates**: `date` is `YYYY-MM-DD`, calendar days in IST (`Asia/Kolkata`). `date-time` is ISO 8601 with an offset.
+    - **Errors** use `application/problem+json` with a stable `code`. Validation failures also carry `fieldErrors`.
+      The frontend shows its own wording, so `code` is the contract, not `detail`.
+    - **Pagination** is cursor based: pass `cursor`, read `nextCursor` (null on the last page).
+    - **Retries**: money and bid creation take an `Idempotency-Key` header.
+    - **IDs** are opaque strings.
+    - **Auth**: every endpoint needs a bearer token unless it says otherwise, and can return 401 when the session has expired.
+
+    ## The backend must enforce these
+    The frontend only pre-checks them, and in the prototype they are not enforced anywhere.
+    1. **OTP**: 6 digits, 30 s resend cooldown, 3 resends per number (then 30 min), 3 wrong codes locks the number for 10 min.
+    2. **Profile gate**: until setup is saved (`session.firstLogin = true`), reject every creator endpoint with 403 and code
+       `profile_incomplete`, except `/auth/*`, `GET /me`, `PATCH /me`, `POST /uploads` and `/config`. The frontend redirects to
+       setup, but only the server can actually enforce this. Save `firstLogin = false` once the required details are complete:
+       display name, date of birth (18 or older), at least one language, city, state, a bio of at least 20 characters and at least one platform.
+    3. **KYC gate**: `POST /bids` requires `kyc.status = verified`. KYC is asked for at the first bid, not during setup.
+    4. **Bid limits**: minimum price, maximum of budget plus `overBudgetPct` (rounded to the nearest rupee),
+       `why` length, post date from tomorrow up to the job deadline. Values come from `GET /config`.
+    5. **Withdrawals**: amount between ₹100 and the current ready balance, computed server side inside a transaction.
+       `readyToWithdraw` = paid ledger rows − withdrawals that are `paid` or `processing`. Pending and failed rows never count.
+    6. **Sensitive data in chat**: reject messages that look like a PAN, Aadhaar, IFSC, UPI ID, or a 9–18 digit
+       account or phone number (`sensitive_details`). The frontend patterns are listed on `POST /threads/{threadId}/messages`.
+    7. **Privacy**: full PAN, ID numbers, bank account numbers and ID documents are never returned to the client and
+       never shown to brands. Responses carry masked values only. **Have the handling of Aadhaar numbers and KYC
+       documents reviewed for legal compliance before implementation.**
+    8. **Derived values** are computed by the server: `job.match`, `job.reasons`, `job.bids`, `readyToWithdraw`, `unread`.
+
+    ## State machines
+    - **KYC**: `not_started → in_progress → under_review → verified | action_needed | rejected`.
+      `action_needed` lists the steps to fix in `fix`, and returns to `under_review` on resubmit.
+    - **Bid**: `submitted → viewed → accepted | rejected`, `accepted → completed`. A creator may move
+      `submitted | viewed → withdrawn`.
+    - **Work stage**: `kickoff → in_progress → submitted → review → approved`, with `submitted | review → revision → submitted`.
+      Payment is a separate field (`pay`): `approved` does not mean paid out.
+    - **Ledger**: approval creates a `pending` row with `clears` = approval date + 7 days, which becomes `paid` when
+      cleared or `failed` if the release fails.
+    - **Withdrawal**: `processing → paid | failed`. A failed withdrawal returns the money to the balance.
+
+    ## Not in this spec
+    - **Brand app**: posting briefs, reviewing bids, funding escrow, requesting revisions and approving work are not built
+      yet. In the prototype, sample buttons simulate them. They drive the bid, work and ledger transitions above.
+    - **Payment and KYC provider webhooks**, which depend on the providers chosen.
+    - **Subscription billing**: the dashboard only reads the plan, and shows no price.
+
+    ## Open questions for product and backend
+    1. **Platform fee.** The landing page shows a 10% example platform fee. The dashboard runs on a subscription with no
+       per-deal fee and pays creators the agreed price. This spec follows the dashboard, so it has no fee fields.
+       If a fee applies, bid previews, ledger rows and withdrawals all need one.
+    2. **Tax.** The app says "tax as per confirmed rules" and shows no TDS or GST deduction. Ledger rows may need tax fields.
+    3. **Auth transport.** This draft uses a short-lived bearer token plus a refresh token in an httpOnly cookie.
+    4. **Realtime.** `GET /events` is a proposal. Polling works, but chat delivery ticks and badges would lag.
+    5. **Bid drafts** are kept in the browser's sessionStorage today, so there is no endpoint. Add one to sync across devices.
+    6. **Account deletion** has no screen yet, but will likely be needed for data protection compliance.
+servers:
+  - url: https://api.linkloom.in/api/v1
+    description: Placeholder, replace with the real host
+  - url: http://localhost:8080/api/v1
+    description: Local development
+tags:
+  - name: Auth
+  - name: Profile
+  - name: KYC
+  - name: Jobs
+  - name: Bids
+  - name: Work
+  - name: Messages
+  - name: Earnings
+  - name: Notifications
+  - name: Uploads
+  - name: Platform
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/otp/request:
+    post:
+      tags: [Auth]
+      operationId: requestOtp
+      summary: Send a sign-in code to an Indian mobile number
+      description: Also used for resends. Enforce the 30 s cooldown and the 3-resend limit per number.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mobile]
+              properties:
+                mobile:
+                  type: string
+                  description: 10 digits without the +91 prefix.
+                  pattern: '^[6-9]\d{9}$'
+                  examples: ['9876543210']
+      responses:
+        '200':
+          description: Code sent
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [resendAfterSeconds, resendsLeft]
+                properties:
+                  resendAfterSeconds: { type: integer, examples: [30] }
+                  resendsLeft: { type: integer, examples: [3] }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /auth/otp/verify:
+    post:
+      tags: [Auth]
+      operationId: verifyOtp
+      summary: Verify the code and sign in, creating the account on first use
+      description: Three wrong codes lock the number for 10 minutes.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mobile, code]
+              properties:
+                mobile: { type: string, pattern: '^[6-9]\d{9}$' }
+                code: { type: string, pattern: '^\d{6}$' }
+      responses:
+        '200':
+          description: Signed in
+          headers:
+            Set-Cookie:
+              description: httpOnly refresh token cookie
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '401':
+          description: Wrong or expired code. `code` is `otp_invalid` or `otp_expired`.
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - type: object
+                    properties:
+                      triesLeft: { type: integer, examples: [2] }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /auth/google:
+    post:
+      tags: [Auth]
+      operationId: signInWithGoogle
+      summary: Sign in with a Google ID token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idToken]
+              properties:
+                idToken: { type: string }
+      responses:
+        '200':
+          description: Signed in
+          headers:
+            Set-Cookie:
+              description: httpOnly refresh token cookie
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshSession
+      summary: Exchange the refresh cookie for a new access token
+      description: A 401 here sends the creator to the "session expired" sign-in screen.
+      security: []
+      responses:
+        '200':
+          description: Refreshed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: End the session and clear the refresh cookie
+      responses:
+        '204': { description: Signed out }
+
+  /config:
+    get:
+      tags: [Platform]
+      operationId: getConfig
+      summary: Limits the frontend validates against
+      security: []
+      responses:
+        '200':
+          description: Current rules
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Config' }
+  /newsletter/subscriptions:
+    post:
+      tags: [Platform]
+      operationId: subscribeNewsletter
+      summary: '"Get new briefs in your inbox" form in the landing page footer'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '204': { description: Subscribed. Also returned if already subscribed. }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /events:
+    get:
+      tags: [Platform]
+      operationId: streamEvents
+      summary: Server-sent events for chat, badges and status changes (proposal)
+      description: |
+        Event names: `message.created`, `message.status`, `notification.created`, `bid.updated`, `work.updated`,
+        `ledger.updated`, `withdrawal.updated`, `kyc.updated`. Each event's data is the changed resource as JSON.
+      responses:
+        '200':
+          description: Event stream
+          content:
+            text/event-stream:
+              schema: { type: string }
+
+  /uploads:
+    post:
+      tags: [Uploads]
+      operationId: createUpload
+      summary: Start a direct-to-storage upload
+      description: |
+        Returns presigned URLs so large files skip the API servers. The returned `uploadId` is then passed to the
+        endpoint that uses the file. Limits by purpose:
+
+        | purpose | types | max |
+        |---|---|---|
+        | `profile_photo` | JPEG, PNG, WebP (at least 200 px wide) | 5 MB |
+        | `kyc_document` | JPEG, PNG, PDF | 5 MB |
+        | `kyc_selfie` | JPEG, PNG, WebP, HEIC | 5 MB |
+        | `work_deliverable` | MP4, MOV, M4V, JPEG, PNG | 4 GB |
+
+        KYC files must go to access-restricted storage, separate from public assets.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purpose, fileName, contentType, sizeBytes]
+              properties:
+                purpose:
+                  type: string
+                  enum: [profile_photo, kyc_document, kyc_selfie, work_deliverable]
+                fileName: { type: string }
+                contentType: { type: string, examples: [video/mp4] }
+                sizeBytes: { type: integer, minimum: 1 }
+      responses:
+        '201':
+          description: Upload ready
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [uploadId, parts]
+                properties:
+                  uploadId: { type: string }
+                  parts:
+                    type: array
+                    description: One entry for a small file, several for a multipart upload.
+                    items:
+                      type: object
+                      required: [url, partNumber]
+                      properties:
+                        url: { type: string, format: uri }
+                        partNumber: { type: integer }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /uploads/{uploadId}/complete:
+    post:
+      tags: [Uploads]
+      operationId: completeUpload
+      summary: Finish an upload once all parts are stored
+      parameters:
+        - $ref: '#/components/parameters/UploadId'
+      responses:
+        '204': { description: Stored and ready to use }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /me:
+    get:
+      tags: [Profile]
+      operationId: getMe
+      summary: The signed-in creator's profile
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Creator' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      tags: [Profile]
+      operationId: updateMe
+      summary: Update the profile
+      description: Used by both first-time setup and profile editing. Finishing setup clears `session.firstLogin`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatorUpdate' }
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Creator' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /kyc:
+    get:
+      tags: [KYC]
+      operationId: getKyc
+      summary: Verification status and masked details
+      responses:
+        '200':
+          description: Current verification
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Kyc' }
+  /kyc/pan:
+    put:
+      tags: [KYC]
+      operationId: saveKycPan
+      summary: 'Step: PAN'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pan, panName]
+              properties:
+                pan: { type: string, pattern: '^[A-Z]{5}[0-9]{4}[A-Z]$' }
+                panName: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/KycUpdated' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /kyc/id:
+    put:
+      tags: [KYC]
+      operationId: saveKycId
+      summary: 'Step: government ID'
+      description: |
+        `idNumber` depends on `idType`: Aadhaar `^[2-9]\d{11}$`, Passport `^[A-Z][0-9]{7}$`, Voter ID `^[A-Z]{3}[0-9]{7}$`,
+        Driving licence `^[A-Z]{2}[0-9]{2}[0-9A-Z]{9,12}$`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idType, idNumber, documentUploadId]
+              properties:
+                idType: { $ref: '#/components/schemas/KycIdType' }
+                idNumber: { type: string }
+                documentUploadId: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/KycUpdated' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /kyc/selfie:
+    put:
+      tags: [KYC]
+      operationId: saveKycSelfie
+      summary: 'Step: selfie, required for every ID type except Aadhaar'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [selfieUploadId]
+              properties:
+                selfieUploadId: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/KycUpdated' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /kyc/payout:
+    put:
+      tags: [KYC]
+      operationId: saveKycPayout
+      summary: 'Step: where to pay the creator'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [method, upi]
+                  properties:
+                    method: { const: upi }
+                    upi: { type: string, pattern: '^[a-zA-Z0-9._-]{2,256}@[a-zA-Z][a-zA-Z0-9]{1,63}$' }
+                - type: object
+                  required: [method, accountNumber, ifsc, holder]
+                  properties:
+                    method: { const: bank }
+                    accountNumber: { type: string }
+                    ifsc: { type: string, pattern: '^[A-Z]{4}0[A-Z0-9]{6}$' }
+                    holder: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/KycUpdated' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /kyc/gst:
+    put:
+      tags: [KYC]
+      operationId: saveKycGst
+      summary: 'Step: GSTIN, optional'
+      description: The GSTIN contains the PAN, so check that they match. Send an empty string to skip the step.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [gst]
+              properties:
+                gst:
+                  type: string
+                  pattern: '^$|^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$'
+      responses:
+        '200': { $ref: '#/components/responses/KycUpdated' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /kyc/submit:
+    post:
+      tags: [KYC]
+      operationId: submitKyc
+      summary: Send for review, moving the status to under_review
+      responses:
+        '200': { $ref: '#/components/responses/KycUpdated' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /jobs:
+    get:
+      tags: [Jobs]
+      operationId: listJobs
+      summary: Find Jobs search and filters
+      description: Hired jobs are excluded. Hidden jobs are excluded unless `includeHidden` is true.
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - name: city
+          in: query
+          description: A city name, or `remote` for "any city".
+          schema: { type: string }
+        - name: platform
+          in: query
+          schema: { $ref: '#/components/schemas/Platform' }
+        - { name: category, in: query, schema: { type: string } }
+        - name: minBudget
+          in: query
+          description: In paise.
+          schema: { type: integer, minimum: 0 }
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [match, budget, deadline, newest, bids]
+            default: match
+        - { name: saved, in: query, schema: { type: boolean, default: false } }
+        - { name: includeHidden, in: query, schema: { type: boolean, default: false } }
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Matching jobs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    required: [items]
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Job' }
+  /jobs/{jobId}:
+    get:
+      tags: [Jobs]
+      operationId: getJob
+      summary: Job brief
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      responses:
+        '200':
+          description: The job
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Job' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /jobs/{jobId}/save:
+    put:
+      tags: [Jobs]
+      operationId: saveJob
+      summary: Save a job
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      responses:
+        '204': { description: Saved }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Jobs]
+      operationId: unsaveJob
+      summary: Remove a saved job
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      responses:
+        '204': { description: Removed }
+  /jobs/{jobId}/hide:
+    put:
+      tags: [Jobs]
+      operationId: hideJob
+      summary: Hide a job (swipe left)
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      responses:
+        '204': { description: Hidden }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Jobs]
+      operationId: unhideJob
+      summary: Show a hidden job again
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      responses:
+        '204': { description: Visible again }
+  /jobs/{jobId}/report:
+    post:
+      tags: [Jobs]
+      operationId: reportJob
+      summary: Report a brief. The brand never sees who reported it.
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum:
+                    - Pay looks misleading
+                    - Asks to pay or chat outside Linkloom
+                    - Inappropriate or unsafe content
+                    - Spam or a duplicate brief
+                    - Something else
+                text: { type: string, maxLength: 300 }
+      responses:
+        '204': { description: Report received }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /bids:
+    get:
+      tags: [Bids]
+      operationId: listBids
+      summary: My bids
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/BidStatus' }
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: The creator's bids, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    required: [items]
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Bid' }
+    post:
+      tags: [Bids]
+      operationId: createBid
+      summary: Send a bid
+      description: |
+        Requires verified KYC, otherwise 403 with code `kyc_required`. One bid per creator per job, otherwise 409 with code
+        `bid_exists`. On success the job's bid count and the creator's `totalBids` go up by one.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BidCreate' }
+      responses:
+        '201':
+          description: Bid sent
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bid' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /bids/{bidId}:
+    get:
+      tags: [Bids]
+      operationId: getBid
+      summary: One bid
+      parameters:
+        - $ref: '#/components/parameters/BidId'
+      responses:
+        '200':
+          description: The bid
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bid' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /bids/{bidId}/withdraw:
+    post:
+      tags: [Bids]
+      operationId: withdrawBid
+      summary: Withdraw a bid that is still submitted or viewed
+      description: The job's live bid count goes down by one.
+      parameters:
+        - $ref: '#/components/parameters/BidId'
+      responses:
+        '200':
+          description: Withdrawn
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bid' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /bids/{bidId}/feedback:
+    put:
+      tags: [Bids]
+      operationId: leaveBidFeedback
+      summary: Rate the brand after a completed bid
+      parameters:
+        - $ref: '#/components/parameters/BidId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating]
+              properties:
+                rating: { type: integer, minimum: 1, maximum: 5 }
+                text: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bid' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /work:
+    get:
+      tags: [Work]
+      operationId: listWork
+      summary: Active jobs board
+      parameters:
+        - name: filter
+          in: query
+          description: '`you` means waiting on the creator, `brand` means waiting on the brand.'
+          schema:
+            type: string
+            enum: [all, you, brand, done]
+            default: all
+      responses:
+        '200':
+          description: Active and finished work
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Work' }
+  /work/{workId}:
+    get:
+      tags: [Work]
+      operationId: getWork
+      summary: One active job
+      parameters:
+        - $ref: '#/components/parameters/WorkId'
+      responses:
+        '200':
+          description: The job
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Work' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /work/{workId}/start:
+    post:
+      tags: [Work]
+      operationId: startWork
+      summary: Move from kickoff to in_progress
+      parameters:
+        - $ref: '#/components/parameters/WorkId'
+      responses:
+        '200':
+          description: Started
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Work' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /work/{workId}/uploads:
+    post:
+      tags: [Work]
+      operationId: submitDeliverable
+      summary: Submit a finished upload for review
+      description: |
+        Moves the stage to `submitted` and clears `draftOk`. Adds a system message to the chat, plus `note` as a message
+        from the creator when given.
+      parameters:
+        - $ref: '#/components/parameters/WorkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [uploadId]
+              properties:
+                uploadId: { type: string }
+                note: { type: string }
+      responses:
+        '200':
+          description: Submitted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Work' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /work/{workId}/live:
+    post:
+      tags: [Work]
+      operationId: submitLiveLink
+      summary: Submit the live post link for final review
+      description: Must be an Instagram or YouTube link. Moves the stage to `review`.
+      parameters:
+        - $ref: '#/components/parameters/WorkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url:
+                  type: string
+                  examples: [instagram.com/reel/abc]
+      responses:
+        '200':
+          description: Sent for final review
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Work' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /threads:
+    get:
+      tags: [Messages]
+      operationId: listThreads
+      summary: Chats. These exist only with brands that accepted a bid.
+      responses:
+        '200':
+          description: Threads with their latest message
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Thread' }
+  /threads/{threadId}/messages:
+    get:
+      tags: [Messages]
+      operationId: listMessages
+      summary: Messages in a chat, newest page first
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Messages
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    required: [items]
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Message' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [Messages]
+      operationId: sendMessage
+      summary: Send a message
+      description: |
+        Reject with 422 and code `sensitive_details` when the text matches any of these (case-insensitive):
+
+        | Looks like | Pattern |
+        |---|---|
+        | PAN | `\b[A-Z]{5}\d{4}[A-Z]\b` |
+        | Aadhaar | `\b\d{4}[\s-]?\d{4}[\s-]?\d{4}\b` |
+        | IFSC | `\b[A-Z]{4}0[A-Z0-9]{6}\b` |
+        | UPI ID | `\b[\w.-]{2,}@[a-z]{2,}\b(?!\.)` |
+        | Account or phone number | `\b\d{9,18}\b` |
+
+        Returns 403 with code `thread_blocked` if the creator blocked this brand.
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text, clientId]
+              properties:
+                text: { type: string, minLength: 1, maxLength: 1000 }
+                clientId:
+                  type: string
+                  description: Generated by the client, so a resend after going offline does not duplicate the message.
+      responses:
+        '201':
+          description: Sent
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Message' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /threads/{threadId}/read:
+    post:
+      tags: [Messages]
+      operationId: markThreadRead
+      summary: Clear the unread count
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      responses:
+        '204': { description: Marked as read }
+  /threads/{threadId}/block:
+    put:
+      tags: [Messages]
+      operationId: blockThread
+      summary: Block a brand in this chat
+      description: The job and its escrow are not affected.
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      responses:
+        '204': { description: Blocked }
+    delete:
+      tags: [Messages]
+      operationId: unblockThread
+      summary: Unblock a brand
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      responses:
+        '204': { description: Unblocked }
+  /threads/{threadId}/report:
+    post:
+      tags: [Messages]
+      operationId: reportThread
+      summary: Report a chat to the trust team. The brand is not told who reported it.
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum:
+                    - Asked for KYC, bank or UPI details
+                    - Wants to pay or talk outside Linkloom
+                    - Spam or scam
+                    - Rude or abusive
+                    - Something else
+                note: { type: string, maxLength: 500 }
+      responses:
+        '204': { description: Report received }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /earnings/summary:
+    get:
+      tags: [Earnings]
+      operationId: getEarningsSummary
+      summary: Balances for the Earnings screen and the sidebar
+      responses:
+        '200':
+          description: Balances, computed from the ledger and withdrawals
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EarningsSummary' }
+  /ledger:
+    get:
+      tags: [Earnings]
+      operationId: listLedger
+      summary: Earnings history
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/LedgerStatus' }
+        - name: range
+          in: query
+          description: Last 30 days, last 90 days, this Indian financial year (April to March), or everything.
+          schema:
+            type: string
+            enum: ['30', '90', fy, all]
+            default: fy
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Ledger rows, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    required: [items, total]
+                    properties:
+                      total:
+                        $ref: '#/components/schemas/Paise'
+                        description: Sum for the selected range and status.
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/LedgerEntry' }
+  /payout-methods:
+    get:
+      tags: [Earnings]
+      operationId: listPayoutMethods
+      summary: Verified places to send money, masked
+      responses:
+        '200':
+          description: Payout methods
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/PayoutMethod' }
+  /withdrawals:
+    get:
+      tags: [Earnings]
+      operationId: listWithdrawals
+      summary: Withdrawal history
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Withdrawals, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    required: [items]
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Withdrawal' }
+    post:
+      tags: [Earnings]
+      operationId: createWithdrawal
+      summary: Withdraw to UPI or bank
+      description: |
+        Check the balance and create the row in one transaction. Error codes: `amount_below_minimum`,
+        `amount_above_balance`. A declined payout becomes a `failed` row whose `reason` is shown to the creator.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, payoutMethodId]
+              properties:
+                amount:
+                  $ref: '#/components/schemas/Paise'
+                  minimum: 10000
+                payoutMethodId: { type: string }
+      responses:
+        '201':
+          description: Withdrawal created, usually `processing`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Withdrawal' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /withdrawals/{withdrawalId}:
+    get:
+      tags: [Earnings]
+      operationId: getWithdrawal
+      summary: One withdrawal, used to follow its status
+      parameters:
+        - name: withdrawalId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: The withdrawal
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Withdrawal' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /plan:
+    get:
+      tags: [Earnings]
+      operationId: getPlan
+      summary: The creator's subscription. No price is shown in the app.
+      responses:
+        '200':
+          description: The plan, or null if there is no subscription
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Plan'
+                  - type: 'null'
+
+  /notifications:
+    get:
+      tags: [Notifications]
+      operationId: listNotifications
+      summary: Bell menu
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Notifications, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    required: [items, unread]
+                    properties:
+                      unread: { type: integer }
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Notification' }
+  /notifications/{notificationId}/read:
+    post:
+      tags: [Notifications]
+      operationId: markNotificationRead
+      summary: Mark one as read
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: Marked as read }
+  /notifications/read-all:
+    post:
+      tags: [Notifications]
+      operationId: markAllNotificationsRead
+      summary: Mark all as read
+      responses:
+        '204': { description: All marked as read }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: A unique value per attempted action. Repeating it returns the first result instead of acting twice.
+      schema: { type: string }
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      schema: { type: string }
+    BidId:
+      name: bidId
+      in: path
+      required: true
+      schema: { type: string }
+    WorkId:
+      name: workId
+      in: path
+      required: true
+      schema: { type: string }
+    ThreadId:
+      name: threadId
+      in: path
+      required: true
+      schema: { type: string }
+    UploadId:
+      name: uploadId
+      in: path
+      required: true
+      schema: { type: string }
+  responses:
+    Unauthorized:
+      description: Missing or expired session
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: Not allowed, see `code`
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: Not found, or not owned by this creator
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: Not allowed in the current state, see `code`
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    ValidationFailed:
+      description: The input failed validation
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    RateLimited:
+      description: Too many attempts. `code` is `otp_cooldown`, `otp_resend_limit`, `otp_locked` or `rate_limited`.
+      headers:
+        Retry-After:
+          description: Seconds to wait
+          schema: { type: integer }
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    KycUpdated:
+      description: The updated verification
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Kyc' }
+  schemas:
+    Paise:
+      type: integer
+      description: Integer paise. ₹12,500 is 1250000.
+      examples: [1250000]
+    Platform:
+      type: string
+      enum: [instagram, youtube]
+    JobFormat:
+      type: string
+      enum: [Reel, Video, Carousel, Short, Story]
+    Problem:
+      type: object
+      required: [code, title, status]
+      properties:
+        code:
+          type: string
+          description: Stable machine-readable code.
+          examples: [kyc_required]
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        fieldErrors:
+          type: object
+          description: Field name to a machine-readable reason.
+          additionalProperties: { type: string }
+          examples:
+            - { price: above_maximum, postDate: after_deadline }
+    AuthResult:
+      type: object
+      required: [accessToken, expiresIn, session]
+      properties:
+        accessToken: { type: string }
+        expiresIn: { type: integer, description: Seconds }
+        session: { $ref: '#/components/schemas/Session' }
+    Session:
+      type: object
+      required: [method, firstLogin]
+      properties:
+        method: { type: string, enum: [google, mobile] }
+        email: { type: [string, 'null'], format: email }
+        mobile:
+          type: [string, 'null']
+          description: Masked.
+          examples: ['+91 98•••••210']
+        firstLogin:
+          type: boolean
+          description: True sends the creator to profile setup after sign-in. False goes to the dashboard.
+        googleName: { type: string }
+    Config:
+      type: object
+      required: [bidRules, minWithdrawal]
+      properties:
+        bidRules:
+          type: object
+          required: [minPaise, overBudgetPct, whyMin, whyMax, maxLinks]
+          properties:
+            minPaise: { $ref: '#/components/schemas/Paise', examples: [100000] }
+            overBudgetPct: { type: integer, examples: [25] }
+            whyMin: { type: integer, examples: [40] }
+            whyMax: { type: integer, examples: [500] }
+            maxLinks: { type: integer, examples: [5] }
+        minWithdrawal: { $ref: '#/components/schemas/Paise', examples: [10000] }
+    PlatformStats:
+      type: object
+      required: [handle, url, followers, avgViews, er, updated, source]
+      properties:
+        handle: { type: string, examples: ['@ananyamakes'] }
+        url: { type: string, examples: [instagram.com/ananyamakes] }
+        followers: { type: integer }
+        avgViews: { type: integer }
+        er: { type: number, description: Engagement rate in percent, examples: [6.8] }
+        updated: { type: string, format: date }
+        source: { type: string, examples: [Self-reported] }
+    PortfolioItem:
+      type: object
+      required: [title, platform, url]
+      properties:
+        title: { type: string }
+        platform: { type: string, enum: [instagram, youtube, web] }
+        format: { type: string }
+        views: { type: integer }
+        url: { type: string }
+    Creator:
+      type: object
+      required: [name, handle, city, region, languages, categories, bio, platforms, audienceGeo, completedJobs, totalBids, portfolio, reviews]
+      properties:
+        name: { type: string }
+        handle: { type: string }
+        city: { type: string }
+        region: { type: string }
+        dob: { type: string, format: date }
+        gender: { type: string, description: Empty if not given. }
+        languages:
+          type: array
+          items: { type: string }
+        categories:
+          type: array
+          items: { type: string }
+        bio: { type: string }
+        photoUrl: { type: [string, 'null'], format: uri }
+        platforms:
+          type: object
+          description: Either platform may be missing.
+          properties:
+            instagram: { $ref: '#/components/schemas/PlatformStats' }
+            youtube: { $ref: '#/components/schemas/PlatformStats' }
+        audienceGeo:
+          type: array
+          items:
+            type: object
+            required: [city, percent]
+            properties:
+              city: { type: string }
+              percent: { type: number }
+        completedJobs: { type: integer }
+        totalBids: { type: integer }
+        portfolio:
+          type: array
+          items: { $ref: '#/components/schemas/PortfolioItem' }
+        reviews:
+          type: array
+          items:
+            type: object
+            required: [brand, rating, text]
+            properties:
+              brand: { type: string }
+              rating: { type: integer, minimum: 1, maximum: 5 }
+              text: { type: string }
+    CreatorUpdate:
+      type: object
+      description: Send only the fields being changed. `email` and `mobile` are collected during setup.
+      properties:
+        name:
+          type: string
+          maxLength: 60
+          pattern: "^[\\p{L}][\\p{L}\\p{M} .'-]*$"
+        dob: { type: string, format: date, description: Validate the minimum age on the server. }
+        gender: { type: string }
+        bio: { type: string, minLength: 20 }
+        city:
+          type: string
+          pattern: "^[\\p{L}][\\p{L} .'-]{1,40}$"
+        region: { type: string }
+        languages:
+          type: array
+          items: { type: string }
+        categories:
+          type: array
+          items: { type: string }
+        photoUploadId: { type: [string, 'null'], description: Null removes the photo. }
+        email: { type: string, format: email }
+        mobile: { type: string, pattern: '^[6-9]\d{9}$' }
+        instagram: { $ref: '#/components/schemas/PlatformUpdate' }
+        youtube: { $ref: '#/components/schemas/PlatformUpdate' }
+        portfolio:
+          type: array
+          items:
+            type: object
+            required: [title, url]
+            properties:
+              title: { type: string }
+              url: { type: string }
+    PlatformUpdate:
+      type: object
+      required: [handle]
+      properties:
+        handle:
+          type: string
+          description: A handle or a profile link. The server normalizes it.
+        followers: { type: integer, minimum: 0, maximum: 9999999999 }
+        avgViews: { type: integer, minimum: 0, maximum: 9999999999 }
+        er: { type: number, minimum: 0 }
+    KycIdType:
+      type: string
+      enum: [Aadhaar, Passport, Voter ID, Driving licence]
+    Kyc:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [not_started, in_progress, under_review, verified, action_needed, rejected]
+        panMasked: { type: string, examples: ['ABCDE••••F'] }
+        panName: { type: string }
+        idType: { $ref: '#/components/schemas/KycIdType' }
+        idMasked: { type: string }
+        idDone: { type: boolean }
+        selfieDone: { type: boolean }
+        selfieRequired: { type: boolean, description: True for every ID type except Aadhaar. }
+        payoutMethod: { type: string, enum: [upi, bank] }
+        upiMasked: { type: string, examples: ['ananya••••@upi'] }
+        bankMasked:
+          type: object
+          properties:
+            acc: { type: string, examples: ['••••4821'] }
+            ifsc: { type: string, examples: ['HDFC0••••12'] }
+            holder: { type: string }
+        gst: { type: string }
+        gstDone: { type: boolean }
+        note:
+          type: string
+          description: Why action is needed or why it was rejected. Shown to the creator.
+          examples: ['Name on PAN does not match your bank account. Fix it to keep bidding.']
+        fix:
+          type: [array, 'null']
+          description: Steps that need fixing when `action_needed`.
+          items: { type: string, enum: [pan, id, payout, gst] }
+        submittedAt: { type: string, format: date-time }
+        verifiedAt: { type: string, format: date-time }
+    Job:
+      type: object
+      required: [id, brand, brandInitials, title, platform, format, category, budget, deadline, city, remote, languages, bids, posted, match, reasons, deliverables, brief, min, usage, saved, hidden]
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [open, hired] }
+        brand: { type: string }
+        brandInitials: { type: string, examples: [MS] }
+        title: { type: string }
+        platform: { $ref: '#/components/schemas/Platform' }
+        format: { $ref: '#/components/schemas/JobFormat' }
+        category: { type: string }
+        budget: { $ref: '#/components/schemas/Paise' }
+        deadline: { type: string, format: date }
+        city: { type: string, description: "A city name, or `Any city`." }
+        remote: { type: boolean }
+        languages:
+          type: array
+          items: { type: string }
+        bids: { type: integer, description: Live count that leaves out withdrawn bids. }
+        posted: { type: string, format: date-time }
+        match: { type: integer, minimum: 0, maximum: 100, description: Computed per creator. }
+        reasons:
+          type: array
+          description: Why this job matches, shown on the card. Computed per creator.
+          items: { type: string }
+        deliverables:
+          type: array
+          items: { type: string }
+        brief: { type: string }
+        min:
+          type: string
+          description: Eligibility text. The frontend parses this, so a structured field would be better.
+          examples: [Min 50K followers]
+        usage: { type: string, examples: [Brand can repost for 30 days] }
+        saved: { type: boolean }
+        hidden: { type: boolean }
+    BidStatus:
+      type: string
+      enum: [submitted, viewed, accepted, rejected, withdrawn, completed]
+    BidCreate:
+      type: object
+      required: [jobId, price, why, postDate, links]
+      properties:
+        jobId: { type: string }
+        price:
+          $ref: '#/components/schemas/Paise'
+          description: From `bidRules.minPaise` up to the job budget plus `overBudgetPct`.
+        why: { type: string, description: Trimmed length from `whyMin` to `whyMax`. }
+        postDate: { type: string, format: date, description: From tomorrow up to the job deadline. }
+        views: { type: [integer, 'null'], minimum: 0, maximum: 100000000, description: Expected views. Optional. }
+        links:
+          type: array
+          description: Unique links to similar work. Reject javascript, data and file schemes.
+          minItems: 1
+          maxItems: 5
+          items: { type: string }
+    Bid:
+      type: object
+      description: Carries its own job summary, because a bid can outlive its job listing.
+      required: [id, jobId, brand, title, platform, format, price, status, sent, note, postDate]
+      properties:
+        id: { type: string }
+        jobId: { type: string }
+        brand: { type: string }
+        title: { type: string }
+        platform: { $ref: '#/components/schemas/Platform' }
+        format: { $ref: '#/components/schemas/JobFormat' }
+        price: { $ref: '#/components/schemas/Paise' }
+        status: { $ref: '#/components/schemas/BidStatus' }
+        sent: { type: string, format: date-time }
+        note: { type: string, examples: [Waiting for the brand to review.] }
+        postDate: { type: string, format: date }
+        withdrawnBy: { type: string, enum: [you, brand, linkloom] }
+        withdrawnAt: { type: string, format: date-time }
+        views: { type: [integer, 'null'] }
+        why: { type: string }
+        links:
+          type: array
+          items: { type: string }
+        feedback:
+          type: object
+          required: [rating, at]
+          properties:
+            rating: { type: integer, minimum: 1, maximum: 5 }
+            text: { type: string }
+            at: { type: string, format: date-time }
+    WorkUpload:
+      type: object
+      required: [name, sizeBytes, at]
+      properties:
+        name: { type: string }
+        sizeBytes: { type: integer }
+        at: { type: string, format: date-time }
+        url: { type: string, format: uri }
+    Work:
+      type: object
+      required: [id, jobId, brand, title, platform, format, price, stage, pay, due, uploads, deliverables, threadId, revisionsIncluded, brief, usage, languages, accepted, funded, draftDue, log]
+      properties:
+        id: { type: string }
+        jobId: { type: string }
+        bidId: { type: string }
+        brand: { type: string }
+        title: { type: string }
+        platform: { $ref: '#/components/schemas/Platform' }
+        format: { $ref: '#/components/schemas/JobFormat' }
+        price: { $ref: '#/components/schemas/Paise' }
+        stage:
+          type: string
+          enum: [kickoff, in_progress, submitted, revision, review, approved]
+        pay:
+          type: string
+          description: Separate from stage on purpose.
+          enum: [escrow, released]
+        due: { type: string, format: date }
+        draftDue: { type: string, format: date }
+        uploads:
+          type: array
+          items: { $ref: '#/components/schemas/WorkUpload' }
+        deliverables:
+          type: array
+          items: { type: string }
+        threadId: { type: string }
+        revisionsIncluded: { type: integer }
+        revision: { type: string, description: The brand's revision note. }
+        revisionAt: { type: string, format: date-time }
+        draftOk: { type: boolean, description: "The brand approved the draft, so the creator can post it." }
+        liveUrl: { type: string }
+        brief: { type: string }
+        usage: { type: string }
+        languages:
+          type: array
+          items: { type: string }
+        accepted: { type: string, format: date-time }
+        funded: { type: string, format: date-time }
+        log:
+          type: array
+          items:
+            type: object
+            required: [at, kind]
+            properties:
+              at: { type: string, format: date-time }
+              kind:
+                type: string
+                enum: [accepted, funded, kickoff, upload, revision, draftok, live, approved]
+              file: { type: string, description: Only on `upload`. }
+    Message:
+      type: object
+      required: [id, from, at, text]
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        from: { type: string, enum: [me, brand, sys] }
+        at: { type: string, format: date-time }
+        text: { type: string }
+        status:
+          type: string
+          description: Only on the creator's own messages.
+          enum: [sent, delivered]
+    Thread:
+      type: object
+      required: [id, brand, brandInitials, workId, unread, blocked]
+      properties:
+        id: { type: string }
+        brand: { type: string }
+        brandInitials: { type: string }
+        workId: { type: string }
+        unread: { type: integer }
+        blocked: { type: boolean }
+        lastMessage: { $ref: '#/components/schemas/Message' }
+        reportedAt: { type: string, format: date-time }
+    EarningsSummary:
+      type: object
+      required: [readyToWithdraw, clearing, cleared, withdrawn, earned, inEscrow]
+      properties:
+        readyToWithdraw: { $ref: '#/components/schemas/Paise', description: cleared − withdrawn. }
+        clearing: { $ref: '#/components/schemas/Paise', description: Sum of pending ledger rows. }
+        cleared: { $ref: '#/components/schemas/Paise', description: Sum of paid ledger rows. }
+        withdrawn: { $ref: '#/components/schemas/Paise', description: Sum of paid and processing withdrawals. }
+        earned: { $ref: '#/components/schemas/Paise', description: cleared + clearing. }
+        inEscrow: { $ref: '#/components/schemas/Paise', description: Price of work with `pay = escrow`. }
+    LedgerStatus:
+      type: string
+      enum: [paid, pending, failed]
+    LedgerEntry:
+      type: object
+      required: [id, date, brand, job, amount, status]
+      properties:
+        id: { type: string }
+        date: { type: string, format: date }
+        brand: { type: string }
+        job: { type: string, description: The job title. }
+        amount: { $ref: '#/components/schemas/Paise' }
+        status: { $ref: '#/components/schemas/LedgerStatus' }
+        clears: { type: string, format: date, description: Only when pending. }
+        reason: { type: string, description: Only when failed. }
+    PayoutMethod:
+      type: object
+      required: [id, kind, label, note]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [UPI, Bank] }
+        label: { type: string, examples: [HDFC Bank ••••4821] }
+        note: { type: string, examples: ['IMPS, usually within a few hours'] }
+    Withdrawal:
+      type: object
+      required: [id, amount, method, date, status, ref]
+      properties:
+        id: { type: string }
+        amount: { $ref: '#/components/schemas/Paise' }
+        method: { type: string, examples: ['UPI ananya••••@upi'] }
+        date: { type: string, format: date }
+        status: { type: string, enum: [processing, paid, failed] }
+        ref: { type: string, description: "The UTR once sent, or why it was not sent.", examples: [UTR 430918274405] }
+        reason: { type: string, description: Only when failed. }
+    Plan:
+      type: object
+      required: [name, status, since, renews]
+      properties:
+        name: { type: string, examples: [Creator plan] }
+        status: { type: string, enum: [active] }
+        since: { type: string, format: date }
+        renews: { type: string, format: date }
+    Notification:
+      type: object
+      required: [id, at, text, go, read]
+      properties:
+        id: { type: string }
+        at: { type: string, format: date-time }
+        text: { type: string }
+        go:
+          type: string
+          description: In-app link. One of `#work-{workId}`, `#bids`, `#chat-{threadId}`, `#earnings`, `#kyc`.
+          examples: ['#work-a3']
+        read: { type: boolean }
+    Page:
+      type: object
+      required: [nextCursor]
+      properties:
+        nextCursor: { type: [string, 'null'] }

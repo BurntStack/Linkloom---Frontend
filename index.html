@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Linkloom</title>
+<meta name="description" content="Linkloom: brands post a brief, creators bid in a minute, and escrow holds the money until the work is approved.">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Faculty+Glyphic&family=Figtree:wght@400;500;600;700&family=Mynerve&display=swap">
+</head>
+<body>
+<div class="ll-cur" aria-hidden="true"><div class="ll-cur-in"><span class="ll-cur-dot"></span><span class="ll-cur-txt"></span></div></div>
+
+<header class="hdr" id="hdr">
+  <a class="hbox hlogo" href="#top" aria-label="Linkloom home"><img src="assets/logo-mark.svg" width="32" height="32" alt=""><span>linkloom</span></a>
+  <nav class="hbox hnav" aria-label="Main">
+    <a href="#sides" data-pick-side="creator">For creators</a>
+    <a href="#sides" data-pick-side="brand">For brands</a>
+    <a href="#how">How it works</a>
+  </nav>
+  <div class="hbox hgreet" aria-hidden="true"><p id="greet">Good evening from India</p></div>
+  <div class="hright">
+    <a class="hbox hsign" href="signin.html">Sign in</a>
+    <a class="lq lq-p" href="signin.html?join=1"><span class="t">Get started</span><span class="t2" aria-hidden="true">Get started</span></a>
+  </div>
+</header>
+
+<main id="top">
+<!-- ── part: hero ── -->
+<!-- Hero: P2 stripe shader, blur-rise headline with the inline ring pill, sub copy, two buttons -->
+<section class="sec dark hx" id="hero" aria-labelledby="hxH">
+  <canvas class="hx-bg" aria-hidden="true"></canvas>
+  <div class="hx-fb" aria-hidden="true"></div>
+  <div class="in hx-in">
+    <h1 class="hx-h" id="hxH" data-reveal="now" data-reveal-delay=".2">Creators and<br class="hx-bm"> brands<br class="hx-bd"> <span class="hx-pill" aria-hidden="true"><span class="hx-knot"><i class="hx-r hx-rc"></i><i class="hx-r hx-rv"></i><i class="hx-r hx-rc hx-rc2"></i></span></span><br class="hx-bm"> weave work<br> that pays.</h1>
+    <div class="hx-foot" data-hx-in>
+      <p class="hx-sub">Brands post a brief. Creators bid in a minute. Escrow holds the money until the work is approved.</p>
+      <div class="hx-ctas">
+        <a class="lq lq-p" href="app.html#home">I'm a creator</a>
+        <a class="lq lq-s" href="brand.html#home">I'm a brand</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── part: steps ── -->
+<!-- Steps (v5): header row + a horizontal scroll-snap rail of six cards. No sticky column, no thread. -->
+<section class="sec dark st" id="how" aria-labelledby="stH">
+  <div class="in st-in">
+    <h2 class="st-h" id="stH" data-reveal>From brief to paid.</h2>
+    <div class="st-lede">
+      <p class="st-sub">Six steps, one shared timeline. Creator and brand see the same deal, from the first brief to the final payout.</p>
+      <p class="sample">Mirevo, Ananya and the amounts shown are samples.</p>
+    </div>
+    <div class="st-ctl">
+      <p class="st-pos" aria-live="polite"><span class="st-pos-n">1</span> / 6</p>
+      <button class="lq lq-s st-nav" type="button" data-dir="-1" aria-controls="stRail" aria-label="Previous step" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button>
+      <button class="lq lq-s st-nav" type="button" data-dir="1" aria-controls="stRail" aria-label="Next step"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></button>
+    </div>
+
+    <div class="st-railbox">
+      <ol class="st-rail" id="stRail" aria-label="The six steps of a deal">
+
+        <li class="st-card" tabindex="0" aria-labelledby="st-t1">
+          <div class="st-stage">
+            <div class="st-art" aria-hidden="true"><div class="st-fit"><div class="art m-envelope"><img class="full" src="assets/step-01-envelope.svg" width="300" height="220" alt=""></div></div></div>
+            <div class="st-ui st-fields" role="group" aria-label="Brief">
+              <p><span>Budget</span><b>₹18,000</b></p>
+              <p><span>Platform</span><b>Reel</b></p>
+              <p><span>Deadline</span><b>12 Dec</b></p>
+            </div>
+          </div>
+          <p class="st-n">01</p>
+          <h3 class="st-tt" id="st-t1"><svg class="st-ar" viewBox="0 0 40 16" aria-hidden="true"><path d="M1 8h37M31 1.5 38 8l-7 6.5"/></svg><span>Post a brief</span></h3>
+          <p class="st-tx">Set the budget, platform and deadline. Or skip the wait and invite a creator directly.</p>
+        </li>
+
+        <li class="st-card" tabindex="0" aria-labelledby="st-t2">
+          <div class="st-stage">
+            <div class="st-art" aria-hidden="true"><div class="st-fit"><div class="art">
+              <div class="p-trail m-trail"><img src="assets/step-02-trail.svg" width="163" height="101" alt=""></div>
+              <div class="p-plane m-plane"><img src="assets/step-02-plane.svg" width="72" height="72" alt=""></div>
+              <div class="p-chip m-chip"><img class="bg" src="assets/step-02-chip.svg" width="112" height="36" alt=""><div class="rupee"><img src="assets/step-02-chip-rupee.svg" width="14" height="18" alt=""></div><span class="amt">18,000</span></div>
+            </div></div></div>
+            <div class="st-ui st-fields" role="group" aria-label="Bid">
+              <p><span>Post date</span><b>12 Dec</b></p>
+              <p><span>Past work</span><b>3 links</b></p>
+              <span class="st-pill">Send bid</span>
+            </div>
+          </div>
+          <p class="st-n">02</p>
+          <h3 class="st-tt" id="st-t2"><svg class="st-ar" viewBox="0 0 40 16" aria-hidden="true"><path d="M1 8h37M31 1.5 38 8l-7 6.5"/></svg><span>Bid in a minute</span></h3>
+          <p class="st-tx">Creators send a price, a post date and past work. ID is checked once, at the first bid.</p>
+        </li>
+
+        <li class="st-card" tabindex="0" aria-labelledby="st-t3">
+          <div class="st-stage">
+            <div class="st-art" aria-hidden="true"><div class="st-fit"><div class="art m-lock"><img class="full" src="assets/step-03-lock.svg" width="300" height="220" alt=""></div></div></div>
+            <div class="st-ui st-split" role="group" aria-label="Escrow">
+              <p class="st-amt">₹18,000</p>
+              <span class="st-held">Held by Linkloom</span>
+            </div>
+          </div>
+          <p class="st-n">03</p>
+          <h3 class="st-tt" id="st-t3"><svg class="st-ar" viewBox="0 0 40 16" aria-hidden="true"><path d="M1 8h37M31 1.5 38 8l-7 6.5"/></svg><span>Lock it in escrow</span></h3>
+          <p class="st-tx">The brand pays in, Linkloom holds it, and chat unlocks for both sides.</p>
+        </li>
+
+        <li class="st-card" tabindex="0" aria-labelledby="st-t4">
+          <div class="st-stage">
+            <div class="st-art" aria-hidden="true"><div class="st-fit"><div class="art m-orbit"><img class="full" src="assets/step-04-orbit.svg" width="300" height="220" alt=""></div></div></div>
+            <ol class="st-ui st-track" aria-label="Job stages">
+              <li class="is-done">Kickoff</li>
+              <li class="is-done">Upload</li>
+              <li class="is-now" aria-current="step">Review</li>
+            </ol>
+          </div>
+          <p class="st-n">04</p>
+          <h3 class="st-tt" id="st-t4"><svg class="st-ar" viewBox="0 0 40 16" aria-hidden="true"><path d="M1 8h37M31 1.5 38 8l-7 6.5"/></svg><span>Create</span></h3>
+          <p class="st-tx">Kickoff, upload, review. Every stage tracked in one place, with chat alongside.</p>
+        </li>
+
+        <li class="st-card" tabindex="0" aria-labelledby="st-t5">
+          <div class="st-stage">
+            <div class="st-art" aria-hidden="true"><div class="st-fit"><div class="art m-stamp"><img class="full" src="assets/step-05-stamp.svg" width="300" height="220" alt=""></div></div></div>
+            <div class="st-ui st-acts" role="group" aria-label="Review">
+              <span class="st-pill">Approve</span>
+              <span class="st-pill st-pill-o">Ask for a revision</span>
+            </div>
+          </div>
+          <p class="st-n">05</p>
+          <h3 class="st-tt" id="st-t5"><svg class="st-ar" viewBox="0 0 40 16" aria-hidden="true"><path d="M1 8h37M31 1.5 38 8l-7 6.5"/></svg><span>Sign it off</span></h3>
+          <p class="st-tx">Approve the work or ask for a revision. The money stays put until you do.</p>
+        </li>
+
+        <li class="st-card st-pay" tabindex="0" aria-labelledby="st-t6">
+          <div class="st-stage">
+            <div class="st-art" aria-hidden="true"><div class="st-fit"><div class="art m-coins"><img class="full" src="assets/step-06-coins.svg" width="300" height="220" alt=""></div></div></div>
+            <div class="st-ui st-slip" role="group" aria-label="Payout slip">
+              <p class="st-row"><span>Platform fee</span><b>None, Linkloom is a subscription</b></p>
+              <p class="st-row"><span>Tax / withholding</span><b>As per confirmed rules</b></p>
+              <p class="st-row st-recv"><span>You receive</span><b><span data-st-pay="net">₹18,000</span><small> − tax</small></b></p>
+            </div>
+          </div>
+          <p class="st-n">06</p>
+          <h3 class="st-tt" id="st-t6"><svg class="st-ar" viewBox="0 0 40 16" aria-hidden="true"><path d="M1 8h37M31 1.5 38 8l-7 6.5"/></svg><span>Get paid</span></h3>
+          <p class="st-tx">Funds release to UPI or bank: the full agreed price, no platform fee.</p>
+        </li>
+
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ── part: sides ── -->
+<section class="sec sd light" id="sides" data-side="creator" aria-labelledby="sdH">
+
+  <!-- 1. Entrance: funkhaus P13 colour flip. The ink layer holds the real heading; the paper layer is a
+       duplicate whose clip-path edge is scrubbed upward, so the headline repaints exactly along that edge. -->
+  <div class="sd-flip">
+    <div class="sd-pin">
+      <div class="sd-lay sd-lay-ink">
+        <div class="sd-hw">
+          <p class="eyebrow sd-eb0">Two sides</p>
+          <h2 class="sd-hl" id="sdH"><span class="sd-l">One deal. <span class="sd-ip" aria-hidden="true"><img class="sd-ipc" src="assets/dot-creator.svg" width="10" height="10" alt=""><img class="sd-ipb" src="assets/dot-brand.svg" width="10" height="10" alt=""></span></span> <span class="sd-l">Two sides.</span><br class="sd-br"> Nobody chasing payments.</h2>
+        </div>
+      </div>
+      <div class="sd-lay sd-lay-paper" aria-hidden="true">
+        <div class="sd-hw">
+          <p class="eyebrow sd-eb0">Two sides</p>
+          <p class="sd-hl"><span class="sd-l">One deal. <span class="sd-ip"><img class="sd-ipc" src="assets/dot-creator.svg" width="10" height="10" alt=""><img class="sd-ipb" src="assets/dot-brand.svg" width="10" height="10" alt=""></span></span> <span class="sd-l">Two sides.</span><br class="sd-br"> Nobody chasing payments.</p>
+        </div>
+      </div>
+      <i class="sd-edge" aria-hidden="true"></i>
+      <i class="sd-hdrmark" data-hdr="light" aria-hidden="true"></i>
+      <div class="sd-float sd-float-c" aria-hidden="true">
+        <div class="sd-fl-top"><p class="sd-fl-eb">Creator side</p><span class="sd-fl-ic"><img src="assets/icon-instagram.svg" width="22" height="22" alt=""></span></div>
+        <div><p class="sd-fl-lb">Your bid</p><p class="sd-fl-amt">₹18,000</p></div>
+        <div class="sd-fl-bot"><span>Mirevo Skincare</span><span class="sample">Sample</span></div>
+      </div>
+      <div class="sd-float sd-float-b" aria-hidden="true">
+        <div class="sd-fl-top"><p class="sd-fl-eb">Brand side</p><span class="sd-fl-ic"><i class="sd-lock"></i></span></div>
+        <div><p class="sd-fl-lb">Into escrow</p><p class="sd-fl-amt">₹18,000</p></div>
+        <div class="sd-fl-bot"><span>Released on approval</span><span class="sample">Sample</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Deal stage on paper: one deal card, two faces -->
+  <div class="sd-deal" id="sdDeal" data-hdr="light">
+    <div class="sd-in">
+      <div class="sd-switch" role="tablist" aria-label="Show the deal as">
+        <span class="sd-thumb" aria-hidden="true"></span>
+        <button class="sd-tab" type="button" role="tab" id="sdTabC" aria-controls="sdStage" aria-selected="true" data-s="creator">I'm a creator</button>
+        <button class="sd-tab" type="button" role="tab" id="sdTabB" aria-controls="sdStage" aria-selected="false" tabindex="-1" data-s="brand">I'm a brand</button>
+      </div>
+
+      <div class="sd-stage" id="sdStage" role="tabpanel" aria-labelledby="sdTabC">
+        <div class="sd-flood" aria-hidden="true"><i class="sd-fld sd-fld-c"></i><i class="sd-fld sd-fld-b"></i></div>
+
+        <div class="sd-copy">
+          <div class="sd-side" data-for="creator">
+            <p class="eyebrow sd-eb">For creators</p>
+            <h3 class="sd-h3">Brand deals, paid on time.</h3>
+            <ul class="sd-feats">
+              <li><span class="sd-dot"><img src="assets/dot-creator.svg" width="10" height="10" alt=""></span>Jobs matched to your niche, city and language</li>
+              <li><span class="sd-dot"><img src="assets/dot-creator.svg" width="10" height="10" alt=""></span>ID checked once, never shown to brands</li>
+              <li><span class="sd-dot"><img src="assets/dot-creator.svg" width="10" height="10" alt=""></span>Every job stage and chat in one place</li>
+              <li><span class="sd-dot"><img src="assets/dot-creator.svg" width="10" height="10" alt=""></span>Withdraw to UPI or bank, the full agreed price</li>
+            </ul>
+            <a class="lq lq-p sd-cta" href="app.html#home">Join as a creator</a>
+          </div>
+          <div class="sd-side sd-off" data-for="brand" inert aria-hidden="true">
+            <p class="eyebrow sd-eb">For brands</p>
+            <h3 class="sd-h3">Right creator. Safe payment.</h3>
+            <ul class="sd-feats">
+              <li><span class="sd-dot"><img src="assets/dot-brand.svg" width="10" height="10" alt=""></span>Filter by niche, city, language, followers and price</li>
+              <li><span class="sd-dot"><img src="assets/dot-brand.svg" width="10" height="10" alt=""></span>Hire directly, or post a job and compare bids</li>
+              <li><span class="sd-dot"><img src="assets/dot-brand.svg" width="10" height="10" alt=""></span>Pay into escrow. Release only on approval</li>
+              <li><span class="sd-dot"><img src="assets/dot-brand.svg" width="10" height="10" alt=""></span>Reports on spend, views and every creator</li>
+            </ul>
+            <a class="lq lq-p sd-cta" href="brand.html#home">Start hiring</a>
+          </div>
+        </div>
+
+        <div class="sd-right">
+          <div class="sd-card">
+            <div class="sd-card-in">
+
+              <!-- front: the creator sees the brief and bids -->
+              <article class="sd-face sd-front" aria-label="Sample brief from Mirevo Skincare">
+                <div class="sd-fh">
+                  <span class="sd-src"><img src="assets/icon-instagram.svg" width="20" height="20" alt="">Mirevo Skincare · Instagram</span>
+                  <span class="sample">Sample</span>
+                </div>
+                <h4 class="sd-title">Barrier Repair Serum launch</h4>
+                <p class="sd-meta">1 Reel · Budget ₹18,000</p>
+                <ul class="sd-tags" aria-label="Brief matches your profile">
+                  <li><img src="assets/dot-creator.svg" width="10" height="10" alt="">Skincare</li>
+                  <li><img src="assets/dot-creator.svg" width="10" height="10" alt="">Mumbai</li>
+                  <li><img src="assets/dot-creator.svg" width="10" height="10" alt="">Hindi or English</li>
+                </ul>
+                <div class="sd-bid">
+                  <label class="sd-lab" for="sdBid">Your bid</label>
+                  <div class="sd-field">
+                    <span class="sd-cur" aria-hidden="true">₹</span>
+                    <input class="sd-in-bid" id="sdBid" type="text" inputmode="numeric" autocomplete="off" maxlength="9" value="18,000" aria-describedby="sdNet sdFine">
+                    <button class="sd-step" type="button" data-step="-500" aria-label="Lower bid by ₹500">−</button>
+                    <button class="sd-step" type="button" data-step="500" aria-label="Raise bid by ₹500">+</button>
+                  </div>
+                  <p class="sd-net" id="sdNet">You'd receive <b id="sdNetV">₹18,000</b> − tax <span class="sd-ex">(the agreed price, no platform fee)</span></p>
+                  <p class="sd-fine" id="sdFine">No platform fee<span id="sdFeeV" hidden></span>. Tax as per confirmed rules.</p>
+                </div>
+                <div class="sd-act">
+                  <button class="lq lq-p sd-send" id="sdSend" type="button">Send bid</button>
+                  <span class="sd-chip" id="sdChip" data-tone="draft"><span>Draft</span></span>
+                </div>
+                <p class="sd-next" id="sdNext">Next: Mirevo compares bids and pays the one it accepts into escrow.</p>
+              </article>
+
+              <!-- back: the brand compares bids on the same brief -->
+              <article class="sd-face sd-back" aria-label="Sample bids on the Mirevo brief" inert>
+                <div class="sd-fh">
+                  <span class="sd-src">Bids on your brief</span>
+                  <span class="sample">Sample</span>
+                </div>
+                <h4 class="sd-title">Barrier Repair Serum launch</h4>
+                <div class="sd-sort" role="group" aria-label="Sort bids by">
+                  <span class="sd-lab" aria-hidden="true">Sort</span>
+                  <button class="sd-sb" type="button" data-key="price" aria-pressed="false">Price</button>
+                  <button class="sd-sb" type="button" data-key="eng" aria-pressed="true">Engagement</button>
+                  <button class="sd-sb" type="button" data-key="fol" aria-pressed="false">Followers</button>
+                </div>
+                <ol class="sd-bids" id="sdBids">
+                  <li class="sd-row sd-pro" data-price="18000" data-eng="6.8" data-fol="182000">
+                    <span class="sd-av sd-av-c" aria-hidden="true">AI</span>
+                    <div class="sd-who"><b>Ananya Iyer</b><span>@ananyamakes · Mumbai · Skincare</span></div>
+                    <b class="sd-price">₹18,000</b>
+                    <div class="sd-stats"><span><b>182K</b> Instagram</span><span><b>41K</b> YouTube</span><span><b>6.8%</b> Engagement</span></div>
+                    <button class="sd-acc" type="button" aria-pressed="false" data-name="Ananya Iyer" data-price="18000"><i class="sd-lock" aria-hidden="true"></i><span class="sd-acc-t"><span>Accept</span></span></button>
+                  </li>
+                  <li class="sd-row" data-price="14500" data-eng="5.2" data-fol="96000">
+                    <span class="sd-av sd-av-b" aria-hidden="true">KS</span>
+                    <div class="sd-who"><b>Kabir Sethi</b><span>@kabirskinlab · Pune</span></div>
+                    <b class="sd-price">₹14,500</b>
+                    <div class="sd-stats"><span><b>96K</b> Instagram</span><span><b>5.2%</b> Engagement</span></div>
+                    <button class="sd-acc" type="button" aria-pressed="false" data-name="Kabir Sethi" data-price="14500"><i class="sd-lock" aria-hidden="true"></i><span class="sd-acc-t"><span>Accept</span></span></button>
+                  </li>
+                  <li class="sd-row" data-price="24000" data-eng="4.1" data-fol="240000">
+                    <span class="sd-av sd-av-y" aria-hidden="true">MP</span>
+                    <div class="sd-who"><b>Meera Pillai</b><span>@meeraglows · Kochi</span></div>
+                    <b class="sd-price">₹24,000</b>
+                    <div class="sd-stats"><span><b>240K</b> Instagram</span><span><b>4.1%</b> Engagement</span></div>
+                    <button class="sd-acc" type="button" aria-pressed="false" data-name="Meera Pillai" data-price="24000"><i class="sd-lock" aria-hidden="true"></i><span class="sd-acc-t"><span>Accept</span></span></button>
+                  </li>
+                </ol>
+              </article>
+
+            </div>
+          </div>
+
+          <ul class="sd-bubbles" aria-hidden="true">
+            <li class="sd-bub sd-b1" data-for="creator" style="--d:0"><i>M</i>New brief · Reel · ₹18,000</li>
+            <li class="sd-bub sd-b2" data-for="creator" style="--d:1"><i>M</i>Can you post by 12 Dec?</li>
+            <li class="sd-bub sd-b3 sd-me sd-bx" data-for="creator" id="sdBubBid"><i>You</i><span>Bid sent · ₹18,000</span></li>
+            <li class="sd-bub sd-b4" data-for="brand" style="--d:0"><i>3</i>New bids on your brief</li>
+            <li class="sd-bub sd-b5" data-for="brand" style="--d:1"><i>AI</i>Love this, I'm in!</li>
+            <li class="sd-bub sd-b6 sd-me sd-bx" data-for="brand" id="sdBubEsc"><i class="sd-lock-w"><b class="sd-lock"></b></i><span>Escrow funded · ₹18,000</span></li>
+          </ul>
+          <p class="note sd-note sd-note-c" data-for="creator">Best match</p>
+          <p class="note sd-note sd-note-b" data-for="brand">Sample profile</p>
+        </div>
+      </div>
+      <p class="sr-only" id="sdLive" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ── part: trust ── -->
+<!-- Trust (v5): static two-line headline, escrow track (tap to move, refund branch), payout copy + ink receipt calculator -->
+<section class="sec butter tr sheet" id="trust" data-hdr="light" aria-labelledby="trH">
+  <div class="in tr-in">
+
+    <div class="tr-head">
+      <h2 class="tr-h" id="trH" data-reveal><span class="tr-l">Money moves only</span> <span class="tr-l">when work does.</span></h2>
+      <p class="body-l tr-intro">Sample deal: Mirevo Skincare pays Ananya Iyer ₹18,000 for one Instagram Reel. Tap a step to see what each side sees.</p>
+    </div>
+
+    <!-- escrow track: the coin rests on step 1 and moves only when a step is chosen -->
+    <div class="tr-track" id="trTrack" role="group" aria-label="Escrow steps for the sample deal">
+      <button class="tr-node" type="button" data-i="0" aria-controls="trCap" aria-current="step">
+        <span class="tr-n">01</span><span class="tr-nt">Brand pays in</span><span class="tr-rail"><span class="tr-rl"></span><span class="tr-dot"></span></span>
+      </button>
+      <button class="tr-node" type="button" data-i="1" aria-controls="trCap">
+        <span class="tr-n">02</span><span class="tr-nt">Linkloom holds it</span><span class="tr-rail"><span class="tr-rl"></span><span class="tr-dot"></span></span>
+      </button>
+      <button class="tr-node" type="button" data-i="2" aria-controls="trCap">
+        <span class="tr-n">03</span><span class="tr-nt">Work approved</span><span class="tr-rail"><span class="tr-rl"></span><span class="tr-dot"></span></span>
+      </button>
+      <button class="tr-node" type="button" data-i="3" aria-controls="trCap">
+        <span class="tr-n">04</span><span class="tr-nt">Paid to UPI or bank</span><span class="tr-rail"><span class="tr-rl"></span><span class="tr-dot"></span><span class="tr-arr"></span></span>
+      </button>
+      <button class="tr-node tr-node-r" type="button" data-i="4" aria-controls="trCap" disabled>
+        <span class="tr-rail"><span class="tr-rl"></span><span class="tr-dot"></span></span><span class="tr-nt">Refunded to brand</span>
+      </button>
+      <button class="tr-sw" id="trRefund" type="button" role="switch" aria-checked="false">
+        <span class="tr-sw-k" aria-hidden="true"></span><span>What if the work never arrives?</span>
+      </button>
+
+      <div class="tr-cap" id="trCap" aria-live="polite">
+        <p class="sr-only" id="trCapStep">Step 1 of 4, brand pays in.</p>
+        <div class="tr-cap-col tr-cap-b"><span class="tr-who">Brand sees</span><b>₹18,000 paid in</b><span class="tr-cap-x">It goes into escrow, not straight to the creator.</span></div>
+        <div class="tr-cap-col tr-cap-c"><span class="tr-who">Creator sees</span><b>Bid accepted</b><span class="tr-cap-x">Work starts once Mirevo has paid in.</span></div>
+      </div>
+
+      <svg class="tr-svg" aria-hidden="true" focusable="false"><path class="tr-br-ghost" d=""/><path class="tr-br" d="" pathLength="1"/><path class="tr-prog" d=""/></svg>
+      <span class="tr-tok" aria-hidden="true"><span>₹</span></span>
+    </div>
+
+    <!-- payout: copy + the ink receipt as a live calculator -->
+    <div class="tr-pay">
+      <div class="tr-pay-copy">
+        <h3 class="h1" data-reveal>No surprises at payout</h3>
+        <p class="body-l">See exactly what lands in your account before you tap withdraw.</p>
+      </div>
+
+      <div class="tr-calc-wrap">
+        <form class="tr-calc" id="trCalc" aria-labelledby="trCalcH" novalidate>
+          <div class="tr-calc-h"><span id="trCalcH">Payout slip</span><span class="tr-ex">Example</span></div>
+
+          <div class="tr-calc-l">
+            <label class="tr-price-l" for="trPrice">Agreed price</label>
+            <div class="tr-price-in"><span class="tr-rs" aria-hidden="true">₹</span><input id="trPrice" name="price" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" value="18,000" aria-describedby="trRangeHint"></div>
+            <input class="tr-range" id="trRange" type="range" min="1000" max="200000" step="500" value="18000" aria-label="Agreed price slider" aria-valuetext="₹18,000">
+            <p class="tr-range-h" id="trRangeHint"><span>₹1,000</span><span>₹2,00,000</span></p>
+            <div class="tr-chips" role="group" aria-label="Quick prices">
+              <button type="button" data-v="5000" aria-pressed="false">₹5k</button>
+              <button type="button" data-v="10000" aria-pressed="false">₹10k</button>
+              <button type="button" data-v="18000" aria-pressed="true">₹18k</button>
+              <button type="button" data-v="50000" aria-pressed="false">₹50k</button>
+            </div>
+            <div class="tr-dest">
+              <span class="tr-dest-l" id="trDestL">Paid to</span>
+              <div class="tr-seg" role="radiogroup" aria-labelledby="trDestL">
+                <button type="button" role="radio" aria-checked="true" data-d="upi">UPI</button>
+                <button type="button" role="radio" aria-checked="false" data-d="bank" tabindex="-1">Bank</button>
+              </div>
+              <span class="tr-handle" id="trHandle">ananya••••@upi</span>
+            </div>
+          </div>
+
+          <div class="tr-calc-r">
+            <dl class="tr-rows">
+              <div><dt>Agreed price</dt><dd id="trOutP">₹18,000</dd></div>
+              <div><dt>Platform fee <span class="tr-eg" hidden><span id="trRate"></span></span></dt><dd id="trOutFee">None</dd></div>
+              <div><dt>Tax / withholding</dt><dd>As per confirmed rules</dd></div>
+            </dl>
+            <div class="tr-recv"><span>You receive</span><span class="tr-net"><span id="trOutNet">₹18,000</span> − tax</span></div>
+            <span class="tr-escrow">Released from escrow on approval</span>
+          </div>
+          <p class="sr-only" id="trSay" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── part: platforms ── -->
+<!-- Platforms: funkhaus P8 banner rows that flood with a curved colour front; each opens a format drawer with a morphing device frame -->
+<section class="sec light sheet pf" id="platforms" data-hdr="light" aria-labelledby="pf-title">
+  <div class="in pf-head">
+    <h2 class="display-l pf-title" id="pf-title" data-reveal>Built for the platforms India creates on.</h2>
+    <p class="body-l pf-lede">Open a platform, then pick a format to see what a brief for it looks like. Every brief, name and budget shown here is a sample.</p>
+  </div>
+
+  <div class="pf-rows">
+    <!-- ── Instagram ── -->
+    <div class="pf-item pf-ig" data-pf="ig">
+      <h3 class="pf-h">
+        <button class="pf-row" id="pf-r-ig" type="button" aria-expanded="false" aria-controls="pf-d-ig">
+          <span class="pf-run" aria-hidden="true"><span class="pf-track" data-run="Reels|Posts|Stories" data-ico="assets/icon-instagram.svg"></span></span>
+          <span class="pf-box">
+            <span class="pf-roll">
+              <span class="pf-lab"><img class="pf-ico" src="assets/icon-instagram.svg" width="32" height="32" alt=""><span class="pf-name">Instagram</span></span>
+              <span class="pf-fl">Reels · Posts · Stories</span>
+              <span class="pf-tog" aria-hidden="true"><i></i></span>
+            </span>
+          </span>
+        </button>
+      </h3>
+      <div class="pf-drawer" id="pf-d-ig" role="region" aria-labelledby="pf-r-ig" hidden>
+        <div class="pf-dr">
+          <div class="pf-dr-in">
+            <div class="pf-side">
+              <div class="pf-tabs" role="tablist" aria-label="Instagram formats">
+                <i class="pf-ind" aria-hidden="true"></i>
+                <button class="pf-tab" role="tab" type="button" id="pf-t-reel" aria-selected="true" aria-controls="pf-p-ig" data-f="reel">Reels</button>
+                <button class="pf-tab" role="tab" type="button" id="pf-t-post" aria-selected="false" aria-controls="pf-p-ig" data-f="post" tabindex="-1">Posts</button>
+                <button class="pf-tab" role="tab" type="button" id="pf-t-story" aria-selected="false" aria-controls="pf-p-ig" data-f="story" tabindex="-1">Stories</button>
+              </div>
+              <div class="pf-panel" role="tabpanel" id="pf-p-ig" aria-labelledby="pf-t-reel">
+                <p class="pf-fname">Reel</p>
+                <p class="pf-desc">Vertical 9:16 video for the Reels tab and the feed.</p>
+                <div class="pf-brief">
+                  <p class="pf-bwho">Brief from Mirevo Skincare</p>
+                  <p class="pf-bline">1 Reel&nbsp;· 30–&#8288;45&nbsp;s&nbsp;· product in first 3&nbsp;s&nbsp;· ₹18,000</p>
+                </div>
+                <a class="lq lq-s pf-cta" href="brand.html#post">Post a brief like this</a>
+              </div>
+            </div>
+
+            <div class="pf-stage" aria-hidden="true">
+              <div class="pf-guides"><i data-r="9:16" class="is-on"></i><i data-r="1:1"></i></div>
+              <div class="pf-device" data-shape="tall">
+                <i class="pf-island"></i>
+                <div class="pf-screen">
+                  <!-- Reel -->
+                  <div class="pf-mock pf-m-reel is-on" data-f="reel">
+                    <div class="pf-scene">
+                      <i class="pf-sun"></i>
+                      <i class="pf-bot"><i class="pf-bot-cap"></i><i class="pf-bot-body"><b>Mirevo</b></i></i>
+                    </div>
+                    <div class="pf-ui">
+                      <p class="pf-top">Reels</p>
+                      <p class="pf-rail"><span><i class="pf-heart"></i><small>4.1K</small></span><span><i class="pf-bub"></i><small>86</small></span><span><i class="pf-send"></i></span></p>
+                      <div class="pf-meta">
+                        <p class="pf-who"><i class="pf-av"></i><b>ananya.iyer</b></p>
+                        <p class="pf-cap">Day 14 with the barrier serum</p>
+                        <p class="pf-aud"><i class="pf-disc"></i>Original audio</p>
+                      </div>
+                      <p class="pf-prog"><i class="pf-prog-3"></i><i class="pf-prog-f"></i></p>
+                    </div>
+                  </div>
+                  <!-- Post -->
+                  <div class="pf-mock pf-m-post" data-f="post">
+                    <div class="pf-car"><div class="pf-car-t">
+                      <div class="pf-sl pf-sl1"><i class="pf-bot"><i class="pf-bot-cap"></i><i class="pf-bot-body"><b>Mirevo</b></i></i></div>
+                      <div class="pf-sl pf-sl2"><span><b>Day 1</b></span><span><b>Day 14</b></span></div>
+                      <div class="pf-sl pf-sl3"><p>3 things I noticed</p></div>
+                    </div></div>
+                    <div class="pf-ui">
+                      <p class="pf-who pf-chip"><i class="pf-av"></i><span class="pf-whot"><b>ananya.iyer</b><small>Paid partnership with mirevo</small></span></p>
+                      <p class="pf-cnt"><span>1/3</span><span>2/3</span><span>3/3</span></p>
+                      <p class="pf-likes"><i class="pf-heart"></i>2,481 likes</p>
+                      <p class="pf-dots"><i></i><i></i><i></i></p>
+                    </div>
+                  </div>
+                  <!-- Story -->
+                  <div class="pf-mock pf-m-story" data-f="story">
+                    <div class="pf-fr pf-fr1"><p class="pf-big">Day 1</p><p class="pf-sm">barrier check</p></div>
+                    <div class="pf-fr pf-fr2"><i class="pf-sun"></i><i class="pf-bot"><i class="pf-bot-cap"></i><i class="pf-bot-body"><b>Mirevo</b></i></i></div>
+                    <div class="pf-fr pf-fr3"><p class="pf-big">Day 14</p><p class="pf-link"><i class="pf-lnk"></i>Shop the serum</p></div>
+                    <div class="pf-ui">
+                      <p class="pf-segs"><i><b></b></i><i><b></b></i><i><b></b></i></p>
+                      <p class="pf-who"><i class="pf-av"></i><b>ananya.iyer</b><small>2h</small></p>
+                      <p class="pf-reply"><span>Send message</span><i class="pf-heart"></i><i class="pf-send"></i></p>
+                    </div>
+                  </div>
+                </div>
+                <p class="pf-note pf-n-reel is-on" data-f="reel">product in<br>the first 3 s<i class="pf-arc"></i></p>
+                <p class="pf-note pf-n-post" data-f="post">swipe for<br>3 slides<i class="pf-arc"></i></p>
+                <p class="pf-note pf-n-story" data-f="story">link sticker<br>on frame 3<i class="pf-arc"></i></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── YouTube ── -->
+    <div class="pf-item pf-yt" data-pf="yt">
+      <h3 class="pf-h">
+        <button class="pf-row" id="pf-r-yt" type="button" aria-expanded="false" aria-controls="pf-d-yt">
+          <span class="pf-run" aria-hidden="true"><span class="pf-track" data-run="Videos|Shorts" data-ico="assets/icon-youtube.svg"></span></span>
+          <span class="pf-box">
+            <span class="pf-roll">
+              <span class="pf-lab"><img class="pf-ico" src="assets/icon-youtube.svg" width="32" height="32" alt=""><span class="pf-name">YouTube</span></span>
+              <span class="pf-fl">Videos · Shorts</span>
+              <span class="pf-tog" aria-hidden="true"><i></i></span>
+            </span>
+          </span>
+        </button>
+      </h3>
+      <div class="pf-drawer" id="pf-d-yt" role="region" aria-labelledby="pf-r-yt" hidden>
+        <div class="pf-dr">
+          <div class="pf-dr-in">
+            <div class="pf-side">
+              <div class="pf-tabs" role="tablist" aria-label="YouTube formats">
+                <i class="pf-ind" aria-hidden="true"></i>
+                <button class="pf-tab" role="tab" type="button" id="pf-t-video" aria-selected="true" aria-controls="pf-p-yt" data-f="video">Videos</button>
+                <button class="pf-tab" role="tab" type="button" id="pf-t-short" aria-selected="false" aria-controls="pf-p-yt" data-f="short" tabindex="-1">Shorts</button>
+              </div>
+              <div class="pf-panel" role="tabpanel" id="pf-p-yt" aria-labelledby="pf-t-video">
+                <p class="pf-fname">Video</p>
+                <p class="pf-desc">Long-form 16:9 video, with the brand segment as its own chapter.</p>
+                <div class="pf-brief">
+                  <p class="pf-bwho">Brief from Mirevo Skincare</p>
+                  <p class="pf-bline">4&nbsp;min review&nbsp;· 60–&#8288;90&nbsp;s integration at 0:42–&#8288;1:30&nbsp;· ₹45,000</p>
+                </div>
+                <a class="lq lq-s pf-cta" href="brand.html#post">Post a brief like this</a>
+              </div>
+            </div>
+
+            <div class="pf-stage" aria-hidden="true">
+              <div class="pf-guides"><i data-r="16:9" class="is-on"></i><i data-r="9:16"></i></div>
+              <div class="pf-device" data-shape="wide">
+                <i class="pf-island"></i>
+                <div class="pf-screen">
+                  <!-- Video -->
+                  <div class="pf-mock pf-m-video is-on" data-f="video">
+                    <div class="pf-set">
+                      <i class="pf-win"></i><i class="pf-lamp"></i>
+                      <i class="pf-person"><i></i></i>
+                      <i class="pf-desk"></i>
+                      <i class="pf-bot pf-vbot"><i class="pf-bot-cap"></i><i class="pf-bot-body"><b>Mirevo</b></i></i>
+                    </div>
+                    <div class="pf-ui">
+                      <p class="pf-vtitle">My 4-week skincare routine, honestly</p>
+                      <p class="pf-promo">Includes paid promotion</p>
+                      <div class="pf-player">
+                        <div class="pf-scrub">
+                          <i class="pf-ch" style="--a:0;--b:16.67"></i>
+                          <i class="pf-ch pf-ch-b" style="--a:16.67;--b:35.71"></i>
+                          <i class="pf-ch" style="--a:35.71;--b:75.4"></i>
+                          <i class="pf-ch" style="--a:75.4;--b:100"></i>
+                          <span class="pf-played"><i class="pf-ch" style="--a:0;--b:16.67"></i><i class="pf-ch" style="--a:35.71;--b:75.4"></i><i class="pf-ch" style="--a:75.4;--b:100"></i></span>
+                          <span class="pf-tip">Brand segment 0:42–1:30</span>
+                          <span class="pf-ph"><i></i></span>
+                        </div>
+                        <p class="pf-ctrl"><i class="pf-pause"></i><span class="pf-tc"><span data-tc>0:53</span> / 4:12</span><span class="pf-chn" data-chn>Brand segment</span></p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Short -->
+                  <div class="pf-mock pf-m-short" data-f="short">
+                    <div class="pf-feed"><div class="pf-feed-t">
+                      <div class="pf-sh pf-sh1"><p class="pf-big">Serum in 30&nbsp;s</p><i class="pf-bot"><i class="pf-bot-cap"></i><i class="pf-bot-body"><b>Mirevo</b></i></i></div>
+                      <div class="pf-sh pf-sh2"><i class="pf-sun"></i><p class="pf-big">Day 14</p></div>
+                      <div class="pf-sh pf-sh1"><p class="pf-big">Serum in 30&nbsp;s</p><i class="pf-bot"><i class="pf-bot-cap"></i><i class="pf-bot-body"><b>Mirevo</b></i></i></div>
+                    </div></div>
+                    <div class="pf-ui">
+                      <p class="pf-top">Shorts</p>
+                      <p class="pf-rail pf-rail-yt"><span><b class="pf-ic"><i class="pf-heart"></i></b><small>18K</small></span><span><b class="pf-ic"><i class="pf-bub"></i></b><small>312</small></span><span><b class="pf-ic"><i class="pf-send"></i></b><small>Share</small></span><span><i class="pf-disc"></i></span></p>
+                      <div class="pf-meta">
+                        <p class="pf-who"><i class="pf-av"></i><b>@ananya.iyer</b><span class="pf-subs">Subscribe</span></p>
+                        <p class="pf-cap">Serum in 30&nbsp;s, no filter</p>
+                      </div>
+                      <p class="pf-prog pf-prog-yt"><i class="pf-prog-f"></i></p>
+                    </div>
+                  </div>
+                </div>
+                <p class="pf-note pf-n-video is-on" data-f="video">the part the<br>brand pays for<i class="pf-arc"></i></p>
+                <p class="pf-note pf-n-short" data-f="short">hook in<br>the first 2 s<i class="pf-arc"></i></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── part: cta ── -->
+<!-- CTA: the finale. Two rings slide along "Start weaving." like rings on a rod and link at the centre -->
+<section class="sec dark ct sheet" id="start" aria-labelledby="ctH">
+  <canvas class="ct-bg" aria-hidden="true"></canvas>
+  <div class="in ct-in">
+    <div class="ct-hwrap">
+      <div class="ct-art ct-back" aria-hidden="true"><div class="ct-knot"><i class="ct-r ct-rc"></i><i class="ct-r ct-rv"></i><i class="ct-r ct-rc ct-rc2"></i></div></div>
+      <h2 class="ct-h" id="ctH" data-reveal>Start<br class="ct-bm"> weaving.</h2>
+      <div class="ct-art ct-front" aria-hidden="true"></div>
+    </div>
+    <div class="ct-foot" data-ct-in>
+      <p class="ct-sub"><span class="ct-cr">Your next brand deal is one bid away.</span> <span class="ct-br">Your next creator is one search away.</span></p>
+      <div class="ct-ctas">
+        <a class="lq lq-p" href="app.html#home">I'm a creator</a>
+        <a class="lq lq-s" href="brand.html#home">I'm a brand</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+<!-- Footer (67:345) -->
+<footer class="sec dark foot">
+  <div class="in">
+    <p class="wordmark" aria-label="linkloom"><span class="wm-mask" aria-hidden="true"><span class="ch">l</span><span class="ch">i</span><span class="ch">n</span><span class="ch">k</span><span class="ch">l</span><span class="ch o1">o</span><span class="ch o2">o</span><span class="ch">m</span></span></p>
+    <div class="bento">
+      <div class="box explore">
+        <nav class="flinks" aria-label="Footer">
+          <a class="cur" href="#top" aria-current="page">Home</a>
+          <a href="app.html#home">For creators</a>
+          <a href="brand.html#home">For brands</a>
+          <a href="#how">How it works <span class="pill coral">6 steps</span></a>
+          <a href="#trust">Escrow &amp; payouts</a>
+          <a href="#start">Help centre</a>
+        </nav>
+        <p class="body-s">English · more languages soon</p>
+      </div>
+      <div class="contact">
+        <div class="box email"><img src="assets/footer-rings.svg" width="26" height="18" alt=""><span>hello@linkloom.in</span></div>
+        <div class="box android"><div class="t">Android app <span class="pill butter">Coming soon</span></div><p class="body-s">Bid, track work and get paid from your phone.</p></div>
+        <div class="box updates">
+          <p class="t">Get new briefs in your inbox</p>
+          <form class="field" id="subForm" novalidate>
+            <label class="sr" for="subEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Your email</label>
+            <input id="subEmail" name="email" type="email" placeholder="Your email" autocomplete="email">
+            <button class="sub" type="submit" aria-label="Subscribe"><img src="assets/arrow.svg" width="18" height="18" alt=""></button>
+          </form>
+          <p class="fmsg" id="fmsg" aria-live="polite"></p>
+          <div class="legal">
+            <a href="#start">Privacy policy<img src="assets/chevron.svg" width="8" height="14" alt=""></a>
+            <a href="#start">Terms of use<img src="assets/chevron.svg" width="8" height="14" alt=""></a>
+            <a href="#trust">Refunds &amp; escrow<img src="assets/chevron.svg" width="8" height="14" alt=""></a>
+          </div>
+        </div>
+      </div>
+      <div class="box follow">
+        <div><p class="t">Follow the loom</p>
+          <div class="social"><a href="#start">Instagram<img src="assets/out.svg" width="12" height="12" alt=""></a><a href="#start">YouTube<img src="assets/out.svg" width="12" height="12" alt=""></a><a href="#start">LinkedIn<img src="assets/out.svg" width="12" height="12" alt=""></a></div>
+        </div>
+        <p class="note" data-write>say hi, we weave back</p>
+      </div>
+      <div class="statement">
+        <div class="top">
+          <p class="h1">Work that pays, woven.</p>
+          <div class="time"><span>Local time · India</span><img class="spark" src="assets/spark.svg" width="18" height="18" alt=""><span class="line"><i></i><img src="assets/line-head.svg" width="10" height="14" alt=""></span><span id="clock">10:42 AM IST</span></div>
+        </div>
+        <p class="copy">© 2026 Linkloom · Made in India</p>
+      </div>
+    </div>
+  </div>
+</footer>
+<script type="module" src="/src/landing/main.ts"></script>
+</body>
+</html>

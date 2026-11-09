@@ -1,0 +1,648 @@
+/* Find Jobs + shared brief card (.jobs-card, used on Home too). Owner: Builder B. Tokens from core.css only. */
+
+/* ---------- brand chip, platform glyph ---------- */
+.jobs-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-ink-text);
+}
+.jobs-bn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.jobs-bi {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ll-violet);
+  color: var(--ll-ink-text);
+  font: 700 11px/1 var(--ll-sans);
+  letter-spacing: 0.02em;
+}
+.jobs-plat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-slate);
+  white-space: nowrap;
+}
+.jobs-plat svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ll-ink-text);
+}
+
+/* ---------- the brief card ---------- */
+.jobs-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px 24px 16px;
+  border-radius: var(--r-lg);
+  background: var(--ll-white);
+  box-shadow: var(--ll-shadow-card);
+  touch-action: pan-y;
+  transition:
+    box-shadow 0.35s var(--ll-ease),
+    transform 0.35s var(--ll-ease);
+}
+.jobs-card:hover {
+  box-shadow: var(--ll-shadow-pin);
+}
+.jobs-card:has(.jobs-card-link:focus-visible) {
+  outline: 2px solid var(--ll-ink-text);
+  outline-offset: 3px;
+}
+.jobs-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.jobs-card-t {
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 25px;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.jobs-card-link {
+  color: var(--ll-ink-text);
+}
+.jobs-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+}
+.jobs-card-link:focus-visible {
+  outline: 0;
+}
+.jobs-cat {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: -12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-slate);
+}
+
+/* money first, location directly below the price */
+.jobs-money {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.jobs-price {
+  font-size: 40px;
+  line-height: 1.05;
+  color: var(--ll-ink-text);
+}
+.jobs-loc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-ink-text);
+}
+.jobs-loc svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ll-slate);
+}
+
+/* field tiles, as on the homepage "Post a brief" step card */
+.jobs-meta {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+}
+.jobs-meta > div {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  background: var(--ll-paper);
+}
+.jobs-meta dt {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ll-slate);
+}
+.jobs-meta dd {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.jobs-meta dd .muted {
+  font-weight: 500;
+}
+
+/* match % with its reasons */
+.jobs-match {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.jobs-pct {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 12px 3px 8px;
+  border-radius: var(--r-full);
+  background: var(--ll-butter);
+  color: var(--ll-ink-text);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.jobs-pct b {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.jobs-why {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.jobs-why li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px 3px 8px;
+  border-radius: var(--r-full);
+  background: var(--ll-paper);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ll-ink-text);
+}
+.jobs-why li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--ll-coral);
+}
+
+.jobs-acts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--ll-rule);
+}
+.jobs-acts > button,
+.jobs-acts > a {
+  position: relative;
+  z-index: 1;
+}
+.jobs-acts-grow {
+  flex: 1;
+}
+.jobs-save[aria-pressed="true"] {
+  background: var(--ll-ink-text);
+  border-color: var(--ll-ink-text);
+  color: var(--ll-white);
+}
+.jobs-save[aria-pressed="true"] svg path {
+  fill: currentColor;
+}
+.jobs-card .pill {
+  position: relative;
+  z-index: 1;
+}
+.jobs-card.is-hidden-job {
+  opacity: 0.6;
+}
+
+/* feature variant (top match on Home): the money sits in a coral-tinted bid box like the homepage deal card */
+.jobs-card--feature {
+  gap: 16px;
+  padding: 32px 32px 24px;
+  box-shadow: var(--ll-shadow-pin);
+}
+.jobs-card--feature .jobs-card-t {
+  font-size: 26px;
+  line-height: 32px;
+}
+.jobs-card--feature .jobs-money {
+  padding: 16px 24px;
+  border-radius: var(--r-md);
+  background: var(--ll-coral-subtle);
+}
+.jobs-card--feature .jobs-price {
+  font-size: clamp(48px, 4.4vw, 60px);
+  line-height: 1;
+}
+.jobs-mlab {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-slate);
+  margin-bottom: 4px;
+}
+.jobs-net {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ll-rule);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-ink-text);
+  text-wrap: pretty;
+}
+.jobs-net b {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.jobs-net span {
+  color: var(--ll-slate);
+}
+/* display-size money reads better with proportional figures (tabular "1" leaves a gap in Faculty Glyphic) */
+.jobs-price,
+.home-money-v,
+.job-budget,
+.bid-rc-net .t-money,
+.bid-rv-price,
+.bid-rv-net .t-money,
+.bids-price,
+.bids-mini-p,
+.job-sticky .t-money,
+.bid-dock-t b {
+  font-variant-numeric: proportional-nums;
+}
+/* on phones, lift toasts above the Bid / Review dock that sits on the tab bar */
+@media (max-width: 900px) {
+  body:has(.job-sticky, .bid-dock) .toast {
+    bottom: calc(168px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ---------- #jobs layout ---------- */
+.jobs-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px 32px;
+  flex-wrap: wrap;
+}
+.jobs-head-t {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.jobs-head-t p {
+  text-wrap: pretty;
+}
+.jobs-head-t .sample {
+  white-space: nowrap;
+}
+.jobs-search {
+  position: relative;
+  flex: 0 1 440px;
+  min-width: min(100%, 280px);
+}
+.jobs-search svg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  color: var(--ll-slate);
+  pointer-events: none;
+}
+.jobs-search .input {
+  padding-left: 48px;
+  border-radius: var(--r-full);
+}
+.jobs-layout {
+  display: grid;
+  grid-template-columns: 304px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.jobs-filters {
+  position: sticky;
+  top: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  border-radius: var(--r-lg);
+  background: var(--ll-paper-raised);
+}
+.jobs-f-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.jobs-clear[aria-disabled="true"] {
+  color: var(--ll-slate);
+  pointer-events: none;
+}
+/* Platform seg: full width, every item gets the same side padding plus an equal share of the spare width,
+   so insets read even; the track keeps core's 4px ring and both radii are full, so the selected pill stays concentric */
+.jobs-seg {
+  display: flex;
+  width: 100%;
+}
+.jobs-seg button {
+  flex: 1 1 auto;
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-inline: 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.jobs-seg svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.jobs-filters .chips {
+  gap: 8px;
+}
+.jobs-filters .chip {
+  padding: 0 12px;
+}
+.jobs-saved-only {
+  padding-top: 4px;
+}
+
+.jobs-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.jobs-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.jobs-count {
+  flex: 1;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ll-slate);
+}
+.jobs-count b {
+  font-family: var(--ll-display);
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--ll-ink-text);
+  margin-right: 2px;
+}
+.jobs-sort .select {
+  min-height: 44px;
+  padding: 8px 36px 8px 16px;
+  border-radius: var(--r-full);
+  font-size: 14px;
+  width: auto;
+}
+.jobs-ftoggle {
+  display: none;
+}
+.jobs-live,
+.jobs-offline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.jobs-live svg,
+.jobs-offline svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.jobs-offline {
+  padding: 12px 16px;
+  border-radius: var(--r-sm);
+  background: var(--ll-warn-bg);
+  color: var(--ll-warn-fg);
+  font-weight: 600;
+  font-size: 14px;
+}
+.jobs-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+.jobs-empty .t-h2 {
+  max-width: 20ch;
+}
+.jobs-hidden-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  justify-content: center;
+  min-height: 44px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ll-slate);
+}
+.jobs-hidden-line:empty {
+  display: none;
+}
+
+@media (max-width: 1180px) {
+  .jobs-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 1100px) and (min-width: 901px) {
+  .jobs-layout {
+    grid-template-columns: 288px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .jobs-filters {
+    padding: 24px 16px;
+  }
+}
+@media (max-width: 900px) {
+  .jobs-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .jobs-results {
+    display: contents;
+  }
+  .jobs-results > * {
+    order: 2;
+  }
+  .jobs-results > .jobs-bar {
+    order: 0;
+  }
+  .jobs-search {
+    flex-basis: 100%;
+  }
+  .jobs-count {
+    flex-basis: 100%;
+    order: 3;
+  }
+  .jobs-sort {
+    flex: 1;
+  }
+  .jobs-sort .select {
+    width: 100%;
+  }
+  .jobs-ftoggle {
+    display: inline-flex;
+  }
+  .jobs-filters {
+    position: static;
+    display: none;
+    order: 1;
+  }
+  .jobs-filters.is-open {
+    display: flex;
+  }
+  .jobs-list {
+    gap: 16px;
+  }
+  .jobs-filters {
+    padding: 24px 16px;
+  }
+  .jobs-card {
+    padding: 24px 16px 16px;
+  }
+  .jobs-price {
+    font-size: 36px;
+  }
+  .jobs-card--feature {
+    padding: 24px 16px 16px;
+  }
+  .jobs-card--feature .jobs-card-t {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .jobs-card--feature .jobs-money {
+    padding: 16px;
+  }
+}
+@media (max-width: 420px) {
+  .jobs-card-top {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+}
+
+/* ---------- motion that explains (polish B). Transforms/opacity/stroke only; reduced motion collapses every one ---------- */
+/* match ring: fills to the score once, as the card arrives */
+.jobs-ring {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  transform: rotate(-90deg);
+}
+.jobs-ring circle {
+  fill: none;
+  stroke-width: 2.5;
+}
+.jobs-ring circle:first-child {
+  stroke: rgba(18, 18, 18, 0.14);
+}
+.jobs-ring-v {
+  stroke: var(--ll-ink-text);
+  stroke-dasharray: 100;
+  stroke-linecap: round;
+  animation: jobsRing 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.24s backwards;
+}
+@keyframes jobsRing {
+  from {
+    stroke-dashoffset: 100;
+  }
+}
+.is-settled .jobs-ring-v {
+  animation: none;
+}
+/* saved: the bookmark is stitched shut, dashes close into a line, then it fills */
+.jobs-save.is-stitch svg path,
+.job-save.is-stitch svg path {
+  animation: jobsStitch 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes jobsStitch {
+  0% {
+    stroke-dasharray: 2 2.6;
+    stroke-dashoffset: 9;
+    fill-opacity: 0;
+  }
+  70% {
+    stroke-dasharray: 2 2.6;
+    stroke-dashoffset: 0;
+    fill-opacity: 0;
+  }
+  100% {
+    stroke-dasharray: 4.6 0;
+    stroke-dashoffset: 0;
+    fill-opacity: 1;
+  }
+}
+/* a chosen filter lands with a slight overshoot; translate only, the global press owns scale */
+.is-settle {
+  animation: jobsSettle 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes jobsSettle {
+  0% {
+    translate: 0 -3px;
+  }
+  60% {
+    translate: 0 1px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jobs-ring-v,
+  .is-stitch svg path,
+  .is-settle {
+    animation: none !important;
+  }
+}
+@media (pointer: coarse) {
+  .jobs-seg button {
+    min-height: 44px;
+  }
+}

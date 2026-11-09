@@ -1,0 +1,124 @@
+/* Home: greeting, today strip, KYC nudge, Best Match, notifications sheet. Owner: Builder B. */
+.home{gap:32px}
+
+/* greeting */
+.home-hi{display:flex;flex-direction:column;gap:8px;padding-top:8px}
+@media (min-width:901px){.home-when{display:none}}   /* the top bar clock shows it on desktop */
+.home-when{font-weight:600;font-size:13px;line-height:18px;color:var(--ll-slate);font-variant-numeric:tabular-nums}
+.home-greet{font-family:var(--ll-display);font-weight:400;font-size:clamp(40px,4.6vw,64px);line-height:1;letter-spacing:-.035em;text-wrap:balance}
+.home-lede{font-size:18px;line-height:26px;color:var(--ll-ink-text);text-wrap:pretty}
+.home-lede .sample{white-space:nowrap}
+
+/* what needs you today: three different real objects, not tiles */
+.home-strip{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.92fr);gap:24px;align-items:stretch}
+.home-obj{display:flex;flex-direction:column;gap:12px;min-width:0;padding:24px;border-radius:var(--r-lg);background:var(--ll-white);box-shadow:var(--ll-shadow-card)}
+.home-obj-top{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;min-height:24px}
+.home-due{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px;line-height:18px;color:var(--ll-slate);white-space:nowrap}
+.home-due svg{width:15px;height:15px}
+.home-obj-act{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+.home-obj-act .btn-q svg{width:16px;height:16px}
+.home-job{font-size:14px;line-height:20px;color:var(--ll-slate)}
+.home-obj-t{font-weight:600;font-size:18px;line-height:24px;letter-spacing:-.01em;text-wrap:balance}
+
+/* revision: the brand's message, as a chat bubble */
+.home-from{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;line-height:20px}
+.home-from .jobs-bi{width:26px;height:26px;font-size:10px}
+.home-quote{margin:0;padding:12px 16px;border-radius:6px 20px 20px 20px;background:var(--ll-paper-raised);font-weight:500;font-size:18px;line-height:26px;color:var(--ll-ink-text);text-wrap:balance}
+
+/* review: mini stage track (homepage step 04) */
+.home-track{display:flex;align-items:center;min-height:48px;padding:0 16px;border-radius:var(--r-sm);background:var(--ll-paper);font-size:13px;line-height:18px;color:var(--ll-slate)}
+.home-track li{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.home-track li:not(:last-child){flex:1 1 auto}
+.home-track li:not(:last-child)::after{content:"";flex:1;height:1.5px;margin-inline:8px;background:var(--ll-rule)}
+.home-track li::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--ll-slate)}
+.home-track .is-done{color:var(--ll-ink-text)}
+.home-track .is-done::before{background:var(--ll-violet);box-shadow:none}
+.home-track .is-now{color:var(--ll-ink-text);font-weight:600}
+.home-track .is-now::before{box-shadow:inset 0 0 0 2.5px var(--ll-coral)}
+
+/* money: an ink slip with a torn edge, like the homepage payout slip */
+.home-obj.home-money{gap:8px;padding:24px 24px 32px;background:var(--ll-ink-900);color:var(--ll-white);box-shadow:var(--ll-shadow-pin);
+  -webkit-mask:radial-gradient(circle 7px at 10px 100%,#0000 97%,#000 100%) 0 0/20px 100% repeat-x;mask:radial-gradient(circle 7px at 10px 100%,#0000 97%,#000 100%) 0 0/20px 100% repeat-x}
+.home-money-l{font-weight:500;font-size:14px;line-height:20px;color:var(--ll-mist)}
+.home-money-v{font-size:clamp(44px,4vw,56px);line-height:1.05;color:var(--ll-butter)}
+.home-money-s{font-size:13px;line-height:18px;color:var(--ll-mist)}
+.home-money .home-obj-act{padding-top:16px}
+.home-money-to{font-size:13px;color:var(--ll-mist)}
+
+/* KYC nudge */
+.home-kyc{display:flex;align-items:center;gap:16px 24px;padding:16px 24px 16px 16px;border-radius:var(--r-lg);background:var(--ll-butter);color:var(--ll-ink-text)}
+.home-kyc img{width:96px;height:auto;flex:none}
+.home-kyc-t{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;text-wrap:pretty}
+.home-kyc-h{font-weight:600;font-size:18px;line-height:24px;letter-spacing:-.01em}
+.home-kyc .lq{flex:none}
+
+/* Best Match */
+.home-match{display:flex;flex-direction:column;gap:16px}
+.home-match-h{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.home-match-h>div{display:flex;flex-direction:column;gap:4px}
+.home-match-h .btn-q svg{width:16px;height:16px}
+.home-hint{display:none;align-items:center;gap:8px}
+.home-hint svg{width:16px;height:16px;flex:none}
+@media (hover:none) and (pointer:coarse){.home-hint{display:flex}}
+.home-match-grid{display:flex;flex-direction:column;gap:24px}
+.home-feat{position:relative}
+/* the aside sits in the bid box's top-right corner, opposite the Budget label */
+.home-feat .jobs-money{position:relative}
+.home-note{position:absolute;right:24px;top:12px;z-index:1;font-size:20px;line-height:24px;transform:rotate(-3deg);transform-origin:right center;color:var(--ll-coral-deep);pointer-events:none;white-space:nowrap}
+.home-more{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;align-items:stretch}
+.home-more:empty{display:none}
+.home-hidden{display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;color:var(--ll-slate)}
+.home-hidden:empty{display:none}
+
+/* the feature brief goes wide: details left, the bid box on the right */
+@media (min-width:1100px){
+  .home-feat .jobs-card--feature{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);column-gap:32px;
+    grid-template-areas:"top money" "title money" "cat money" "match money" "meta money" "acts acts"}
+  .home-feat .jobs-card-top{grid-area:top}
+  .home-feat .jobs-card-t{grid-area:title}
+  .home-feat .jobs-cat{grid-area:cat}
+  .home-feat .jobs-money{grid-area:money;align-self:stretch;justify-content:center;padding:24px}
+  .home-feat .jobs-meta{grid-area:meta}
+  .home-feat .jobs-match{grid-area:match}
+  .home-feat .jobs-acts{grid-area:acts}
+}
+
+/* notifications sheet */
+.home-nt-h{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;margin-bottom:8px}
+.home-nt-h .btn-q svg{width:16px;height:16px}
+.home-nt-h .btn-q[disabled]{color:var(--ll-slate);cursor:default;border-color:transparent}
+.home-nt{display:flex;flex-direction:column;margin-inline:-8px}
+.home-nt li{position:relative}
+.home-nt li+li::before{content:"";position:absolute;top:0;left:8px;right:8px;border-top:1px solid var(--ll-rule)}
+.home-nt-i{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 8px;text-align:left;border-radius:var(--r-sm);transition:background-color .25s}
+.home-nt-i:hover{background:var(--ll-paper-raised)}
+.home-nt-i>svg{width:18px;height:18px;flex:none;color:var(--ll-slate)}
+.home-nt-dot{width:10px;height:10px;flex:none;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--ll-rule)}
+.home-nt-i.is-unread .home-nt-dot{background:var(--ll-coral);box-shadow:none}
+.home-nt-t{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;font-size:15px;line-height:22px;text-wrap:pretty}
+.home-nt-i.is-unread .home-nt-t>span:first-child{font-weight:600}
+.home-nt-at{font-size:13px;line-height:18px;color:var(--ll-slate)}
+.home-nt-foot{margin-top:16px}
+.home-nt-empty img{width:140px}
+
+@media (max-width:1100px){
+  .home-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .home-strip>.home-rev{grid-column:1/-1}
+}
+@media (max-width:900px){
+  .home{gap:24px}
+  .home-lede{font-size:16px;line-height:24px}
+  .home-strip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 calc(-1 * var(--gutr)) 0 calc(-1 * var(--gut));
+    padding:4px var(--gutr) 16px var(--gut);scroll-padding-inline:var(--gut);scrollbar-width:none}
+  .home-strip::-webkit-scrollbar{display:none}
+  .home-strip>.home-obj{flex:0 0 min(86%,340px);scroll-snap-align:start}
+  .home-kyc{flex-wrap:wrap;align-items:flex-start;padding:16px}
+  .home-kyc img{width:72px}
+  .home-kyc-t{flex-basis:calc(100% - 96px)}
+  .home-kyc .lq{width:100%}
+  .home-note{right:16px;top:12px;font-size:18px}
+  .home-more{grid-template-columns:minmax(0,1fr);gap:16px}
+  .home-match-grid{gap:16px}
+  .home-obj{padding:24px 16px 16px}
+  .home-obj.home-money{padding:24px 16px 32px}
+}

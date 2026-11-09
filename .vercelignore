@@ -1,0 +1,7 @@
+prototype
+prototype-landing
+tests
+docs
+dist
+.parity-dist
+.env.parity

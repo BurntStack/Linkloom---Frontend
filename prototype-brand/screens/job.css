@@ -1,0 +1,168 @@
+/* Job detail (#job-<id>). Brand side, Builder C. Mirrors the creator job page; kit bits (.bk-*) live in jobs.css. */
+.jd{gap:24px}
+.jd-back,.pj-back{align-self:flex-start}
+.jd-back svg,.pj-back svg{width:16px;height:16px}
+.jd-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:48px;align-items:start}
+.jd-main{display:flex;flex-direction:column;min-width:0}
+
+.jd-h{display:flex;flex-direction:column;gap:12px;padding-bottom:24px}
+.jd-src{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap}
+.jd-h .sample{white-space:nowrap}
+.jd-h .t-h1{max-width:20ch}
+.jd-tools-h{display:flex;flex-wrap:wrap;gap:8px;padding-top:4px}
+.jd-tools-h .chip svg{width:16px;height:16px}
+.jd-tools-h .chip[aria-pressed=true] svg path{fill:currentColor}
+.jd-tools-h .chip[aria-disabled=true]{color:var(--ll-slate);pointer-events:none;box-shadow:inset 0 0 0 1.5px var(--ll-rule)}
+
+.jd-sec{display:flex;flex-direction:column;gap:16px;padding:24px 0;border-top:1px solid var(--ll-rule)}
+.jd-brief{max-width:62ch;font-size:19px;line-height:30px;color:var(--ll-ink-text);text-wrap:pretty}
+.jd-dels{display:flex;flex-direction:column}
+.jd-dels li{display:flex;align-items:baseline;gap:16px;padding:12px 0;font-size:16px;line-height:24px}
+.jd-dels li+li{border-top:1px dashed var(--ll-rule)}
+.jd-n{flex:none;width:32px;font-weight:500;font-size:14px;line-height:20px;color:var(--ll-slate);font-variant-numeric:tabular-nums}
+.jd-kv{margin:0}
+.jd-kv dd{max-width:60%}
+
+/* why it matches: six checks against the profile */
+
+/* the deal slip on the right, sticky while you read */
+.jd-side{position:sticky;top:92px}
+.jd-deal{display:flex;flex-direction:column;gap:12px;padding:24px}
+.jd-lab{font-weight:500;font-size:14px;line-height:20px;color:var(--ll-slate)}
+.jd-budget{margin-top:-4px;font-size:clamp(48px,4.4vw,60px);line-height:1}
+.jd-payline{padding:12px 16px;border-radius:var(--r-sm);background:var(--ll-paper);font-size:14px;line-height:20px;text-wrap:pretty}
+
+/* phone: a dock above the tab bar holds price, place and Bid */
+
+@media (max-width:1100px){ .jd-layout{grid-template-columns:minmax(0,1fr) 300px;gap:32px} }
+@media (max-width:900px){
+  .jd{padding-bottom:96px}
+  .jd-layout{display:flex;flex-direction:column;gap:0}
+  .jd-main{display:contents}
+  .jd-main>*{order:2}
+  .jd-main>.jd-h{order:0}
+  .jd-side{position:static;order:1;margin-bottom:24px}
+  .jd-deal{padding:24px 16px}
+  .jd-deal .jd-bid-btn{display:none}
+  .jd-brief{font-size:17px;line-height:27px}
+    display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;border-radius:var(--r-lg);background:var(--ll-ink-800);color:var(--ll-white);box-shadow:var(--ll-shadow-float)}
+}
+
+/* ---------- brand side: bids received ---------- */
+.jd-h .t-h1{max-width:22ch}
+.jd-banner{display:flex;align-items:center;gap:8px;margin-bottom:24px;padding:12px 16px;border-radius:var(--r-md);background:var(--ll-paper-raised);font-weight:600;font-size:14px;line-height:20px}
+.jd-banner svg{width:16px;height:16px;flex:none}
+.jd-facts{margin:4px 0 0}
+.jd-bids-sec{gap:24px}
+.jd-bids-sec>.row .help{max-width:42ch}
+.jd-tools{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap}
+.jd-filter .chip[disabled]{opacity:.45;cursor:default;pointer-events:none}
+.jd-filter .chip[aria-pressed=true] .jl-cn{background:var(--ll-butter)}
+.jd-sort{width:220px;flex:none}
+.jd-bids{display:flex;flex-direction:column;gap:16px}
+.jd-none{padding:24px 0}
+.jd-more{padding-top:4px}
+.jd-empty{padding:40px 24px}
+.jd-empty .muted{max-width:44ch}
+
+.jd-bid{position:relative;display:flex;flex-direction:column;gap:16px;padding:24px;border-radius:var(--r-lg);background:var(--ll-white);box-shadow:var(--ll-shadow-card);transition:box-shadow .3s}
+.jd-bid.is-new::before{content:"";position:absolute;left:0;top:24px;width:4px;height:40px;border-radius:0 4px 4px 0;background:var(--ll-butter);box-shadow:inset 0 0 0 1px rgba(18,18,18,.12)}
+.jd-bid.is-shortlisted{box-shadow:inset 0 0 0 2px var(--ll-violet),var(--ll-shadow-card)}
+.jd-bid.is-hired{box-shadow:inset 0 0 0 2px var(--ll-ok-fg),var(--ll-shadow-card)}
+.jd-bid.is-declined{background:var(--ll-paper-raised);box-shadow:none}
+.jd-bid.is-declined .jd-bid-price{color:var(--ll-slate)}
+.jd-bid.is-declined .jd-pitch p,.jd-bid.is-declined .bk-meta dd{color:var(--ll-slate)}
+.jd-bid.is-declined .bk-meta>div{background:var(--ll-paper)}
+.jd-bid-h{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.jd-bid-who{display:inline-flex;min-width:0;border-radius:var(--r-full)}
+.jd-bid-who:hover .bk-cr-t b{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px}
+.jd-bid-g{display:grid;grid-template-columns:168px minmax(0,1fr);gap:16px 24px;align-items:center}
+.jd-lab{font-weight:500;font-size:13px;line-height:18px;color:var(--ll-slate)}
+.jd-bid-price{font-size:clamp(32px,2.8vw,40px);line-height:1.05}
+.jd-bid-vs{font-size:13px;line-height:18px;color:var(--ll-slate)}
+.jd-bid-vs.is-over{color:var(--ll-warn-fg);font-weight:600}
+.jd-bid-m{flex-wrap:wrap}
+.jd-bid-m>div{flex:1 1 120px}
+.jd-pitch{margin:0;padding:0 0 0 16px;border-left:2px solid var(--ll-coral)}
+.jd-pitch p{font-size:16px;line-height:24px;max-width:66ch}
+.jd-links{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;line-height:18px;color:var(--ll-slate)}
+.jd-links li{display:inline-flex;align-items:center;gap:6px;min-width:0;word-break:break-all}
+.jd-links svg{width:14px;height:14px;flex:none}
+.jd-sent{font-size:13px;line-height:18px;color:var(--ll-slate);margin-top:-8px}
+.jd-acts{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--ll-rule)}
+.jd-acts .chip svg{width:16px;height:16px}
+.jd-acts .btn-q svg{width:16px;height:16px}
+.jd-short[aria-pressed=true]{background:var(--ll-violet);color:var(--ll-ink-text)}
+.jd-short[aria-pressed=true] svg path{fill:currentColor}
+.jd-seen{margin-left:auto}
+
+/* deal card on the right */
+.jd-deal{display:flex;flex-direction:column;gap:12px;padding:24px}
+.jd-budget{margin-top:-4px;font-size:clamp(44px,4vw,56px);line-height:1;font-variant-numeric:proportional-nums}
+.jd-tally{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 16px;padding:12px 0;border-top:1px solid var(--ll-rule);border-bottom:1px solid var(--ll-rule)}
+.jd-tally li{display:flex;align-items:center;gap:8px;font-size:14px;line-height:28px}
+.jd-tally b{margin-left:auto;font-weight:600}
+.jd-tally .is-new .dot{background:var(--ll-butter);box-shadow:inset 0 0 0 1px rgba(18,18,18,.2)}
+.jd-tally .is-viewed .dot{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ll-ink-text)}
+.jd-tally .is-shortlisted .dot{background:var(--ll-violet)}
+.jd-tally .is-declined .dot{background:var(--ll-rule)}
+.jd-payline{padding:12px 16px;border-radius:var(--r-sm);background:var(--ll-paper);font-size:14px;line-height:20px}
+.jd-side-btn{width:100%}
+.jd-side-btn svg{width:16px;height:16px}
+
+/* compare tray: a quiet dock that appears once a bid is picked */
+.jd-tray{position:fixed;z-index:35;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));translate:-50% 0;display:flex;align-items:center;gap:16px;width:max-content;max-width:calc(100vw - 32px);
+  padding:8px 8px 8px 12px;border-radius:var(--r-full);background:var(--ll-ink-800);color:var(--ll-white);box-shadow:var(--ll-shadow-float)}
+.jd-tray-t{display:flex;align-items:center;gap:12px;font-size:14px;line-height:20px;color:var(--ll-mist);white-space:nowrap}
+.jd-tray-t b{color:var(--ll-white)}
+.jd-tray-av{display:flex}
+.jd-tray-av .avatar{width:32px;height:32px;font-size:11px;box-shadow:0 0 0 2px var(--ll-ink-800)}
+.jd-tray-av .avatar+.avatar{margin-left:-8px}
+.jd-tray .btn-q{color:var(--ll-mist)}
+.jd-tray .row{gap:12px}
+body:has(.jd-tray:not([hidden])){--toast-offset:72px}
+@media (prefers-reduced-motion:no-preference){.jd-tray:not([hidden]){animation:jdTrayIn .4s var(--mo-out,cubic-bezier(.22,1,.36,1))}}
+@keyframes jdTrayIn{from{opacity:0;translate:-50% 12px}}
+
+/* compare sheet: creators as columns; every row label spans the columns, so it works at 390 too */
+.jd-cmp{display:flex;flex-direction:column}
+.jd-cmp-r{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));column-gap:16px;padding:12px 0;border-bottom:1px solid var(--ll-rule)}
+.jd-cmp-l{grid-column:1/-1;margin-bottom:4px;font-weight:700;font-size:12px;line-height:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--ll-slate)}
+.jd-cmp-c{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;font-size:14px;line-height:20px;overflow-wrap:anywhere}
+.jd-cmp-c svg{width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:2px;fill:var(--ll-butter)}
+.jd-cmp-c.is-top{font-weight:600}
+.jd-cmp-head{padding-top:0}
+.jd-cmp-head .jd-cmp-c{gap:6px}
+.jd-cmp-n{display:flex;align-items:center;gap:4px;font-weight:600;font-size:15px;line-height:20px}
+.jd-cmp-price{font-size:28px;line-height:1.1}
+.jd-cmp-tag{padding:2px 8px;border-radius:var(--r-full);background:var(--ll-ok-bg);color:var(--ll-ok-fg);font-weight:600;font-size:12px;line-height:16px}
+.jd-cmp-pitch{font-size:14px;line-height:20px;color:var(--ll-ink-text)}
+.jd-cmp-foot{border-bottom:0;padding-top:16px}
+.jd-cmp-foot .jd-cmp-c{gap:8px}
+.jd-cmp-foot .lq,.jd-cmp-foot .chip{max-width:100%}
+.jd-cmp-foot .chip svg{width:14px;height:14px}
+.jd-close-others{padding:12px 16px;border-radius:var(--r-sm);background:var(--ll-white);box-shadow:inset 0 0 0 1.5px var(--ll-rule)}
+
+@media (max-width:900px){
+  .jd{padding-bottom:24px}
+  .jd-bid{padding:20px 16px}
+  .jd-bid-g{grid-template-columns:minmax(0,1fr);gap:12px}
+  .jd-bid-m>div{flex:1 1 calc(50% - 4px)}
+  .jd-sort{width:100%}
+  .jd-filter{flex-wrap:nowrap;overflow-x:auto;margin:-4px calc(-1 * var(--gutr)) 0 calc(-1 * var(--gut));padding:4px var(--gutr) 8px var(--gut);scrollbar-width:none}
+  .jd-filter::-webkit-scrollbar{display:none}
+  .jd-filter .chip{flex:none}
+  .jd-seen{margin-left:0}
+  .jd-tray{bottom:calc(var(--tab-clear) + 12px);left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));translate:none;width:auto;justify-content:space-between;border-radius:var(--r-lg)}
+  .jd-tray-t>span:last-child{white-space:normal}
+  @keyframes jdTrayIn{from{opacity:0;translate:0 12px}}
+  .jd-cmp-r{column-gap:12px}
+  .jd-cmp-price{font-size:22px}
+  .jd-cmp-c{font-size:13px;line-height:18px}
+  .jd-cmp-foot .lq{padding:0 12px;white-space:normal;text-align:center;line-height:16px}
+}
+/* review pass: compare cells read as one line of text; bid facts sit in a tidy 2 × 2 */
+.jd-cmp-c{display:block}
+.jd-cmp-head .jd-cmp-c,.jd-cmp-foot .jd-cmp-c{display:flex}
+.jd-cmp-tag{display:inline-block;margin-left:8px;vertical-align:6px}
+.jd-bid-m{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}

@@ -1,0 +1,513 @@
+/* Hiring cart (#cart). Owner: Builder B. Rows are product objects (a brief being written for one creator), the aside is the payment explainer. */
+.cart-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 32px;
+  flex-wrap: wrap;
+}
+.cart-head-t {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.cart-lede {
+  max-width: 64ch;
+  color: var(--ll-slate);
+}
+.cart-lede b {
+  font-weight: 600;
+  color: var(--ll-ink-text);
+}
+.cart-head .btn-q svg {
+  width: 16px;
+  height: 16px;
+}
+.cart-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  gap: 32px;
+  align-items: start;
+}
+.cart-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ---------- a cart row ---------- */
+.cart-row {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+  padding: 24px 32px 24px;
+  border-radius: var(--r-lg);
+  background: var(--ll-white);
+  box-shadow: var(--ll-shadow-card);
+}
+.cart-row-h {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--ll-rule);
+}
+.cart-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.cart-who h2 {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.cart-who a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color 0.25s;
+}
+.cart-who a:hover {
+  border-color: currentColor;
+}
+.cart-who .muted {
+  font-size: 14px;
+  line-height: 20px;
+}
+.cart-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: -8px;
+  padding: 12px 16px;
+  border-radius: var(--r-sm);
+  background: var(--ll-info-bg);
+  color: var(--ll-info-fg);
+  font-size: 14px;
+  line-height: 20px;
+}
+.cart-note svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 2px;
+}
+.cart-note b {
+  font-weight: 600;
+}
+
+.cart-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.cart-sec-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+.cart-sec-h h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ll-ink-text);
+}
+.cart-sec-h label {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.cart-step {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--ll-ink-text);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+}
+.cart-sec > .err:empty,
+.cart-title > .err:empty {
+  display: none;
+}
+.cart-opt {
+  font-weight: 500;
+  color: var(--ll-slate);
+}
+
+/* deliverable lines */
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cart-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 96px 40px;
+  grid-template-areas: "p f n x" "notes notes notes notes";
+  align-items: end;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--r-md);
+  background: var(--ll-paper);
+}
+.cart-f-p {
+  grid-area: p;
+}
+.cart-f-f {
+  grid-area: f;
+}
+.cart-f-n {
+  grid-area: n;
+}
+.cart-f-notes {
+  grid-area: notes;
+}
+.cart-item-x {
+  grid-area: x;
+}
+.cart-item .field > label,
+.cart-item .field > .lab {
+  font-size: 12px;
+  line-height: 16px;
+}
+.cart-fixed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--ctl-h);
+  padding: 0 16px;
+  border-radius: var(--r-sm);
+  background: var(--ll-paper-raised);
+  font-weight: 600;
+  font-size: 15px;
+}
+.cart-fixed svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.cart-item-x {
+  align-self: end;
+  margin-bottom: 4px;
+}
+.cart-item .cart-item-x:not(button) {
+  width: 40px;
+}
+.cart-add {
+  align-self: flex-start;
+}
+.cart-add svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cart-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+}
+.cart-date {
+  max-width: 240px;
+}
+.cart-seg {
+  align-self: flex-start;
+  --seg-pad: 20px;
+}
+.cart-seg button {
+  min-width: 56px;
+}
+
+.cart-price .money-in {
+  max-width: 320px;
+}
+.cart-price .money-in input {
+  font-variant-numeric: proportional-nums;
+}
+.cart-price [data-listed] .btn-q {
+  margin-left: 4px;
+  font-size: 13px;
+}
+.cart-below {
+  display: block;
+  margin-top: 4px;
+  color: var(--ll-warn-fg);
+  font-weight: 600;
+}
+.field.is-err .money-in {
+  border-color: var(--ll-err-fg);
+}
+
+.cart-row-f {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  margin: 0 -32px -24px;
+  padding: 20px 32px 24px;
+  border-top: 1px solid var(--ll-rule);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: var(--ll-paper);
+}
+.cart-sum {
+  flex: 1 1 320px;
+  max-width: 60ch;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-slate);
+}
+.cart-sum b {
+  font-weight: 700;
+  color: var(--ll-ink-text);
+}
+.cart-send {
+  flex: none;
+}
+
+/* ---------- after sending: the row becomes its receipt ---------- */
+.cart-slip {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-radius: var(--r-lg);
+  background: var(--ll-white);
+  box-shadow:
+    inset 0 0 0 1.5px var(--ll-violet),
+    var(--ll-shadow-card);
+}
+.cart-slip-ic {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ll-violet);
+  color: var(--ll-ink-text);
+}
+.cart-slip-ic svg {
+  width: 20px;
+  height: 20px;
+}
+.cart-slip-t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.cart-slip-t b {
+  font-weight: 600;
+}
+.cart-slip-t .muted {
+  font-size: 14px;
+  line-height: 20px;
+}
+.cart-slip .btn-q {
+  white-space: nowrap;
+}
+.cart-slip .btn-q svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cart-undo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  min-height: 44px;
+  font-size: 14px;
+  color: var(--ll-slate);
+}
+.cart-undo:empty {
+  display: none;
+}
+.cart-empty .t-h2 {
+  max-width: 22ch;
+}
+.cart-empty-a {
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ---------- aside: total + when you pay ---------- */
+.cart-aside {
+  position: sticky;
+  top: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cart-total {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+  border-radius: var(--r-lg);
+  background: var(--ll-ink-900);
+  color: var(--ll-white);
+}
+.cart-total .t-eyebrow {
+  color: var(--ll-mist);
+}
+.cart-total .t-money {
+  font-variant-numeric: proportional-nums;
+}
+.cart-total-s {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-mist);
+}
+.cart-how {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: var(--r-lg);
+  background: var(--ll-paper-raised);
+}
+.cart-steps {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cart-steps::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 12px;
+  bottom: 12px;
+  width: 1.5px;
+  background: rgba(18, 18, 18, 0.18);
+}
+.cart-steps li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-slate);
+}
+.cart-steps b {
+  font-weight: 600;
+  color: var(--ll-ink-text);
+}
+.cart-dot {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ll-paper-raised);
+  box-shadow: inset 0 0 0 1.5px var(--ll-ink-text);
+}
+.cart-dot::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ll-violet);
+}
+.cart-steps li.is-escrow .cart-dot {
+  background: var(--ll-escrow-bg);
+  box-shadow: inset 0 0 0 1.5px var(--ll-escrow-fg);
+  color: var(--ll-escrow-fg);
+}
+.cart-steps li.is-escrow .cart-dot::after {
+  display: none;
+}
+.cart-steps li.is-escrow .cart-dot svg {
+  width: 13px;
+  height: 13px;
+}
+.cart-steps li.is-escrow b {
+  color: var(--ll-escrow-fg);
+}
+
+@media (max-width: 1100px) {
+  .cart-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cart-aside {
+    position: static;
+    order: 2;
+  }
+}
+@media (max-width: 900px) {
+  .cart-row {
+    padding: 24px 16px;
+  }
+  .cart-row-f {
+    margin: 0 -16px -24px;
+    padding: 16px 16px 24px;
+  }
+  .cart-send {
+    width: 100%;
+  }
+  .cart-row-h {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    padding-bottom: 16px;
+  }
+  .cart-row-h > .pill {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+  }
+  .cart-remove {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .cart-two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cart-item {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "p f" "n x" "notes notes";
+    padding: 16px 12px;
+  }
+  .cart-item-x {
+    justify-self: end;
+  }
+  .cart-date {
+    max-width: none;
+  }
+  .cart-slip {
+    grid-template-columns: 40px minmax(0, 1fr);
+    padding: 16px;
+  }
+  .cart-slip .btn-q {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+@media (pointer: coarse) {
+  .cart-seg button {
+    min-height: 44px;
+  }
+}

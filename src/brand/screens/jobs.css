@@ -1,0 +1,646 @@
+/* My Bids (#bids): bid slips (ticket stub + body with a progress rail) on a status board. Brand side, Builder C. Mirrors the creator My bids slips. */
+.jl {
+  gap: 32px;
+}
+.jl-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+.jl-head-t {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.jl-head-t p {
+  text-wrap: pretty;
+}
+.jl-head-t .sample {
+  white-space: nowrap;
+}
+.jl-head .lq svg {
+  width: 16px;
+  height: 16px;
+}
+.jl-filter .chip[disabled] {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+.jl-cn {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--r-full);
+  background: var(--ll-paper-raised);
+  color: var(--ll-ink-text);
+  font-size: 12px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.jl-filter .chip[aria-pressed="true"] .jl-cn {
+  background: var(--ll-butter);
+}
+
+.jl-board {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.jl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.jl-gh {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 400;
+}
+.jl-gn {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-slate);
+}
+.jl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* the slip: stub on the left, perforation, body on the right */
+.jl-slip {
+  position: relative;
+  display: grid;
+  grid-template-columns: 208px minmax(0, 1fr);
+  border-radius: var(--r-md);
+  background: var(--ll-white);
+  box-shadow: var(--ll-shadow-card);
+  overflow: hidden;
+}
+.jl-stub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 24px;
+  border-right: 1.5px dashed var(--ll-rule);
+}
+.jl-stub::before,
+.jl-stub::after {
+  content: "";
+  position: absolute;
+  right: -11px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ll-paper);
+}
+.jl-stub::before {
+  top: -10px;
+}
+.jl-stub::after {
+  bottom: -10px;
+}
+.jl-stub-l {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-slate);
+}
+.jl-price {
+  font-size: clamp(32px, 2.8vw, 40px);
+  line-height: 1.1;
+  color: var(--ll-ink-text);
+}
+.jl-stub-d {
+  margin-top: auto;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-slate);
+}
+
+/* won bids get an ink stub with butter money; closed bids go quiet */
+.jl-slip.is-hired .jl-stub {
+  background: var(--ll-ink-900);
+  border-right-color: var(--ll-ink-700);
+}
+.jl-slip.is-hired .jl-stub-l,
+.jl-slip.is-hired .jl-stub-d {
+  color: var(--ll-mist);
+}
+.jl-slip.is-hired .jl-price {
+  color: var(--ll-butter);
+}
+.jl-slip.is-closed {
+  background: var(--ll-paper-raised);
+  box-shadow: none;
+}
+.jl-slip.is-closed .jl-stub::before,
+.jl-slip.is-closed .jl-stub::after {
+  background: var(--ll-paper);
+}
+.jl-slip.is-closed .jl-price {
+  color: var(--ll-slate);
+}
+/* drafts: a dashed outline, the money not yet promised */
+.jl-slip.is-draft {
+  box-shadow: inset 0 0 0 1.5px var(--ll-rule);
+}
+.jl-slip.is-draft .jl-stub {
+  background: var(--ll-paper);
+}
+.jl-slip.is-draft .jl-price {
+  color: var(--ll-slate);
+}
+.jl-slip.is-new {
+  box-shadow:
+    0 0 0 3px var(--ll-butter),
+    var(--ll-shadow-pin);
+}
+
+.jl-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 24px;
+}
+.jl-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.jl-t {
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 25px;
+  letter-spacing: -0.01em;
+}
+.jl-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-slate);
+}
+.jl-sub svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ll-ink-text);
+}
+.jl-note {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-slate);
+}
+.jl-acts {
+  display: flex;
+  align-items: center;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.jl-acts .btn-q svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* progress rail: violet for what the brand did, coral ring for where it stands (homepage step 04) */
+.jl-rail {
+  display: flex;
+  align-items: center;
+  max-width: 560px;
+  min-height: 40px;
+  margin-block: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-slate);
+}
+.jl-rail li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.jl-rail li:not(:last-child) {
+  flex: 1 1 auto;
+} /* equal share of spare width per step, so every connector is the same length */
+.jl-rail li:not(:last-child)::after {
+  content: "";
+  flex: 1;
+  min-width: 12px;
+  height: 1.5px;
+  margin-inline: 8px;
+  background: var(--ll-rule);
+}
+.jl-rail li::before {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--ll-slate);
+}
+.jl-rail .is-done {
+  color: var(--ll-ink-text);
+}
+.jl-rail .is-done::before {
+  background: var(--ll-violet);
+  box-shadow: none;
+}
+.jl-rail .is-done:not(:last-child)::after {
+  background: var(--ll-violet);
+}
+.jl-rail .is-now {
+  color: var(--ll-ink-text);
+  font-weight: 600;
+}
+.jl-rail .is-now::before {
+  box-shadow: inset 0 0 0 2.5px var(--ll-coral);
+}
+.jl-rail .is-end {
+  font-weight: 600;
+}
+.jl-rail.is-rejected .is-end {
+  color: var(--ll-err-fg);
+}
+.jl-rail.is-rejected .is-end::before {
+  box-shadow: inset 0 0 0 2.5px var(--ll-err-fg);
+}
+.jl-rail.is-withdrawn .is-end {
+  color: var(--ll-ink-text);
+}
+.jl-rail.is-withdrawn .is-end::before {
+  background: var(--ll-slate);
+  box-shadow: none;
+}
+.jl-rail.is-rejected,
+.jl-rail.is-withdrawn {
+  max-width: 360px;
+}
+
+.jl-empty .t-h2 {
+  max-width: 22ch;
+}
+.jl-empty img {
+  width: 72px;
+}
+
+/* sheets */
+.jl-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 24px;
+  border-radius: var(--r-md);
+  background: var(--ll-white);
+  box-shadow: var(--ll-shadow-card);
+}
+.jl-mini-p {
+  font-size: 40px;
+  line-height: 1.1;
+  margin-top: 8px;
+}
+.jl-conseq {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 22px;
+}
+.jl-conseq li {
+  display: flex;
+  gap: 12px;
+  text-wrap: pretty;
+}
+.jl-conseq li::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: var(--ll-ink-text);
+}
+
+@media (max-width: 900px) {
+  .jl-slip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .jl-stub {
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    padding: 16px;
+    border-right: 0;
+    border-bottom: 1.5px dashed var(--ll-rule);
+  }
+  .jl-slip.is-hired .jl-stub {
+    border-bottom-color: var(--ll-ink-700);
+  }
+  .jl-stub::before,
+  .jl-stub::after {
+    top: auto;
+    bottom: -11px;
+    right: auto;
+  }
+  .jl-stub::before {
+    left: -10px;
+  }
+  .jl-stub::after {
+    right: -10px;
+  }
+  .jl-stub-l {
+    flex-basis: 100%;
+  }
+  .jl-stub-d {
+    margin: 0 0 0 auto;
+  }
+  .jl-body {
+    padding: 16px 16px 24px;
+  }
+  .jl-t {
+    font-size: 17px;
+    line-height: 23px;
+  }
+  .jl-rail {
+    font-size: 12px;
+  }
+  .jl-rail li:not(:last-child)::after {
+    margin-inline: 6px 4px;
+    min-width: 8px;
+  }
+  .jl {
+    gap: 24px;
+  }
+  .jl-board {
+    gap: 32px;
+  }
+  .jl-filter {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: -4px calc(-1 * var(--gutr)) 0 calc(-1 * var(--gut));
+    padding: 4px var(--gutr) 8px var(--gut);
+    scroll-padding-inline: var(--gut);
+    scrollbar-width: none;
+  }
+  .jl-filter::-webkit-scrollbar {
+    display: none;
+  }
+  .jl-filter .chip {
+    flex: none;
+  }
+  .jl-head .lq {
+    display: none;
+  }
+}
+
+/* narrow phones: the rail keeps every dot but only names the steps reached, so it never clips */
+@media (max-width: 420px) {
+  .jl-rail .is-next span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+/* a just-sent bid: a fine coral thread draws from Sent along its lane, once */
+.jl-slip.is-new .jl-rail li:first-child::after {
+  background: var(--ll-coral);
+  transform-origin: left center;
+  animation: jlThread 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.6s backwards;
+}
+@keyframes jlThread {
+  from {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jl-slip.is-new .jl-rail li:first-child::after {
+    animation: none;
+  }
+}
+
+/* ---------- brand side additions ---------- */
+.jl-t a {
+  color: var(--ll-ink-text);
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100%/0 1.5px;
+  transition: background-size 0.4s var(--ll-ease);
+}
+.jl-t a:hover {
+  background-size: 100% 1.5px;
+}
+.jl-pills {
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.jl-meta {
+  margin: 4px 0 0;
+  max-width: 560px;
+}
+.jl-meta-w {
+  flex: 1.4 1 0;
+}
+.jl-acts .btn-q svg {
+  width: 16px;
+  height: 16px;
+}
+.jl-empty-cta {
+  justify-content: center;
+  margin-top: 8px;
+}
+.jl-rail.is-all .is-done:last-child {
+  font-weight: 600;
+}
+.jl-mini .bk-plat {
+  margin-bottom: 8px;
+}
+
+/* ---------- Builder C kit (.bk-*): shared by jobs, post, job and campaigns ---------- */
+.bk-src {
+  display: flex;
+  align-items: center;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+.bk-plat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-slate);
+}
+.bk-plat > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bk-plat svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--ll-ink-text);
+}
+.bk-loc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ll-ink-text);
+}
+.bk-loc svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ll-slate);
+}
+.bk-meta {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+}
+.bk-meta > div {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  background: var(--ll-paper);
+}
+.bk-meta dt {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ll-slate);
+}
+.bk-meta dd {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.bk-meta dd .muted {
+  font-weight: 500;
+}
+/* creators: coral family only */
+.avatar.bk-cav {
+  background: var(--ll-coral);
+  color: var(--ll-ink-text);
+}
+.avatar.bk-cav.is-b {
+  background: var(--ll-coral-subtle);
+  color: var(--ll-coral-deep);
+  box-shadow: inset 0 0 0 1.5px var(--ll-coral);
+}
+.bk-cr {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.bk-cr-t {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-slate);
+}
+.bk-cr-t b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--ll-ink-text);
+}
+.bk-cr-t > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bk-ver {
+  display: inline-grid;
+  color: var(--ll-coral-deep);
+}
+.bk-ver svg {
+  width: 16px;
+  height: 16px;
+}
+.bk-rate {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.bk-rate svg {
+  width: 15px;
+  height: 15px;
+  color: var(--ll-ink-text);
+  fill: var(--ll-butter);
+}
+.bk-rate .muted {
+  font-size: 13px;
+}
+.bk-rate.is-none {
+  color: var(--ll-slate);
+  font-size: 13px;
+}
+/* the one destructive button: ink outline that fills error-red on hover; used only in confirm sheets */
+.lq.bk-danger {
+  --c: var(--ll-err-fg);
+  --on: #fff;
+  --fill: var(--ll-ink-text);
+  --on-fill: #fff;
+}
+.bk-sample {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 16px;
+  border-radius: var(--r-md);
+  border: 1.5px dashed var(--ll-rule);
+}
+.bk-sample p {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-slate);
+}
+@media (max-width: 900px) {
+  .jl-meta {
+    flex-wrap: wrap;
+  }
+  .jl-meta > div {
+    flex: 1 1 calc(50% - 4px);
+  }
+  .jl-meta-w {
+    flex-basis: 100% !important;
+  }
+}

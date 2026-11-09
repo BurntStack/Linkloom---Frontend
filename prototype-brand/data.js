@@ -1,0 +1,201 @@
+/* Linkloom Brand Dashboard: sample data. All money is integer paise. Today is 4 Nov 2026, 10:42 IST (LLD.today()).
+   The brand is Mirevo Skincare — the same brand the creator dashboard shows, so jobs, prices and Ananya's work line up across both apps.
+   Business model: brands and creators are on a subscription. No per-deal platform fee: the brand pays the agreed price into escrow,
+   the creator receives the agreed price on approval. Taxes: "As per confirmed rules". Plans never show a price in the app. */
+window.LLD_DATA = {
+  session: { signedIn: true, remember: true, status: 'verified' },   /* status: verified | pending | blocked (login demo states) */
+  /* emails and mobiles already registered, for the sign-up "already exists" checks (one email / one mobile = one account) */
+  taken: { emails: ['meera@mirevo.in', 'team@kaapikulture.in', 'hello@gamla.co'], mobiles: ['9820012345', '9876500011'] },
+  me: {
+    brand: 'Mirevo Skincare', name: 'Meera Kapoor', role: 'Brand manager', email: 'meera@mirevo.in', mobile: '9820012345',
+    logo: null, website: 'mirevo.in', industry: 'Skincare', city: 'Mumbai', state: 'Maharashtra',
+    about: 'Skincare made for humid Indian weather. Barrier care, sunscreen and serums.',
+    billing: { legal: 'Mirevo Skincare Private Limited', gstin: '27AABCM1234F1Z5', address: '4th floor, Lodha Supremus, Lower Parel, Mumbai 400013', email: 'accounts@mirevo.in' },
+    passwordChanged: '2026-08-12'
+  },
+  plan: { name: 'Brand plan', status: 'active', since: '2026-05-01', renews: '2026-12-01' },   /* subscription; never show a price */
+  budget: { label: 'Oct–Dec 2026', total: 20000000 },                                        /* ₹2,00,000 creator budget this quarter */
+
+  /* ---------- creators (search, profiles, favourites, cart) ---------- */
+  creators: [
+    { id: 'cr1', name: 'Ananya Iyer', handle: '@ananyamakes', tone: 'c', city: 'Mumbai', state: 'Maharashtra', country: 'India', gender: 'Woman', age: 25,
+      languages: ['Hindi', 'English', 'Marathi'], categories: ['Skincare', 'Beauty', 'Lifestyle'], content: ['Reel', 'Story', 'Carousel', 'Video', 'Short'],
+      platforms: [{ p: 'instagram', handle: '@ananyamakes', followers: 180000, er: 6.5, avgViews: 56000 }, { p: 'youtube', handle: '@AnanyaMakes', followers: 40000, er: 5.1, avgViews: 21000 }],
+      verified: true, rating: 4.9, reviews: 12, availability: 'open', rates: { reel: 1800000, story: 600000, carousel: 1200000, video: 4500000, short: 1500000 },
+      bio: 'Honest skincare for humid Mumbai weather. Routines, ingredient breakdowns and 30-day tests.',
+      work: [{ brand: 'Mirevo Skincare', title: 'Vitamin C gel, first impressions', views: 84000 }, { brand: 'Kaapi Kulture', title: 'Pongal filter coffee Story', views: 31000 }, { brand: 'Gamla Co.', title: 'Diwali balcony plants', views: 47000 }] },
+    { id: 'cr2', name: 'Kabir Sethi', handle: '@kabirskin', tone: 'b', city: 'New Delhi', state: 'Delhi', country: 'India', gender: 'Man', age: 29,
+      languages: ['Hindi', 'English'], categories: ['Skincare', 'Grooming'], content: ['Reel', 'Story'],
+      platforms: [{ p: 'instagram', handle: '@kabirskin', followers: 340000, er: 4.1, avgViews: 98000 }],
+      verified: true, rating: 4.7, reviews: 21, availability: 'from 15 Nov', rates: { reel: 3200000, story: 900000 },
+      bio: 'Men’s skincare without the jargon. Dermat-checked routines for Delhi winters.',
+      work: [{ brand: 'Urban Root', title: 'Beard oil, 4-week test', views: 162000 }, { brand: 'Kosha Labs', title: 'SPF for runners', views: 88000 }] },
+    { id: 'cr3', name: 'Riya Thomas', handle: '@riyaglows', tone: 'c', city: 'Kochi', state: 'Kerala', country: 'India', gender: 'Woman', age: 27,
+      languages: ['Malayalam', 'English'], categories: ['Beauty', 'Skincare'], content: ['Reel', 'Carousel', 'Story'],
+      platforms: [{ p: 'instagram', handle: '@riyaglows', followers: 92000, er: 7.8, avgViews: 41000 }],
+      verified: true, rating: 4.8, reviews: 9, availability: 'open', rates: { reel: 1200000, story: 400000, carousel: 900000 },
+      bio: 'Monsoon-proof skin and simple routines from Kochi. Coconut oil myths, debunked kindly.',
+      work: [{ brand: 'Kerala Ayur Co.', title: 'Monsoon hair routine', views: 52000 }] },
+    { id: 'cr4', name: 'Arjun Rao', handle: '@arjunexplains', tone: 'b', city: 'Bengaluru', state: 'Karnataka', country: 'India', gender: 'Man', age: 31,
+      languages: ['Kannada', 'English', 'Hindi'], categories: ['Science', 'Skincare', 'Tech'], content: ['Video', 'Short'],
+      platforms: [{ p: 'youtube', handle: '@ArjunExplains', followers: 610000, er: 3.4, avgViews: 120000 }],
+      verified: true, rating: 4.6, reviews: 17, availability: 'busy until 20 Nov', rates: { video: 3800000, short: 1400000 },
+      bio: 'The science behind what you put on your skin. Lab visits, ingredient deep-dives, no hype.',
+      work: [{ brand: 'Mirevo Skincare', title: 'Barrier cream, winter care', views: 0 }, { brand: 'Kosha Labs', title: 'How sunscreen filters work', views: 410000 }] },
+    { id: 'cr5', name: 'Sana Qureshi', handle: '@sanaskinlab', tone: 'c', city: 'Hyderabad', state: 'Telangana', country: 'India', gender: 'Woman', age: 26,
+      languages: ['Urdu', 'Hindi', 'English'], categories: ['Skincare'], content: ['Reel', 'Video', 'Short'],
+      platforms: [{ p: 'instagram', handle: '@sanaskinlab', followers: 130000, er: 5.9, avgViews: 47000 }, { p: 'youtube', handle: '@SanaSkinLab', followers: 48000, er: 4.4, avgViews: 19000 }],
+      verified: true, rating: 4.9, reviews: 14, availability: 'open', rates: { reel: 1600000, video: 3500000, short: 1200000 },
+      bio: 'Pharmacist turned creator. Actives, layering and patch tests, explained slowly.',
+      work: [{ brand: 'Kosha Labs', title: 'Niacinamide, 6 weeks', views: 73000 }] },
+    { id: 'cr6', name: 'Meher Gill', handle: '@meherdoesmakeup', tone: 'c', city: 'Chandigarh', state: 'Punjab', country: 'India', gender: 'Woman', age: 23,
+      languages: ['Punjabi', 'Hindi', 'English'], categories: ['Makeup', 'Beauty'], content: ['Reel', 'Story'],
+      platforms: [{ p: 'instagram', handle: '@meherdoesmakeup', followers: 260000, er: 3.8, avgViews: 64000 }],
+      verified: false, rating: 4.4, reviews: 6, availability: 'open', rates: { reel: 2000000, story: 700000 },
+      bio: 'Wedding-season glam on a student budget.', work: [{ brand: 'Glam Theory', title: 'Sangeet look in 10 minutes', views: 120000 }] },
+    { id: 'cr7', name: 'Dev Malhotra', handle: '@devfitdaily', tone: 'b', city: 'Pune', state: 'Maharashtra', country: 'India', gender: 'Man', age: 28,
+      languages: ['Hindi', 'English', 'Marathi'], categories: ['Fitness', 'Grooming'], content: ['Reel', 'Video', 'Short'],
+      platforms: [{ p: 'instagram', handle: '@devfitdaily', followers: 110000, er: 5.2, avgViews: 38000 }, { p: 'youtube', handle: '@DevFitDaily', followers: 75000, er: 4.0, avgViews: 26000 }],
+      verified: true, rating: 4.5, reviews: 8, availability: 'open', rates: { reel: 1400000, video: 3000000, short: 1000000 },
+      bio: 'Morning runs, sweat-proof skincare and honest gym gear reviews.', work: [{ brand: 'Roz Fit', title: 'Sweat-proof SPF test', views: 44000 }] },
+    { id: 'cr8', name: 'Ishita Banerjee', handle: '@ishitareads', tone: 'c', city: 'Kolkata', state: 'West Bengal', country: 'India', gender: 'Woman', age: 30,
+      languages: ['Bengali', 'English'], categories: ['Lifestyle', 'Books', 'Skincare'], content: ['Reel', 'Carousel'],
+      platforms: [{ p: 'instagram', handle: '@ishitareads', followers: 64000, er: 8.4, avgViews: 29000 }],
+      verified: true, rating: 4.8, reviews: 11, availability: 'open', rates: { reel: 900000, carousel: 700000 },
+      bio: 'Slow Sundays: books, tea and a five-step night routine.', work: [{ brand: 'Chai Point', title: 'Reading-nook Sundays', views: 26000 }] },
+    { id: 'cr9', name: 'Tanvi Shah', handle: '@tanvi.tries', tone: 'c', city: 'Ahmedabad', state: 'Gujarat', country: 'India', gender: 'Woman', age: 22,
+      languages: ['Gujarati', 'Hindi', 'English'], categories: ['Beauty', 'Lifestyle'], content: ['Reel', 'Story'],
+      platforms: [{ p: 'instagram', handle: '@tanvi.tries', followers: 41000, er: 9.1, avgViews: 22000 }],
+      verified: false, rating: null, reviews: 0, availability: 'open', rates: { reel: 700000, story: 250000 },
+      bio: 'College student trying every viral product so you don’t have to.', work: [] },
+    { id: 'cr10', name: 'Nikhil Jose', handle: '@nikhilonfilm', tone: 'b', city: 'Chennai', state: 'Tamil Nadu', country: 'India', gender: 'Man', age: 33,
+      languages: ['Tamil', 'English'], categories: ['Lifestyle', 'Travel', 'Tech'], content: ['Video', 'Short'],
+      platforms: [{ p: 'youtube', handle: '@NikhilOnFilm', followers: 240000, er: 4.6, avgViews: 58000 }],
+      verified: true, rating: 4.7, reviews: 10, availability: 'open', rates: { video: 4200000, short: 1300000 },
+      bio: 'Cinematic travel films and the kit that survives them.', work: [{ brand: 'Konkan Kinara Stays', title: 'Monsoon Konkan road trip', views: 91000 }] }
+  ],
+  favorites: ['cr1', 'cr5', 'cr8'],
+  cart: ['cr3'],                                             /* creators picked for a direct hire, not yet invited */
+
+  /* ---------- jobs the brand posted (creators bid on these) ---------- */
+  jobs: [
+    { id: 'j1', title: 'Barrier Repair Serum launch', status: 'open', platform: 'instagram', format: 'Reel', category: 'Skincare', budget: 1800000,
+      deadline: '2026-12-12', posted: '2026-11-03T17:40:00+05:30', city: 'Mumbai', remote: false, languages: ['Hindi', 'English'], minFollowers: 50000,
+      deliverables: ['1 Reel, 30–45 s', 'Product on screen in the first 3 s', '1 Story with link sticker'], usage: 'Brand can repost for 30 days',
+      brief: 'Introduce the Barrier Repair Serum to humid-weather skin. Show a real morning routine, no filters. Mention the 2% ceramide complex once.', bids: 14 },
+    { id: 'j6', title: 'Night routine for oily skin', status: 'open', platform: 'youtube', format: 'Short', category: 'Skincare', budget: 1500000,
+      deadline: '2026-11-28', posted: '2026-10-30T11:00:00+05:30', city: 'Any city', remote: true, languages: ['English', 'Hindi'], minFollowers: 30000,
+      deliverables: ['1 Short, under 60 s', 'Gel cleanser and serum in frame'], usage: 'No repost', brief: 'A calm, real night routine for oily skin using the gel cleanser and the serum.', bids: 6 },
+    { id: 'j4', title: 'Monsoon skincare myths', status: 'draft', platform: 'youtube', format: 'Video', category: 'Skincare', budget: 4000000,
+      deadline: '2027-01-20', posted: null, city: 'Any city', remote: true, languages: ['English'], minFollowers: 100000,
+      deliverables: ['1 Video, 8–12 min', 'Three myths, one product moment'], usage: 'Brand can embed on site', brief: 'Bust three monsoon skincare myths with a dermatologist cameo.', bids: 0 },
+    { id: 'j3', title: 'Sunscreen reapplication, office day', status: 'hired', platform: 'instagram', format: 'Reel', category: 'Skincare', budget: 1600000,
+      deadline: '2026-11-08', posted: '2026-10-20T10:00:00+05:30', city: 'Mumbai', remote: false, languages: ['English', 'Hindi'], minFollowers: 50000,
+      deliverables: ['1 Reel, 30–40 s', 'Say SPF 50 once'], usage: 'Brand can repost for 30 days', brief: 'Reapply sunscreen over makeup on a real office day in Mumbai. No before-and-after claims.', bids: 19, hired: 'cr1' },
+    { id: 'j2', title: 'Vitamin C gel, first impressions', status: 'closed', platform: 'instagram', format: 'Reel', category: 'Skincare', budget: 1400000,
+      deadline: '2026-10-10', posted: '2026-09-20T09:00:00+05:30', city: 'Any city', remote: true, languages: ['English'], minFollowers: 50000,
+      deliverables: ['1 Reel, 30 s'], usage: 'Brand can repost for 30 days', brief: 'First impressions of the Vitamin C gel after one week.', bids: 23, hired: 'cr1' },
+    { id: 'j5', title: 'Summer SPF myths', status: 'closed', platform: 'instagram', format: 'Carousel', category: 'Skincare', budget: 1000000,
+      deadline: '2026-05-20', posted: '2026-05-02T09:00:00+05:30', city: 'Any city', remote: true, languages: ['English'], minFollowers: 30000,
+      deliverables: ['1 Carousel, 6 slides'], usage: 'Brand can repost for 30 days', brief: 'Six summer SPF myths, one per slide.', bids: 17, hired: 'cr1' }
+  ],
+  /* bids received on open jobs (the rest of each job's bid count is summarised, not listed) */
+  bids: [
+    { id: 'bd1', job: 'j1', creator: 'cr1', price: 1800000, status: 'new', sent: '2026-11-04T09:12:00+05:30', postDate: '2026-12-08', views: 55000,
+      pitch: '34% of my audience is in Mumbai and my last skincare Reel reached 2.1 lakh views. I will shoot the real 7 am routine in my own flat.', links: ['instagram.com/reel/ananya-vitc'] },
+    { id: 'bd2', job: 'j1', creator: 'cr5', price: 1700000, status: 'shortlisted', sent: '2026-11-03T21:05:00+05:30', postDate: '2026-12-05', views: 45000,
+      pitch: 'As a pharmacist I can explain the ceramide complex in one plain sentence, then show it on oily, humid skin.', links: ['instagram.com/reel/sana-niacinamide'] },
+    { id: 'bd3', job: 'j1', creator: 'cr3', price: 1200000, status: 'viewed', sent: '2026-11-03T19:40:00+05:30', postDate: '2026-12-10', views: 38000,
+      pitch: 'Kochi humidity is a tough test. I will film the morning routine before and after a commute, no filters.', links: [] },
+    { id: 'bd4', job: 'j1', creator: 'cr6', price: 2200000, status: 'new', sent: '2026-11-04T08:30:00+05:30', postDate: '2026-12-11', views: 60000,
+      pitch: 'Makeup-first audience that struggles with dry patches. I can show the serum as a primer step.', links: ['instagram.com/reel/meher-sangeet'] },
+    { id: 'bd5', job: 'j1', creator: 'cr9', price: 700000, status: 'declined', sent: '2026-11-03T18:00:00+05:30', postDate: '2026-12-12', views: 20000,
+      pitch: 'I would love to try this for my college audience.', links: [] },
+    { id: 'bd6', job: 'j6', creator: 'cr7', price: 1000000, status: 'new', sent: '2026-11-02T20:15:00+05:30', postDate: '2026-11-25', views: 25000,
+      pitch: 'Post-run night routine for sweaty, oily skin. 45 seconds, no voiceover clutter.', links: [] },
+    { id: 'bd7', job: 'j6', creator: 'cr5', price: 1200000, status: 'viewed', sent: '2026-11-01T12:00:00+05:30', postDate: '2026-11-24', views: 19000,
+      pitch: 'I will show how to layer the serum after the gel cleanser without pilling.', links: ['youtube.com/shorts/sana-layering'] }
+  ],
+
+  /* ---------- campaigns: every hire, from a job or a direct invitation ----------
+     stage: invited → accepted → funded → in_progress → submitted → revision → approved → released
+            (or declined / cancelled / refunded). Chat unlocks once funded. */
+  campaigns: [
+    { id: 'c1', creator: 'cr1', source: 'job', job: 'j3', title: 'Sunscreen reapplication, office day', platform: 'instagram', format: 'Reel', price: 1600000,
+      stage: 'revision', revisionsIncluded: 2, revisionsUsed: 1, due: '2026-11-08', funded: '2026-10-24T15:30:00+05:30', thread: 't1',
+      deliveries: [{ v: 1, file: 'office-sunscreen-v1.mp4', at: '2026-11-02T21:10:00+05:30', note: 'Shot on a real Tuesday. Hook is 3 s.' }],
+      revisionNote: 'Love it. Can the hook be shorter, under 2 s?', log: [['2026-10-24T11:00:00+05:30', 'accepted'], ['2026-10-24T15:30:00+05:30', 'funded'], ['2026-11-02T21:10:00+05:30', 'submitted'], ['2026-11-03T10:05:00+05:30', 'revision']] },
+    { id: 'c2', creator: 'cr4', source: 'job', job: null, title: 'Barrier cream, winter care', platform: 'youtube', format: 'Video', price: 3800000,
+      stage: 'submitted', revisionsIncluded: 1, revisionsUsed: 0, due: '2026-11-10', funded: '2026-10-15T12:00:00+05:30', thread: 't2',
+      deliveries: [{ v: 1, file: 'barrier-cream-winter-v1.mp4', at: '2026-11-03T22:40:00+05:30', note: 'Final cut, 9 min 40 s. Product at 2:10 and 7:45.' }],
+      log: [['2026-10-14T10:00:00+05:30', 'accepted'], ['2026-10-15T12:00:00+05:30', 'funded'], ['2026-11-03T22:40:00+05:30', 'submitted']] },
+    { id: 'c3', creator: 'cr8', source: 'direct', job: null, title: 'Winter night routine Carousel', platform: 'instagram', format: 'Carousel', price: 700000,
+      stage: 'accepted', revisionsIncluded: 1, revisionsUsed: 0, due: '2026-11-22', thread: null,
+      deliverables: ['1 Carousel, 5 slides', 'Night cream on slide 3'], log: [['2026-11-01T18:00:00+05:30', 'invited'], ['2026-11-03T09:20:00+05:30', 'accepted']] },
+    { id: 'c4', creator: 'cr2', source: 'direct', job: null, title: 'Cleanser reformulation teaser', platform: 'instagram', format: 'Reel', price: 3200000,
+      stage: 'invited', revisionsIncluded: 2, revisionsUsed: 0, due: '2026-12-02', thread: null,
+      deliverables: ['1 Reel, 20–30 s', 'Old vs new pack on screen'], log: [['2026-11-03T16:45:00+05:30', 'invited']] },
+    { id: 'c5', creator: 'cr1', source: 'job', job: 'j2', title: 'Vitamin C gel, first impressions', platform: 'instagram', format: 'Reel', price: 1400000,
+      stage: 'released', revisionsIncluded: 1, revisionsUsed: 0, due: '2026-10-10', funded: '2026-09-28T12:00:00+05:30', released: '2026-10-14T11:00:00+05:30', thread: 't3',
+      views: 84000, liveUrl: 'instagram.com/reel/ananya-vitc', review: null, log: [['2026-09-28T10:00:00+05:30', 'accepted'], ['2026-09-28T12:00:00+05:30', 'funded'], ['2026-10-09T19:00:00+05:30', 'submitted'], ['2026-10-10T10:00:00+05:30', 'approved'], ['2026-10-14T11:00:00+05:30', 'released']] },
+    { id: 'c6', creator: 'cr1', source: 'job', job: 'j5', title: 'Summer SPF myths', platform: 'instagram', format: 'Carousel', price: 1000000,
+      stage: 'released', revisionsIncluded: 1, revisionsUsed: 1, due: '2026-05-20', funded: '2026-05-05T12:00:00+05:30', released: '2026-05-22T10:00:00+05:30', thread: null,
+      views: 62000, review: { rating: 5, text: 'Clear, on time and the comments were full of real questions.', at: '2026-05-23' }, log: [] },
+    { id: 'c7', creator: 'cr7', source: 'direct', job: null, title: 'Sweat-proof SPF run test', platform: 'instagram', format: 'Reel', price: 900000,
+      stage: 'refunded', revisionsIncluded: 1, revisionsUsed: 0, due: '2026-09-15', funded: '2026-09-01T12:00:00+05:30', refunded: '2026-09-18T10:00:00+05:30', thread: null,
+      refundReason: 'Creator could not deliver after an injury. Escrow returned in full.', log: [] },
+    { id: 'c8', creator: 'cr6', source: 'direct', job: null, title: 'Wedding-season glow Reel', platform: 'instagram', format: 'Reel', price: 2000000,
+      stage: 'declined', revisionsIncluded: 1, revisionsUsed: 0, due: '2026-11-20', thread: null,
+      deliverables: ['1 Reel, 30 s', 'Serum as the primer step'], declineNote: 'Booked through wedding season. Happy to talk again in January.',
+      log: [['2026-10-26T12:00:00+05:30', 'invited'], ['2026-10-28T13:05:00+05:30', 'declined']] }
+  ],
+
+  /* ---------- chat (only for funded campaigns) ---------- */
+  threads: [
+    { id: 't1', campaign: 'c1', creator: 'cr1', unread: 1, messages: [
+      { from: 'system', kind: 'escrow', text: 'You paid ₹16,000 into escrow. Chat is open.', at: '2026-10-24T15:30:00+05:30' },
+      { from: 'creator', text: 'Thank you! Shooting on Tuesday at the office.', at: '2026-10-24T16:02:00+05:30' },
+      { from: 'creator', file: { name: 'office-sunscreen-v1.mp4', size: '48 MB' }, text: 'Draft 1 is up.', at: '2026-11-02T21:10:00+05:30' },
+      { from: 'brand', text: 'Love it. Can the hook be shorter, under 2 s?', at: '2026-11-03T10:05:00+05:30' },
+      { from: 'creator', text: 'Yes, will trim it today and resend by evening.', at: '2026-11-04T09:15:00+05:30' } ] },
+    { id: 't2', campaign: 'c2', creator: 'cr4', unread: 2, messages: [
+      { from: 'system', kind: 'escrow', text: 'You paid ₹38,000 into escrow. Chat is open.', at: '2026-10-15T12:00:00+05:30' },
+      { from: 'creator', text: 'Lab visit is booked for the 28th.', at: '2026-10-20T11:30:00+05:30' },
+      { from: 'creator', file: { name: 'barrier-cream-winter-v1.mp4', size: '1.2 GB' }, text: 'Final cut uploaded for review.', at: '2026-11-03T22:40:00+05:30' },
+      { from: 'creator', text: 'Timestamps for the product moments are in the delivery note.', at: '2026-11-03T22:42:00+05:30' } ] },
+    { id: 't3', campaign: 'c5', creator: 'cr1', unread: 0, messages: [
+      { from: 'system', kind: 'released', text: '₹14,000 released to Ananya Iyer.', at: '2026-10-14T11:00:00+05:30' },
+      { from: 'creator', text: 'Thanks for a smooth one! Happy to do the serum launch too.', at: '2026-10-14T12:20:00+05:30' } ] }
+  ],
+
+  /* ---------- payments: escrow in, releases out, refunds back (no platform fee rows) ---------- */
+  payments: [
+    { id: 'p1', date: '2026-10-24', kind: 'escrow', campaign: 'c1', creator: 'cr1', amount: 1600000, status: 'held', method: 'UPI mirevo@hdfc', invoice: 'LL-INV-2026-0418' },
+    { id: 'p2', date: '2026-10-15', kind: 'escrow', campaign: 'c2', creator: 'cr4', amount: 3800000, status: 'held', method: 'Net banking · HDFC', invoice: 'LL-INV-2026-0391' },
+    { id: 'p3', date: '2026-10-14', kind: 'release', campaign: 'c5', creator: 'cr1', amount: 1400000, status: 'released', method: 'From escrow', invoice: 'LL-INV-2026-0377' },
+    { id: 'p4', date: '2026-09-28', kind: 'escrow', campaign: 'c5', creator: 'cr1', amount: 1400000, status: 'released', method: 'UPI mirevo@hdfc', invoice: 'LL-INV-2026-0352' },
+    { id: 'p5', date: '2026-09-18', kind: 'refund', campaign: 'c7', creator: 'cr7', amount: 900000, status: 'refunded', method: 'Back to card ••••4417', invoice: 'LL-CN-2026-0012' },
+    { id: 'p6', date: '2026-09-01', kind: 'escrow', campaign: 'c7', creator: 'cr7', amount: 900000, status: 'refunded', method: 'Card ••••4417', invoice: 'LL-INV-2026-0301' },
+    { id: 'p7', date: '2026-05-22', kind: 'release', campaign: 'c6', creator: 'cr1', amount: 1000000, status: 'released', method: 'From escrow', invoice: 'LL-INV-2026-0144' },
+    { id: 'p8', date: '2026-05-05', kind: 'escrow', campaign: 'c6', creator: 'cr1', amount: 1000000, status: 'released', method: 'UPI mirevo@hdfc', invoice: 'LL-INV-2026-0121' }
+  ],
+  payMethods: [{ id: 'upi', label: 'UPI', detail: 'mirevo@hdfc' }, { id: 'nb', label: 'Net banking', detail: 'HDFC Bank' }, { id: 'card', label: 'Card', detail: '•••• 4417' }],
+
+  /* ---------- reporting (views are creator-reported + link stats, sample) ---------- */
+  report: {
+    months: [ { m: '2026-06', spent: 0, views: 0 }, { m: '2026-07', spent: 0, views: 0 }, { m: '2026-08', spent: 0, views: 0 },
+              { m: '2026-09', spent: 1400000, views: 0 }, { m: '2026-10', spent: 5400000, views: 84000 }, { m: '2026-11', spent: 0, views: 0 } ],
+    note: 'Views come from live links the creators shared. Updated daily.'
+  },
+
+  notifications: [
+    { id: 'n1', kind: 'bid', text: 'Ananya Iyer bid ₹18,000 on Barrier Repair Serum launch', at: '2026-11-04T09:12:00+05:30', go: '#job-j1', read: false },
+    { id: 'n2', kind: 'message', text: 'Ananya Iyer: Yes, will trim it today and resend by evening.', at: '2026-11-04T09:15:00+05:30', go: '#chat-t1', read: false },
+    { id: 'n3', kind: 'delivery', text: 'Arjun Rao submitted the final cut for Barrier cream, winter care', at: '2026-11-03T22:40:00+05:30', go: '#campaign-c2', read: false },
+    { id: 'n4', kind: 'accepted', text: 'Ishita Banerjee accepted your invitation. Pay into escrow to start.', at: '2026-11-03T09:20:00+05:30', go: '#campaign-c3', read: true },
+    { id: 'n5', kind: 'payment', text: '₹14,000 released to Ananya Iyer for Vitamin C gel, first impressions', at: '2026-10-14T11:00:00+05:30', go: '#payments', read: true },
+    { id: 'n6', kind: 'declined', text: 'Meher Gill declined your invitation for Wedding-season glow Reel. Nothing was charged.', at: '2026-10-28T13:05:00+05:30', go: '#campaign-c8', read: true },
+    { id: 'n7', kind: 'paid', text: 'Payment successful. ₹16,000 is held in escrow for Sunscreen reapplication, office day.', at: '2026-10-24T15:30:00+05:30', go: '#campaign-c1', read: true }
+  ],
+  ui: {}   /* screens keep their own view state here (filters, tabs, drafts) under their own key */
+};

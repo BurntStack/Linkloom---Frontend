@@ -1,0 +1,147 @@
+/* Bid form (#bid-<id>): a numbered bid slip and an ink payout receipt. Owner: Builder B. */
+.bid{gap:24px}
+.bid-h{display:flex;flex-direction:column;gap:8px}
+.bid-h-s{white-space:nowrap}
+.bid-h .t-h1{max-width:22ch}
+.bid-already{justify-content:center}
+.bid-plane{width:72px!important}
+
+/* KYC banner: status first, one line, one action */
+.bid-kyc{display:flex;align-items:center;gap:16px 24px;padding:16px 24px 16px 16px;border-radius:var(--r-lg);background:var(--ll-warn-bg);color:var(--ll-ink-text)}
+.bid-kyc img{width:72px;height:auto;flex:none}
+.bid-kyc-t{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;font-size:15px;line-height:22px;text-wrap:pretty}
+.bid-kyc .pill{background:var(--ll-white)}
+.bid-kyc .lq{flex:none}
+
+.bid-layout{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:32px;align-items:start}
+
+/* the slip */
+.bid-slip{display:flex;flex-direction:column;padding:8px 32px 32px;border-radius:var(--r-lg);background:var(--ll-white);box-shadow:var(--ll-shadow-card)}
+.bid-sec{display:grid;grid-template-columns:40px minmax(0,1fr);gap:0 16px;padding:24px 0;border-bottom:1.5px dashed var(--ll-rule)}
+/* post date + views share one numbered row; both labels start on the same column as every other label */
+.bid-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px;align-items:start}
+.bid-n{font-family:var(--ll-display);font-size:20px;line-height:24px;color:var(--ll-slate);font-variant-numeric:tabular-nums;padding-top:0}
+.bid-sec .field>label,.bid-sec .field>.lab,.bid-why-h label{font-size:14px;line-height:20px;color:var(--ll-ink-text)}
+
+/* price: big money-in with steppers, like the homepage bid field */
+.bid-money{align-items:center;gap:8px;margin-top:2px;border-bottom-color:rgba(18,18,18,.5)}
+.bid-money>span{font-size:clamp(34px,3vw,44px);color:var(--ll-ink-text)}
+.bid-money input{font-size:clamp(44px,4.4vw,60px);color:var(--ll-ink-text)}
+.bid-money input::placeholder{color:var(--ll-mist)}
+.bid-step{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--ll-paper-raised);color:var(--ll-ink-text);transition:background-color .25s,color .25s,transform .2s}
+.bid-step svg{width:18px;height:18px}
+.bid-step:hover{background:var(--ll-ink-text);color:var(--ll-white)}
+.bid-step:active{transform:scale(.92)}
+.field.is-err .bid-money{border-bottom-color:var(--ll-err-fg)}
+.bid-warn{font-weight:600;font-size:13px;line-height:18px;color:var(--ll-warn-fg)}
+.bid-warn:empty,.bid-sec .err:empty{display:none}
+
+/* why this price */
+.bid-why-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bid-note{color:var(--creator,var(--ll-coral-deep));transform:rotate(-2deg);font-size:20px;line-height:24px}
+.bid-why-f{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.bid-sec .help{text-wrap:pretty}
+.bid-count{flex:none;font-size:13px;line-height:18px;color:var(--ll-slate)}
+.bid-count.is-short{color:var(--ll-ink-text)}
+.bid-count.is-near{color:var(--ll-warn-fg);font-weight:600}
+.bid-opt{font-weight:500;color:var(--ll-slate)}
+
+/* similar work links */
+.bid-links{display:flex;flex-direction:column;gap:12px}
+.bid-link-row{position:relative;display:flex;align-items:center;gap:8px}
+.bid-link-ic{position:absolute;left:16px;top:50%;margin-top:-9px;width:18px;height:18px;color:var(--ll-slate);pointer-events:none}
+.bid-link-ic svg{width:18px;height:18px;display:block}
+.bid-link .input{padding-left:44px}
+.bid-link.is-err .input{border-color:var(--ll-err-fg)}
+.bid-link .err{margin-top:4px}
+.bid-link .err:empty{display:none}
+.bid-link-x{flex:none}
+.bid-links-f{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;min-height:44px}
+.bid-links-f .btn-q svg{width:16px;height:16px}
+.bid-links-f .btn-q[disabled]{color:var(--ll-slate);pointer-events:none}
+.bid-port{display:flex;flex-direction:column;gap:8px;padding-top:8px}
+.bid-port .chip svg{width:14px;height:14px}
+.bid-port .chip span{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.bid-foot{display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;padding-top:24px}
+.bid-sum{flex-basis:100%;display:flex;align-items:flex-start;gap:8px;font-weight:600;font-size:14px;line-height:20px;color:var(--ll-err-fg)}
+.bid-sum:empty{display:none}
+.bid-sum svg{width:18px;height:18px;flex:none}
+
+/* receipt: ink payout slip with a torn bottom edge (homepage "No surprises at payout") */
+.bid-side{position:sticky;top:92px;display:flex;flex-direction:column;gap:16px}
+.bid-receipt{display:flex;flex-direction:column;gap:8px;padding:24px 24px 40px;box-shadow:var(--ll-shadow-float);
+  -webkit-mask:radial-gradient(circle 8px at 12px 100%,#0000 97%,#000 100%) 0 0/24px 100% repeat-x;mask:radial-gradient(circle 8px at 12px 100%,#0000 97%,#000 100%) 0 0/24px 100% repeat-x}
+.bid-rc-h{font-weight:500;font-size:14px;line-height:20px;color:var(--ll-mist)}
+.bid-rows{margin:0 0 8px;display:flex;flex-direction:column}
+.bid-rows>div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--ll-ink-700);font-size:15px;line-height:22px}
+.bid-rows dt{color:var(--ll-mist)}
+.bid-rows dd{margin:0;text-align:right;color:var(--ll-white);font-variant-numeric:tabular-nums}
+.bid-rc-l{font-size:15px;line-height:22px;color:var(--ll-mist)}
+.bid-rc-net{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-top:-4px}
+.bid-rc-net .t-money{font-size:clamp(40px,3.6vw,52px);line-height:1.05;color:var(--ll-butter)}
+.bid-rc-s{max-width:30ch;font-size:14px;line-height:20px;color:var(--ll-mist);text-wrap:pretty}
+.bid-receipt .pill{align-self:flex-start;margin-top:8px}
+.bid-side-note{display:flex;align-items:flex-start;gap:8px;padding:0 24px;text-wrap:pretty}
+.bid-side-note svg{width:16px;height:16px;flex:none;margin-top:1px}
+
+/* phone dock */
+.bid-dock{display:none}
+
+/* review sheet */
+.bid-rv{display:flex;flex-direction:column;gap:16px}
+.bid-rv-slip{display:flex;flex-direction:column;gap:4px;padding:24px;border-radius:var(--r-md);background:var(--ll-white);box-shadow:var(--ll-shadow-card)}
+.bid-rv-slip .job-src{gap:8px 12px;margin-bottom:12px}
+.bid-rv-lab{font-weight:500;font-size:13px;line-height:18px;color:var(--ll-slate)}
+.bid-rv-price{font-size:48px;line-height:1.05}
+.bid-rv-kv{margin:4px 0 0}
+.bid-rv-kv dd{max-width:65%}
+.bid-rv-links{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:14px;line-height:20px;word-break:break-all}
+.bid-rv-why{display:flex;flex-direction:column;gap:4px;margin-top:4px;padding-top:12px;border-top:1px dashed var(--ll-rule)}
+.bid-rv-why p:last-child{font-size:15px;line-height:22px;text-wrap:pretty}
+.bid-rv-rc{padding:8px 24px 16px;border-radius:var(--r-md)}
+.bid-rv-rc dl{margin:0}
+.bid-rv-rc dl>div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--ll-ink-700);font-size:14px;line-height:20px}
+.bid-rv-s{padding-top:12px;font-size:13px;line-height:18px;color:var(--ll-mist);text-wrap:pretty}
+.bid-rv-rc dt{color:var(--ll-mist)}
+.bid-rv-rc dd{margin:0;text-align:right;color:var(--ll-white);font-variant-numeric:tabular-nums}
+.bid-rv-net dd{color:var(--ll-butter)}
+.bid-rv-net .t-money{font-size:32px;line-height:1.1}
+.bid-rv-net dt{color:var(--ll-white)}
+.bid-rv-rule{display:flex;gap:8px;align-items:flex-start}
+.bid-rv-rule svg{width:16px;height:16px;flex:none;margin-top:1px}
+.bid-rv-kyc{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding:12px 16px;border-radius:var(--r-sm);font-weight:600;font-size:14px;line-height:20px}
+.bid-rv-kyc svg{width:18px;height:18px;flex:none}
+.bid-rv-kyc.is-ok{background:var(--ll-ok-bg);color:var(--ll-ok-fg)}
+.bid-rv-kyc.is-no{background:var(--ll-warn-bg);color:var(--ll-warn-fg)}
+.bid-rv-kyc.is-no span{flex:1;min-width:180px}
+.bid-rv-acts{display:flex;gap:12px;flex-wrap:wrap}
+.bid-rv .err:empty{display:none}
+
+@media (max-width:1100px){ .bid-layout{grid-template-columns:minmax(0,1fr) 320px;gap:24px} .bid-slip{padding:0 24px 24px} .bid-pair{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:900px){
+  .bid{padding-bottom:96px}
+  .bid-layout{grid-template-columns:minmax(0,1fr);gap:24px}
+  .bid-side{position:static}
+  .bid-slip{padding:0 16px 24px}
+  .bid-sec{grid-template-columns:minmax(0,1fr);row-gap:8px}
+  .bid-pair{row-gap:24px}
+  .bid-n{font-size:16px;line-height:20px}
+  .bid-kyc{flex-wrap:wrap;align-items:flex-start;gap:16px;padding:16px}
+  .bid-kyc img{width:56px}
+  .bid-kyc-t{flex-basis:calc(100% - 72px)}
+  .bid-side-note{padding:0 16px}
+  .bid-kyc .lq{width:100%}
+  .bid-foot .lq{width:100%}
+  .bid-dock{position:fixed;z-index:35;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(90px + env(safe-area-inset-bottom,0px));
+    display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;border-radius:var(--r-lg);background:var(--ll-ink-800);color:var(--ll-white);box-shadow:var(--ll-shadow-float)}
+  .bid-dock-t{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:12px;line-height:16px;color:var(--ll-mist)}
+  .bid-dock-t>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bid-dock-v{font-weight:400;font-size:24px;line-height:1.1;color:var(--ll-butter);white-space:nowrap}
+  .bid-dock .lq{flex:none}
+}
+
+/* the total ticks: each change nudges the figure up 3px and it settles as the digits roll (count does the digits) */
+.is-tick{animation:bidTick .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bidTick{0%{translate:0 3px}100%{translate:0 0}}
+@media (prefers-reduced-motion:reduce){.is-tick{animation:none}}
