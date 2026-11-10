@@ -216,7 +216,6 @@
 
       el.innerHTML = `<div class="view-in home">
         <header class="home-hi">
-          <p class="home-when">${esc(when)}</p>
           <h1 class="home-greet">${esc(greeting(now))}, ${esc(first)}.</h1>
           <p class="home-lede">${objs.length ? `${WORDS[Math.min(objs.length, 5)]} ${objs.length === 1 ? "needs" : "need"} you today.` : "Nothing needs you right now. A good day to find a new brief."} <span class="sample">Sample data</span></p>
         </header>

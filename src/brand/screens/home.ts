@@ -408,7 +408,6 @@
 
       el.innerHTML = `<div class="view-in home">
         <header class="home-hi">
-          <p class="home-when">${esc(when)}</p>
           <h1 class="home-greet">${esc(greeting(now))}, ${esc(first(s.me.name))}.</h1>
           <p class="home-lede">${objs.length ? `${WORDS[Math.min(objs.length, 5)]} ${objs.length === 1 ? "needs" : "need"} you today${waits.length ? `, and ${WORDS[Math.min(waits.length, 5)].toLowerCase()} ${waits.length === 1 ? "is" : "are"} with creators` : ""}.` : "Nothing needs you right now. A good day to find a creator."} <span class="sample">Sample data</span></p>
         </header>

@@ -39,8 +39,9 @@ const COPY: Record<Role, { eyebrow: string; sub: string; btn: string; dash: stri
 let role: Role = q.get("role") === "brand" ? "brand" : "creator";
 
 /* IST clock, same as the dashboards */
-const clk = $("#clock");
+const clk = document.querySelector<HTMLElement>("#clock");
 const tick = (): void => {
+  if (!clk) return;
   try {
     clk.innerHTML =
       new Intl.DateTimeFormat("en-IN", {

@@ -23,6 +23,7 @@
     timeZone: "Asia/Kolkata",
   });
   const tick = () => {
+    if (!clock) return;
     try {
       clock.textContent =
         fmt.format(new Date()).replace(/\s?(am|pm)/i, m => " " + m.trim().toUpperCase()) + " IST";
