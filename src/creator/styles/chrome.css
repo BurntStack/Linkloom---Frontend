@@ -1,0 +1,33 @@
+/* Top-bar badge. Was an inline <style> after the stylesheets in the prototype, so it stays last in the cascade. */
+.bell {
+  position: relative;
+}
+.bell-n {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--ll-coral);
+  color: var(--ll-ink-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* The way back to the marketing site, under the sidebar's nav. */
+.nav-site {
+  display: inline-flex;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ll-mist);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.nav-site:hover {
+  color: var(--ll-white);
+}
