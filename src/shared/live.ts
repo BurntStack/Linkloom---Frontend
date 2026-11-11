@@ -1,5 +1,5 @@
 /* Helpers both dashboards use to turn backend rows into the shapes the screens were designed around. */
-import { paise, type Money } from "@/api/client";
+import { paise, type Money } from "@/shared/api/client";
 
 export type Tone = "c" | "b" | "y";
 

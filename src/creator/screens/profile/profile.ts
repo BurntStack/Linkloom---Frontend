@@ -552,7 +552,7 @@
               ];
               if (photo && photo.startsWith("data:") && photo !== before)
                 jobs.push(
-                  import("@/api/uploads").then(u => LLD.live.uploadAvatar(u.dataUrlToBlob(photo))).then(url => {
+                  import("@/shared/api/uploads").then(u => LLD.live.uploadAvatar(u.dataUrlToBlob(photo))).then(url => {
                     if (url) store.set(s => (s.me.photo = url), "profile-edited");
                   }),
                 );

@@ -15,7 +15,7 @@ import "./screens/messages/messages.css";
 import "./screens/earnings/earnings.css";
 import "./styles/chrome.css";
 
-import "./vendor-gsap";
+import "../shared/vendor-gsap";
 import "./data/seed";
 import { LLD } from "./core";
 import { initSession } from "./session";

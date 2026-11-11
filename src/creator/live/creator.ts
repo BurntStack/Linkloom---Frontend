@@ -3,10 +3,10 @@
    - loadCreator(): fills the store from the API, slice by slice, and keeps it current over the live socket.
    - creatorApi: the actions the screens call. Each one talks to the server first and only then changes the store,
      so the screen never shows something the server refused. */
-import { api, apiAll, ApiError, idemKey, storedUser, type ApiUser } from "@/api/client";
-import { fetchMe } from "@/api/auth";
-import { onLive, startLive, type LiveEvent } from "@/api/realtime";
-import { uploadFile, type UploadedFile } from "@/api/uploads";
+import { api, apiAll, ApiError, idemKey, storedUser, type ApiUser } from "@/shared/api/client";
+import { fetchMe } from "@/shared/api/auth";
+import { onLive, startLive, type LiveEvent } from "@/shared/api/realtime";
+import { uploadFile, type UploadedFile } from "@/shared/api/uploads";
 import type {
   ActiveJob,
   Bid,
@@ -21,7 +21,7 @@ import type {
   State,
   Thread,
   WorkStage,
-} from "@/types";
+} from "@/creator/types";
 import {
   addDaysIso,
   amount,
@@ -40,7 +40,7 @@ import {
   splitLocation,
   todayIst,
   toneOf,
-} from "./shared";
+} from "../../shared/live";
 
 /* ---------- backend rows (only the fields the app reads) ---------- */
 

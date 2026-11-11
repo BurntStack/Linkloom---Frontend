@@ -6,7 +6,7 @@
 
    Deliberately no `declare global`: a migrated file that still says window.LLD must fail to compile. */
 import { closeSelect, enhanceSelects } from "../ui/select";
-import { gsap } from "../vendor-gsap";
+import { gsap } from "../../shared/vendor-gsap";
 import { LLD, store, type LLDRuntime, type State } from "./index";
 import { replaceState } from "./store";
 
@@ -24,7 +24,7 @@ Object.defineProperty(window, "LLD_DATA", {
   set: (next: State) => replaceState(next),
 });
 
-/* motion.ts reads window.gsap until the motion agent imports it from @/vendor-gsap. */
+/* motion.ts reads window.gsap until the motion agent imports it from @/shared/vendor-gsap. */
 globals.gsap = gsap;
 
 /* The prototype's ui-select.js attached this at load. */

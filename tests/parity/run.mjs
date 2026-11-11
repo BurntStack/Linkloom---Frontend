@@ -392,16 +392,16 @@ async function acquireLock() {
   }
 }
 
-const protoSrv = await serve(join(ROOT, "prototype"));
-const buildSrv = await serve(flag("aa") ? join(ROOT, "prototype") : dist); // --aa: prototype vs itself, measures gate noise
+const protoSrv = await serve(join(ROOT, "prototypes", "creator"));
+const buildSrv = await serve(flag("aa") ? join(ROOT, "prototypes", "creator") : dist); // --aa: prototype vs itself, measures gate noise
 await acquireLock();
 const SHELL = join(
   process.env.LOCALAPPDATA || "",
   "ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-win64/chrome-headless-shell.exe",
 );
 const browser = await chromium.launch(existsSync(SHELL) ? { executablePath: SHELL } : { channel: "chrome" });
-const landingSrv = await serve(join(ROOT, "prototype-landing"));
-const brandSrv = await serve(join(ROOT, "prototype-brand"));
+const landingSrv = await serve(join(ROOT, "prototypes", "landing"));
+const brandSrv = await serve(join(ROOT, "prototypes", "brand"));
 const sides = {
   proto: protoSrv.url,
   build: flag("aa") ? buildSrv.url : buildSrv.url + "app.html",

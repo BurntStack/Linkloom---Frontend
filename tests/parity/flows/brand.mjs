@@ -1,4 +1,4 @@
-/* Brand dashboard interactions against prototype-brand/. Sign-in uses the sample account from the design. */
+/* Brand dashboard interactions against prototypes/brand/. Sign-in uses the sample account from the design. */
 const brand = { page: "brand" };
 const signedOut = `(()=>{window.LLD_DATA.session.signedIn=false;})()`;
 

@@ -1,6 +1,6 @@
 # Linkloom frontend: porting contract
 
-`prototype/` is the approved design. It is the source of truth and is **read-only**.
+`prototypes/creator/` is the approved design. It is the source of truth and is **read-only**.
 `src/` must stay indistinguishable from it to a user. This is a refactor, not a redesign.
 
 ## The one rule
@@ -24,7 +24,7 @@ Do not add features, dependencies, frameworks, persistence, or a backend.
 ## How to work
 
 - Convert with targeted edits. Do not retype whole files from memory: templates must stay byte-identical.
-- Keep module-load side effects (`register`, listeners) in the same relative order. `src/main.ts` import order is
+- Keep module-load side effects (`register`, listeners) in the same relative order. `src/creator/main.ts` import order is
   the prototype's script order and the cascade order; do not reorder it, and leave the CSS alone.
 - Modules are strict and the prototype was sloppy. Watch for implicit globals and `this` at function level.
 - Stay inside the paths you own. If you need something changed elsewhere, finish what you can and report it.
@@ -43,7 +43,7 @@ scope every run with `--only`, run it when you have a batch of changes (not afte
 it in parallel with itself, never lower the lock, and never run the whole suite (the orchestrator does that).
 Do not run other browsers or `vite dev`.
 
-A failure means the build differs from the prototype. Change `src/`. Never change `prototype/`,
+A failure means the build differs from the prototype. Change `src/`. Never change `prototypes/creator/`,
 `tests/parity/run.mjs` or `tests/parity/scenarios.mjs` to make a difference disappear; report it instead.
 If a failure is clearly in another agent's unfinished file, wait briefly and re-run before investigating.
 
@@ -64,14 +64,14 @@ Cover every branch a user can reach: happy paths, validation errors, cancel/back
 Put fixtures in `tests/parity/fixtures/`. `Date` is frozen at 2026-11-04 10:42 IST and `Math.random` is seeded
 on both sides, so timers that compare `Date.now()` never elapse; use `eval` with a preset or the state to reach those branches.
 
-## Shared API (`src/core`)
+## Shared API (`src/creator/core`)
 
-Import from `@/core`. `LLD` is the typed runtime object, and screens may keep the short alias:
+Import from `@/creator/core`. `LLD` is the typed runtime object, and screens may keep the short alias:
 
 ```ts
-import { LLD as L, type State } from "@/core";
+import { LLD as L, type State } from "@/creator/core";
 ```
 
-`L.store.s` is the typed state. `L.motion` is the typed motion API. `src/types.ts` holds the data model.
+`L.store.s` is the typed state. `L.motion` is the typed motion API. `src/creator/types.ts` holds the data model.
 
 The test hooks `window.LLD` / `window.LLD_DATA` exist only when `VITE_TEST_HOOKS` is set (parity build). No app code may read them.

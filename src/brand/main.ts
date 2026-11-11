@@ -15,7 +15,7 @@ import "./screens/messages.css";
 import "./screens/payments.css";
 import "./screens/reports.css";
 import "./chrome.css";
-import "../vendor-gsap";
+import "../shared/vendor-gsap";
 import "./seed";
 import "./core";
 import "./select";

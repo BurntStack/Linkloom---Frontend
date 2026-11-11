@@ -5,8 +5,8 @@
    counter; one or more languages; city and state only (never an address); photo upload with crop, type and size checks.
    Save lands on the creator's own profile (#profile).
    Also defines window.LLA.photo (shared photo picker + crop), reused by the profile edit sheet. */
-import { ApiError, apiEnabled } from "@/api/client";
-import { submitCreatorOnboarding } from "@/api/onboarding";
+import { ApiError, apiEnabled } from "@/shared/api/client";
+import { submitCreatorOnboarding } from "@/shared/api/onboarding";
 
 (() => {
   const { esc, icon, store } = LLD;

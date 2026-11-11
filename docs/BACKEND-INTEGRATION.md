@@ -8,14 +8,14 @@ data and never calls the server; every other build swaps the seed files for empt
 
 | Path | What it does |
 |---|---|
-| `src/api/client.ts` | Requests, the `{success,data,error,meta}` envelope, tokens (localStorage when "Keep me signed in", else sessionStorage), automatic refresh, `ApiError` with the backend's error `code` |
-| `src/api/auth.ts` | One-time code (SMS or email), Google, `/auth/me`, sign-up completion, sign-out |
-| `src/api/google.ts` | Google Identity Services: Google's real button laid invisibly over the designed one |
-| `src/api/uploads.ts` | The three-step upload (ticket → PUT → complete) and 5-minute download links |
-| `src/api/realtime.ts` | WebSocket live updates with ticket, ping and reconnect |
-| `src/live/creator.ts`, `src/live/creator-offers.ts` | Creator data: backend rows → the screens' model, plus every creator action |
+| `src/shared/api/client.ts` | Requests, the `{success,data,error,meta}` envelope, tokens (localStorage when "Keep me signed in", else sessionStorage), automatic refresh, `ApiError` with the backend's error `code` |
+| `src/shared/api/auth.ts` | One-time code (SMS or email), Google, `/auth/me`, sign-up completion, sign-out |
+| `src/shared/api/google.ts` | Google Identity Services: Google's real button laid invisibly over the designed one |
+| `src/shared/api/uploads.ts` | The three-step upload (ticket → PUT → complete) and 5-minute download links |
+| `src/shared/api/realtime.ts` | WebSocket live updates with ticket, ping and reconnect |
+| `src/creator/live/creator.ts`, `src/creator/live/creator-offers.ts` | Creator data: backend rows → the screens' model, plus every creator action |
 | `src/brand/live.ts`, `src/brand/kyc.ts` | Brand data and actions, and the brand verification screen |
-| `src/session.ts`, `src/brand/session.ts` | Signed-in loading, read-only guest view, session expiry, sign-out |
+| `src/creator/session.ts`, `src/brand/session.ts` | Signed-in loading, read-only guest view, session expiry, sign-out |
 
 ## What each screen uses
 

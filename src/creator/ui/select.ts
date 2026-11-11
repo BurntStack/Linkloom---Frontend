@@ -3,7 +3,7 @@
    (ARIA select-only combobox). The native <select> stays the source of truth: its value changes and it fires
    input + change, so screen code needs no changes. On coarse pointers (phones) the native picker is kept.
    Opt out with data-native on the select. */
-import { esc, icon } from "@/core";
+import { esc, icon } from "@/creator/core";
 
 /* One <select> and its wrapper. Coarse-pointer selects stop at this: they keep the native picker. */
 interface Inst {

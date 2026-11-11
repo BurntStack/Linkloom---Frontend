@@ -1,10 +1,10 @@
 /* Direct offers. A brand can hire a creator without a brief: POST /v1/offers/ on their side,
    GET /v1/creators/me/offers/ and PATCH { status } on this side. The prototype had no screen for it, so the offers
    that are still open are shown at the top of My Bids, in the same card language as the bid slips. */
-import { LLD, store } from "@/core";
-import { ApiError } from "@/api/client";
+import { LLD, store } from "@/creator/core";
+import { ApiError } from "@/shared/api/client";
 import { creatorApi } from "./creator";
-import { amount, day, nameOf } from "./shared";
+import { amount, day, nameOf } from "../../shared/live";
 
 type Obj = Record<string, unknown>;
 

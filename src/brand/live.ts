@@ -9,10 +9,10 @@
    - the "Favourites" list             → s.favorites
    - conversations                     → s.threads
    - escrow and release, from orders   → s.payments */
-import { api, apiAll, ApiError, type ApiUser } from "@/api/client";
-import { fetchMe } from "@/api/auth";
-import { onLive, startLive, type LiveEvent } from "@/api/realtime";
-import { openPrivateFile, uploadFile } from "@/api/uploads";
+import { api, apiAll, ApiError, type ApiUser } from "@/shared/api/client";
+import { fetchMe } from "@/shared/api/auth";
+import { onLive, startLive, type LiveEvent } from "@/shared/api/realtime";
+import { openPrivateFile, uploadFile } from "@/shared/api/uploads";
 import {
   amount,
   day,
@@ -27,7 +27,7 @@ import {
   settle,
   splitLocation,
   toneOf,
-} from "@/live/shared";
+} from "@/shared/live";
 
 type Obj = Record<string, unknown>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the brand screens are still untyped (@ts-nocheck)

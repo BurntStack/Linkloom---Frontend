@@ -5,14 +5,14 @@
    - Session lost (refresh token expired or revoked): back to #login with the "session expired" note.
 
    The parity build runs on the prototype's sample data and skips all of this. */
-import { clearAuth, isSignedIn, setSessionLostHandler, type ApiUser } from "./api/client";
-import { signOut } from "./api/auth";
-import { stopLive } from "./api/realtime";
+import { clearAuth, isSignedIn, setSessionLostHandler, type ApiUser } from "../shared/api/client";
+import { signOut } from "../shared/api/auth";
+import { stopLive } from "../shared/api/realtime";
 import { LLD, setRouteGuard, store } from "./core";
 import { setGuestRoutes } from "./core/router";
 import { creatorApi, loadCreator, loadGuest } from "./live/creator";
 import { wireCreatorOffers } from "./live/creator-offers";
-import { addSiteLink } from "./signin/handoff";
+import { addSiteLink } from "../signin/handoff";
 
 const OPEN_DURING_SETUP = new Set(["setup", "login"]);
 const GUEST_ROUTES = new Set(["home", "jobs", "login"]);

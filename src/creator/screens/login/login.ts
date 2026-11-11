@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { attachGoogle } from "@/api/google";
-import { authMessage, googleSignIn, requestOtp, verifyOtp } from "@/api/auth";
-import { ApiError } from "@/api/client";
+import { attachGoogle } from "@/shared/api/google";
+import { authMessage, googleSignIn, requestOtp, verifyOtp } from "@/shared/api/auth";
+import { ApiError } from "@/shared/api/client";
 /* login screen (Builder A): Continue with Google, or mobile number + 6-digit OTP.
    OTP rules: 30 s resend cooldown, 3 resends per number, 3 wrong codes locks the number for 10 min.
    Signing in sets session.signedIn; a first login goes to #setup, a returning creator to #home.

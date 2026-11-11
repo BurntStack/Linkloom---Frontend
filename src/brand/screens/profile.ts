@@ -540,7 +540,7 @@
           .saveBrand(me)
           .then(() =>
             me.logo && String(me.logo).startsWith("data:")
-              ? import("@/api/uploads").then(u => L.live.uploadLogo(u.dataUrlToBlob(me.logo))).then(url => url && store.set(s => (s.me.logo = url), "profile-edited"))
+              ? import("@/shared/api/uploads").then(u => L.live.uploadLogo(u.dataUrlToBlob(me.logo))).then(url => url && store.set(s => (s.me.logo = url), "profile-edited"))
               : null,
           )
           .then(done, e => {
@@ -1020,7 +1020,7 @@
                 .saveBrand(me)
                 .then(() =>
                   me.logo && String(me.logo).startsWith("data:")
-                    ? import("@/api/uploads").then(u => L.live.uploadLogo(u.dataUrlToBlob(me.logo))).then(url => url && store.set(s => (s.me.logo = url), "profile-edited"))
+                    ? import("@/shared/api/uploads").then(u => L.live.uploadLogo(u.dataUrlToBlob(me.logo))).then(url => url && store.set(s => (s.me.logo = url), "profile-edited"))
                     : null,
                 )
                 .catch(e => L.toast(L.live.errorText(e), "alert"));

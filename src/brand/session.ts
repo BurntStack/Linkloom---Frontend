@@ -6,9 +6,9 @@
      because sign-in is by one-time code or Google.
 
    The parity build runs on the prototype's sample data and skips all of this. */
-import { clearAuth, isSignedIn, setSessionLostHandler, type ApiUser } from "../api/client";
-import { signOut } from "../api/auth";
-import { stopLive } from "../api/realtime";
+import { clearAuth, isSignedIn, setSessionLostHandler, type ApiUser } from "../shared/api/client";
+import { signOut } from "../shared/api/auth";
+import { stopLive } from "../shared/api/realtime";
 import { addSiteLink } from "../signin/handoff";
 import { brandApi, loadBrand, loadBrandGuest } from "./live";
 import { registerBrandKyc } from "./kyc";

@@ -1,4 +1,4 @@
-/* The landing page against its original (prototype-landing/). Reduced motion only: with full motion its shader and
+/* The landing page against its original (prototypes/landing/). Reduced motion only: with full motion its shader and
    scroll-driven tweens run continuously, so there is no settled state to compare. tests/e2e/journey.mjs covers full motion. */
 const base = { page: "landing", start: "", fullMotion: false };
 

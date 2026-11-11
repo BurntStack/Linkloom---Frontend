@@ -1,10 +1,10 @@
-/* The motion API: the contract between src/motion (the implementation) and the screens (the callers).
+/* The motion API: the contract between src/creator/motion (the implementation) and the screens (the callers).
 
-   Core owns the `motion` object and seeds it with the eight no-ops below. src/motion assigns the real methods ONTO THIS
+   Core owns the `motion` object and seeds it with the eight no-ops below. src/creator/motion assigns the real methods ONTO THIS
    SAME OBJECT when it loads (`Object.assign(motion, impl)`); never replace the object, since the router and every screen
    hold a reference to it. Check the implementation with `satisfies MotionImpl`.
 
-   Members other than the eight are optional because they do not exist until src/motion has loaded. That is why screens
+   Members other than the eight are optional because they do not exist until src/creator/motion has loaded. That is why screens
    guard them (`L.motion.print ? ... : ...`) and go through `mo()` in the job kit. */
 import type { IconName } from "./icons";
 
@@ -156,7 +156,7 @@ export interface Motion {
   /** Runs mutate exactly once, always, then glides the nodes from their old positions. */
   flip: (mutate?: (() => void) | null, nodes?: FlipNodes, o?: FlipOptions) => MotionDone;
 
-  /* ---------- present once src/motion has loaded ---------- */
+  /* ---------- present once src/creator/motion has loaded ---------- */
   /** Same function as count. */
   tick?: (el: MaybeElement, to: number, fmt?: CountFormat | null, o?: CountOptions) => void;
   shake?: (el: MaybeElement) => Promise<void>;
@@ -192,7 +192,7 @@ export interface Motion {
   ready?: boolean;
 }
 
-/** What src/motion must provide: every member, present. */
+/** What src/creator/motion must provide: every member, present. */
 export type MotionImpl = Required<Motion>;
 
 /** The callable members, for dynamic dispatch such as the job kit's mo("press", el). */
@@ -200,7 +200,7 @@ export type MotionMethod = {
   [K in keyof MotionImpl]: MotionImpl[K] extends (...args: never[]) => unknown ? K : never;
 }[keyof MotionImpl];
 
-/* motion API (implemented in src/motion; safe no-ops until then) */
+/* motion API (implemented in src/creator/motion; safe no-ops until then) */
 export const motion: Motion = {
   enter() {},
   stagger() {},
