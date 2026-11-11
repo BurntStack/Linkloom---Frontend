@@ -1,0 +1,36 @@
+/* What the brand dashboard starts from in the real app: no rows. src/brand/live.ts fills it from the API.
+   vite.config.ts serves this file in place of seed.ts in every build except the parity one. */
+(window as unknown as { LLD_DATA: unknown }).LLD_DATA = {
+  session: { signedIn: false, remember: true, status: "verified" },
+  taken: { emails: [], mobiles: [] },
+  me: {
+    brand: "",
+    name: "",
+    role: "",
+    email: "",
+    mobile: "",
+    logo: null,
+    website: "",
+    industry: "",
+    city: "",
+    state: "",
+    about: "",
+    billing: { legal: "", gstin: "", address: "", email: "" },
+    passwordChanged: "",
+  },
+  plan: null,
+  budget: { label: "", total: 0 },
+  creators: [],
+  favorites: [],
+  cart: [],
+  jobs: [],
+  bids: [],
+  campaigns: [],
+  threads: [],
+  payments: [],
+  payMethods: [],
+  report: { months: [], note: "Views come from live links the creators shared." },
+  notifications: [],
+  ui: {},
+};
+export {};
