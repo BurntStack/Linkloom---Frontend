@@ -1,0 +1,116 @@
+/* My Bids (#bids): bid slips (ticket stub + body with a progress rail) on a status board. Owner: Builder B. */
+.bids{gap:32px}
+.bids-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px 24px;flex-wrap:wrap}
+.bids-head-t{display:flex;flex-direction:column;gap:8px;min-width:0}
+.bids-head-t p{text-wrap:pretty}
+.bids-head-t .sample{white-space:nowrap}
+.bids-head .lq svg{width:16px;height:16px}
+.bids-filter .chip[disabled]{opacity:.45;cursor:default;pointer-events:none}
+.bids-cn{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:var(--r-full);background:var(--ll-paper-raised);color:var(--ll-ink-text);font-size:12px;line-height:1;font-variant-numeric:tabular-nums}
+.bids-filter .chip[aria-pressed=true] .bids-cn{background:var(--ll-butter)}
+
+.bids-board{display:flex;flex-direction:column;gap:48px}
+.bids-group{display:flex;flex-direction:column;gap:16px}
+.bids-gh{display:flex;align-items:baseline;gap:8px;font-weight:400}
+.bids-gn{font-weight:600;font-size:14px;line-height:20px;color:var(--ll-slate)}
+.bids-list{display:flex;flex-direction:column;gap:16px}
+
+/* the slip: stub on the left, perforation, body on the right */
+.bids-slip{position:relative;display:grid;grid-template-columns:208px minmax(0,1fr);border-radius:var(--r-md);background:var(--ll-white);box-shadow:var(--ll-shadow-card);overflow:hidden}
+.bids-stub{position:relative;display:flex;flex-direction:column;gap:4px;padding:24px;border-right:1.5px dashed var(--ll-rule)}
+.bids-stub::before,.bids-stub::after{content:"";position:absolute;right:-11px;width:20px;height:20px;border-radius:50%;background:var(--ll-paper)}
+.bids-stub::before{top:-10px}
+.bids-stub::after{bottom:-10px}
+.bids-stub-l{font-weight:500;font-size:13px;line-height:18px;color:var(--ll-slate)}
+.bids-price{font-size:clamp(32px,2.8vw,40px);line-height:1.1;color:var(--ll-ink-text)}
+.bids-stub-d{margin-top:auto;font-size:13px;line-height:18px;color:var(--ll-slate)}
+
+/* won bids get an ink stub with butter money; closed bids go quiet */
+.bids-slip.is-accepted .bids-stub,.bids-slip.is-completed .bids-stub{background:var(--ll-ink-900);border-right-color:var(--ll-ink-700)}
+.bids-slip.is-accepted .bids-stub-l,.bids-slip.is-accepted .bids-stub-d,.bids-slip.is-completed .bids-stub-l,.bids-slip.is-completed .bids-stub-d{color:var(--ll-mist)}
+.bids-slip.is-accepted .bids-price,.bids-slip.is-completed .bids-price{color:var(--ll-butter)}
+.bids-slip.is-rejected,.bids-slip.is-withdrawn{background:var(--ll-paper-raised);box-shadow:none}
+.bids-slip.is-rejected .bids-stub::before,.bids-slip.is-rejected .bids-stub::after,.bids-slip.is-withdrawn .bids-stub::before,.bids-slip.is-withdrawn .bids-stub::after{background:var(--ll-paper)}
+.bids-slip.is-rejected .bids-price,.bids-slip.is-withdrawn .bids-price{color:var(--ll-slate)}
+.bids-slip.is-withdrawn .bids-price{text-decoration:line-through;text-decoration-thickness:1.5px}
+.bids-slip.is-new{box-shadow:0 0 0 3px var(--ll-butter),var(--ll-shadow-pin)}
+
+.bids-body{display:flex;flex-direction:column;gap:8px;min-width:0;padding:24px}
+.bids-top{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;margin-bottom:4px}
+.bids-t{font-weight:600;font-size:19px;line-height:25px;letter-spacing:-.01em}
+.bids-sub{display:flex;align-items:center;gap:6px;font-size:14px;line-height:20px;color:var(--ll-slate)}
+.bids-sub svg{width:16px;height:16px;flex:none;color:var(--ll-ink-text)}
+.bids-note{font-size:14px;line-height:20px;color:var(--ll-slate)}
+.bids-acts{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;padding-top:4px}
+.bids-acts .btn-q svg{width:16px;height:16px}
+.bids-fb{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:14px;color:var(--ll-ok-fg)}
+.bids-fb svg{width:16px;height:16px}
+
+/* progress rail: violet for what the brand did, coral ring for where it stands (homepage step 04) */
+.bids-rail{display:flex;align-items:center;max-width:560px;min-height:40px;margin-block:4px;font-size:13px;line-height:18px;color:var(--ll-slate)}
+.bids-rail li{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.bids-rail li:not(:last-child){flex:1 1 auto}   /* equal share of spare width per step, so every connector is the same length */
+.bids-rail li:not(:last-child)::after{content:"";flex:1;min-width:12px;height:1.5px;margin-inline:8px;background:var(--ll-rule)}
+.bids-rail li::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--ll-slate)}
+.bids-rail .is-done{color:var(--ll-ink-text)}
+.bids-rail .is-done::before{background:var(--ll-violet);box-shadow:none}
+.bids-rail .is-done:not(:last-child)::after{background:var(--ll-violet)}
+.bids-rail .is-now{color:var(--ll-ink-text);font-weight:600}
+.bids-rail .is-now::before{box-shadow:inset 0 0 0 2.5px var(--ll-coral)}
+.bids-rail .is-end{font-weight:600}
+.bids-rail.is-rejected .is-end{color:var(--ll-err-fg)}
+.bids-rail.is-rejected .is-end::before{box-shadow:inset 0 0 0 2.5px var(--ll-err-fg)}
+.bids-rail.is-withdrawn .is-end{color:var(--ll-ink-text)}
+.bids-rail.is-withdrawn .is-end::before{background:var(--ll-slate);box-shadow:none}
+.bids-rail.is-rejected,.bids-rail.is-withdrawn{max-width:360px}
+
+.bids-empty .t-h2{max-width:22ch}
+.bids-empty img{width:72px}
+
+/* sheets */
+.bids-mini{display:flex;flex-direction:column;gap:4px;padding:24px;border-radius:var(--r-md);background:var(--ll-white);box-shadow:var(--ll-shadow-card)}
+.bids-mini-p{font-size:40px;line-height:1.1;margin-top:8px}
+.bids-conseq{display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:22px}
+.bids-conseq li{display:flex;gap:12px;text-wrap:pretty}
+.bids-conseq li::before{content:"";flex:none;width:7px;height:7px;margin-top:8px;border-radius:50%;background:var(--ll-ink-text)}
+.bids-rate{margin:0;padding:0;border:0}
+.bids-rate legend{margin-bottom:12px}
+.bids-stars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.bids-star{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px;border-radius:var(--r-sm);background:var(--ll-white);box-shadow:inset 0 0 0 1.5px var(--ll-rule);cursor:pointer;transition:background-color .25s,color .25s,box-shadow .25s}
+.bids-star input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.bids-star .t-money{font-size:26px;line-height:1.1}
+.bids-star small{font-size:12px;line-height:16px;color:var(--ll-slate);text-align:center}
+.bids-star:hover{box-shadow:inset 0 0 0 1.5px var(--ll-ink-text)}
+.bids-star:has(input:checked){background:var(--ll-ink-text);color:var(--ll-white);box-shadow:none}
+.bids-star:has(input:checked) small{color:var(--ll-mist)}
+.bids-star:has(input:focus-visible){outline:2px solid var(--ll-ink-text);outline-offset:3px}
+
+@media (max-width:900px){
+  .bids-slip{grid-template-columns:minmax(0,1fr)}
+  .bids-stub{flex-direction:row;align-items:baseline;flex-wrap:wrap;gap:4px 12px;padding:16px;border-right:0;border-bottom:1.5px dashed var(--ll-rule)}
+  .bids-slip.is-accepted .bids-stub,.bids-slip.is-completed .bids-stub{border-bottom-color:var(--ll-ink-700)}
+  .bids-stub::before,.bids-stub::after{top:auto;bottom:-11px;right:auto}
+  .bids-stub::before{left:-10px}
+  .bids-stub::after{right:-10px}
+  .bids-stub-l{flex-basis:100%}
+  .bids-stub-d{margin:0 0 0 auto}
+  .bids-body{padding:16px 16px 24px}
+  .bids-t{font-size:17px;line-height:23px}
+  .bids-rail{font-size:12px}
+  .bids-rail li:not(:last-child)::after{margin-inline:6px 4px;min-width:8px}
+  .bids{gap:24px}
+  .bids-board{gap:32px}
+  .bids-filter{flex-wrap:nowrap;overflow-x:auto;margin:-4px calc(-1 * var(--gutr)) 0 calc(-1 * var(--gut));padding:4px var(--gutr) 8px var(--gut);scroll-padding-inline:var(--gut);scrollbar-width:none}
+  .bids-filter::-webkit-scrollbar{display:none}
+  .bids-filter .chip{flex:none}
+  .bids-head .lq{display:none}
+}
+
+/* narrow phones: the rail keeps every dot but only names the steps reached, so it never clips */
+@media (max-width:420px){
+  .bids-rail .is-next span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+/* a just-sent bid: a fine coral thread draws from Sent along its lane, once */
+.bids-slip.is-new .bids-rail li:first-child::after{background:var(--ll-coral);transform-origin:left center;animation:bidsThread .48s cubic-bezier(.16,1,.3,1) .6s backwards}
+@keyframes bidsThread{from{transform:scaleX(0)}}
+@media (prefers-reduced-motion:reduce){.bids-slip.is-new .bids-rail li:first-child::after{animation:none}}

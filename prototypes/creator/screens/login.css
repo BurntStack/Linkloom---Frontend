@@ -1,0 +1,69 @@
+/* login screen styles (Builder A). Classes are prefixed .login- */
+.login{background:var(--ll-paper)}
+.login-art{min-height:100vh;min-height:100dvh;position:sticky;top:0;isolation:isolate}
+.login-brand{position:relative;z-index:2;display:flex;align-items:center;gap:12px}
+.login-brand img{width:28px;height:28px}
+.login-brand span{font-family:var(--ll-display);font-size:28px;line-height:1;letter-spacing:-.02em}
+.login-line{position:relative;z-index:2;max-width:9.5ch;font-size:clamp(44px,6.2vw,96px);line-height:.98;margin-top:clamp(40px,10vh,120px)}
+.login-rings{position:absolute;z-index:0;right:-14%;bottom:-6%;width:min(78%,560px);height:auto;pointer-events:none}
+.login-art-foot{position:relative;z-index:2;margin-top:auto;padding-top:32px;text-wrap:pretty;font-size:14px;line-height:20px;color:var(--ll-mist);max-width:22ch}
+
+.login-form{min-height:100vh;min-height:100dvh}
+.login-in{display:flex;flex-direction:column;gap:24px;max-width:440px;width:100%}
+.login-head{display:flex;flex-direction:column;gap:8px}
+.login-head p{max-width:46ch}
+.login-head h1:focus{outline:0}
+.login-pane{display:flex;flex-direction:column;gap:24px}
+.login-google{width:100%}
+.login-google .ic{width:18px;height:18px}
+.login-or{display:flex;align-items:center;gap:16px;font-size:13px;line-height:18px;color:var(--ll-slate)}
+.login-or::before,.login-or::after{content:"";flex:1;height:1px;background:var(--ll-rule)}
+.login-phone{display:flex;flex-direction:column;gap:24px}
+.login-tel{display:flex;align-items:stretch}
+.login-cc{display:grid;place-items:center;padding:0 16px;border:1.5px solid rgba(18,18,18,.5);border-right:0;border-radius:var(--r-sm) 0 0 var(--r-sm);background:var(--ll-paper-raised);font-weight:600;font-variant-numeric:tabular-nums}
+.login-tel .input{border-radius:0 var(--r-sm) var(--r-sm) 0;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.field.is-err .login-cc{border-color:var(--ll-err-fg)}
+.login-go{align-self:flex-start;min-width:180px}
+
+.login-otp-h{display:flex;flex-direction:column;gap:4px}
+.login-otp{display:flex;flex-direction:column;gap:16px}
+.login-boxes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;max-width:432px}
+.login-box{width:100%;min-width:0;height:64px;padding:0;text-align:center;border-radius:var(--r-sm);background:#fff;border:1.5px solid rgba(18,18,18,.5);
+  font:600 26px/1 var(--ll-sans);font-variant-numeric:tabular-nums;color:var(--ll-ink-text);caret-color:var(--ll-coral);transition:border-color .2s,box-shadow .2s,background-color .2s}
+.login-box::placeholder{color:transparent}
+.login-box:not(:placeholder-shown){border-color:var(--ll-ink-text)}                 /* a filled digit firms up its edge */
+.login-box:focus{outline:0;border-color:var(--ll-ink-text);box-shadow:0 0 0 3px rgba(18,18,18,.08),inset 0 -2px 0 var(--ll-coral)} /* the active box carries a coral thread along its base */
+.login-box:disabled{background:var(--ll-paper-raised);color:var(--ll-slate)}
+.login-otp.is-err .login-box{border-color:var(--ll-err-fg)}
+.login-otp-err:empty{display:none}
+.login-lock{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:var(--r-md);background:var(--ll-warn-bg);color:var(--ll-warn-fg);font-size:14px;line-height:20px}
+.login-lock svg{width:20px;height:20px;flex:none;margin-top:2px}
+.login-resend{display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:20px}
+.login-hint{color:var(--ll-slate)}
+.login-hint b{color:var(--ll-ink-text);letter-spacing:.06em}
+
+.login-note{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:var(--r-md);font-size:14px;line-height:20px}
+.login-note svg{width:20px;height:20px;flex:none;margin-top:0}
+.login-note-info{background:var(--ll-info-bg);color:var(--ll-info-fg)}
+.login-note-err{background:var(--ll-err-bg);color:var(--ll-err-fg)}
+
+.login-sample{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;padding-top:24px;border-top:1px solid var(--ll-rule)}
+.login-acc{display:flex;flex-wrap:wrap;gap:8px}
+.login-acc button{min-height:32px;min-width:44px;padding:0 12px;border-radius:var(--r-full);box-shadow:inset 0 0 0 1.5px var(--ll-rule);background:#fff;font-weight:600;font-size:12px;transition:background-color .25s,color .25s,box-shadow .25s}
+.login-acc button:hover{box-shadow:inset 0 0 0 1.5px var(--ll-ink-text)}
+.login-acc button[aria-pressed=true]{background:var(--ll-ink-text);color:#fff;box-shadow:none}
+.login-legal{font-size:12px;line-height:16px;color:var(--ll-slate)}
+
+@media (max-width:900px){
+  .login-art{position:relative;min-height:0;height:auto}
+  .login-line{font-size:clamp(40px,11vw,56px);margin-top:24px;max-width:8ch}
+  .login-rings{width:180px;right:-44px;bottom:-70px}
+  .login-art-foot{padding-top:16px}
+  .login-form{min-height:0;justify-content:flex-start}
+  .login-go{align-self:stretch}
+}
+@media (pointer:coarse){.login-acc button{min-height:44px}}
+@media (max-width:420px){
+  .login-boxes{gap:8px}
+  .login-box{height:56px;font-size:22px}
+}

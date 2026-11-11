@@ -1,0 +1,72 @@
+/* Job detail (#job-<id>). Owner: Builder B. Card bits (.jobs-*) come from jobs.css. */
+.job{gap:24px}
+.job-back,.bid-back{align-self:flex-start}
+.job-back svg,.bid-back svg{width:16px;height:16px}
+.job-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:48px;align-items:start}
+.job-main{display:flex;flex-direction:column;min-width:0}
+
+.job-h{display:flex;flex-direction:column;gap:12px;padding-bottom:24px}
+.job-src{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap}
+.job-h .sample{white-space:nowrap}
+.job-h .t-h1{max-width:20ch}
+.job-tools{display:flex;flex-wrap:wrap;gap:8px;padding-top:4px}
+.job-tools .chip svg{width:16px;height:16px}
+.job-tools .chip[aria-pressed=true] svg path{fill:currentColor}
+.job-tools .chip[aria-disabled=true]{color:var(--ll-slate);pointer-events:none;box-shadow:inset 0 0 0 1.5px var(--ll-rule)}
+
+.job-sec{display:flex;flex-direction:column;gap:16px;padding:24px 0;border-top:1px solid var(--ll-rule)}
+.job-brief{max-width:62ch;font-size:19px;line-height:30px;color:var(--ll-ink-text);text-wrap:pretty}
+.job-dels{display:flex;flex-direction:column}
+.job-dels li{display:flex;align-items:baseline;gap:16px;padding:12px 0;font-size:16px;line-height:24px}
+.job-dels li+li{border-top:1px dashed var(--ll-rule)}
+.job-n{flex:none;width:32px;font-weight:500;font-size:14px;line-height:20px;color:var(--ll-slate);font-variant-numeric:tabular-nums}
+.job-kv{margin:0}
+.job-kv dd{max-width:60%}
+
+/* why it matches: six checks against the profile */
+.job-fit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.job-fit li{display:grid;grid-template-columns:28px minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;align-items:start;padding:12px 16px;border-radius:var(--r-md);background:var(--ll-white);box-shadow:inset 0 0 0 1px var(--ll-rule)}
+.job-fit-i{grid-row:1/3;display:grid;place-items:center;width:28px;height:28px;border-radius:50%}
+.job-fit-i svg{width:16px;height:16px}
+.job-fit .is-ok .job-fit-i{background:var(--ll-ok-bg);color:var(--ll-ok-fg)}
+.job-fit .is-no .job-fit-i{background:var(--ll-paper-raised);color:var(--ll-slate)}
+.job-fit-k{font-weight:600;font-size:14px;line-height:20px}
+.job-fit-v{font-size:14px;line-height:20px;color:var(--ll-slate)}
+
+/* the deal slip on the right, sticky while you read */
+.job-side{position:sticky;top:92px}
+.job-deal{display:flex;flex-direction:column;gap:12px;padding:24px}
+.job-lab{font-weight:500;font-size:14px;line-height:20px;color:var(--ll-slate)}
+.job-budget{margin-top:-4px;font-size:clamp(48px,4.4vw,60px);line-height:1}
+.job-payline{padding:12px 16px;border-radius:var(--r-sm);background:var(--ll-paper);font-size:14px;line-height:20px;text-wrap:pretty}
+.job-bid-btn{width:100%;margin-top:4px}
+.job-kyc{display:flex;align-items:flex-start;gap:8px}
+.job-kyc svg{width:16px;height:16px;flex:none;margin-top:1px}
+.job-prev{padding-top:4px}
+.job-mine{display:flex;flex-direction:column;gap:12px;padding-top:16px;border-top:1px solid var(--ll-rule)}
+.job-mine .row{gap:8px}
+
+/* phone: a dock above the tab bar holds price, place and Bid */
+.job-sticky{display:none}
+.job-rep-set{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;border:0}
+.job-rep-set legend{margin-bottom:12px}
+
+@media (max-width:1100px){ .job-layout{grid-template-columns:minmax(0,1fr) 320px;gap:32px} .job-fit{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:900px){
+  .job{padding-bottom:96px}
+  .job-layout{display:flex;flex-direction:column;gap:0}
+  .job-main{display:contents}
+  .job-main>*{order:2}
+  .job-main>.job-h{order:0}
+  .job-side{position:static;order:1;margin-bottom:24px}
+  .job-deal{padding:24px 16px}
+  .job-deal .job-bid-btn{display:none}
+  .job-brief{font-size:17px;line-height:27px}
+  .job-sticky{position:fixed;z-index:35;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(90px + env(safe-area-inset-bottom,0px));
+    display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;border-radius:var(--r-lg);background:var(--ll-ink-800);color:var(--ll-white);box-shadow:var(--ll-shadow-float)}
+  .job-sticky-t{min-width:0}
+  .job-sticky .t-money{font-size:26px;line-height:1.1}
+  .job-sticky .jobs-loc{color:var(--ll-mist);font-size:13px}
+  .job-sticky .jobs-loc svg{color:var(--ll-mist)}
+  .job-sticky .lq{flex:none}
+}
