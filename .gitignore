@@ -1,0 +1,9 @@
+node_modules
+dist
+.parity-dist
+tests/parity/out
+*.log
+.vercel
+
+.vercel
+test-results
