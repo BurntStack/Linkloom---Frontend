@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="26" height="18" viewBox="0 0 26 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Rings" clip-path="url(#clip0_0_14)">
+<path id="Vector" d="M16 9C16 12.866 12.866 16 9 16C5.13401 16 2 12.866 2 9C2 5.13401 5.13401 2 9 2C12.866 2 16 5.13401 16 9Z" stroke-width="2.6" stroke="#EB6273"/>
+<path id="Vector_2" d="M24 9C24 12.866 20.866 16 17 16C13.134 16 10 12.866 10 9C10 5.13401 13.134 2 17 2C20.866 2 24 5.13401 24 9Z" stroke-width="2.6" stroke="#8981EE"/>
+</g>
+<defs>
+<clipPath id="clip0_0_14">
+<rect width="26" height="18" fill="white"/>
+</clipPath>
+</defs>
+</svg>
