@@ -16,6 +16,7 @@
     "test:mocked": "node tests/e2e/live-mocked.mjs && node tests/e2e/live-actions.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "gsap": "3.12.5",
     "lenis": "1.1.13"
   },

@@ -5,8 +5,8 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
    Every other build swaps both seed files for empty states, so no sample row can reach a real visitor. */
 function noSampleData(enabled: boolean): Plugin {
   const swap: Record<string, string> = {
-    [fileURLToPath(new URL("./src/creator/data/seed.ts", import.meta.url))]: fileURLToPath(new URL("./src/creator/data/empty.ts", import.meta.url)),
-    [fileURLToPath(new URL("./src/brand/seed.ts", import.meta.url))]: fileURLToPath(new URL("./src/brand/empty.ts", import.meta.url)),
+    [fileURLToPath(new URL("./src/apps/creator/data/seed.ts", import.meta.url))]: fileURLToPath(new URL("./src/apps/creator/data/empty.ts", import.meta.url)),
+    [fileURLToPath(new URL("./src/apps/brand/seed.ts", import.meta.url))]: fileURLToPath(new URL("./src/apps/brand/empty.ts", import.meta.url)),
   };
   const norm = (p: string) => p.replace(/\\/g, "/").toLowerCase();
   const table = new Map(Object.entries(swap).map(([k, v]) => [norm(k), v]));

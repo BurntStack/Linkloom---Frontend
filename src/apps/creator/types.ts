@@ -1,4 +1,4 @@
-/* Linkloom Creator Dashboard: the data model. One in-memory `State` object (see src/creator/data/seed.ts) holds everything.
+/* Linkloom Creator Dashboard: the data model. One in-memory `State` object (see src/apps/creator/data/seed.ts) holds everything.
 
    Conventions used throughout:
    - Money is ALWAYS integer paise (₹1 = 100): see `Paise`. Only form inputs ever hold rupees.

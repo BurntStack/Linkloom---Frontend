@@ -2,7 +2,7 @@
    "Continue with Google" button gets Google's real button laid over it, invisible, at the same size.
    The page keeps its look; the click lands on Google's button. */
 const CLIENT_ID =
-  import.meta.env.VITE_GOOGLE_CLIENT_ID || "1042168589486-k7e30v1tao2ooepsb5lp339m7anlvq44.apps.googleusercontent.com";
+  import.meta.env.VITE_GOOGLE_CLIENT_ID || "591280470035-mamos86blk66gpr7bufpv48ln9dntsef.apps.googleusercontent.com";
 
 interface Gsi {
   accounts: {

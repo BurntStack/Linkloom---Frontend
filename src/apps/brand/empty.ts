@@ -1,4 +1,4 @@
-/* What the brand dashboard starts from in the real app: no rows. src/brand/live.ts fills it from the API.
+/* What the brand dashboard starts from in the real app: no rows. src/apps/brand/live.ts fills it from the API.
    vite.config.ts serves this file in place of seed.ts in every build except the parity one. */
 (window as unknown as { LLD_DATA: unknown }).LLD_DATA = {
   session: { signedIn: false, remember: true, status: "verified" },

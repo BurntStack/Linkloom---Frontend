@@ -6,7 +6,7 @@
 
    Deliberately no `declare global`: a migrated file that still says window.LLD must fail to compile. */
 import { closeSelect, enhanceSelects } from "../ui/select";
-import { gsap } from "../../shared/vendor-gsap";
+import { gsap } from "../../../shared/vendor-gsap";
 import { LLD, store, type LLDRuntime, type State } from "./index";
 import { replaceState } from "./store";
 

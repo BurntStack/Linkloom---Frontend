@@ -1,4 +1,5 @@
 /* Entry point. Import order is the prototype's <link>/<script> order: the cascade and the module side effects depend on it. */
+import "../../shared/analytics";
 import "./styles/core.css";
 import "./styles/motion.css";
 import "./screens/login/login.css";
@@ -15,13 +16,13 @@ import "./screens/messages/messages.css";
 import "./screens/earnings/earnings.css";
 import "./styles/chrome.css";
 
-import "../shared/vendor-gsap";
+import "../../shared/vendor-gsap";
 import "./data/seed";
 import { LLD } from "./core";
 import { initSession } from "./session";
 import "./ui/select";
 import "./core/legacy-bridge"; // must stay here: after core and select, before anything that reads the globals
-import "./motion/motion";
+import "../../shared/motion";
 import "./screens/login/login";
 import "./screens/setup/setup";
 import "./screens/kyc/kyc";

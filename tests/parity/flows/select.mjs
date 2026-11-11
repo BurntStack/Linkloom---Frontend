@@ -1,4 +1,4 @@
-/* The custom select (src/creator/ui/select.ts): mouse, keyboard, typeahead, dismissal, ARIA wiring, and the native fallback.
+/* The custom select (src/apps/creator/ui/select.ts): mouse, keyboard, typeahead, dismissal, ARIA wiring, and the native fallback.
    #jobsSort options: 0 Best match, 1 Highest budget, 2 Deadline soonest, 3 Newest, 4 Fewest bids.
    Typeahead keeps a 600 ms buffer, so anything that depends on it dispatches its keys in one step, or waits it out. */
 const SORT = "#jobsSort-ui";

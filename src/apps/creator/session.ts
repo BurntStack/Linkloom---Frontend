@@ -5,9 +5,9 @@
    - Session lost (refresh token expired or revoked): back to #login with the "session expired" note.
 
    The parity build runs on the prototype's sample data and skips all of this. */
-import { clearAuth, isSignedIn, setSessionLostHandler, type ApiUser } from "../shared/api/client";
-import { signOut } from "../shared/api/auth";
-import { stopLive } from "../shared/api/realtime";
+import { clearAuth, isSignedIn, setSessionLostHandler, type ApiUser } from "../../shared/api/client";
+import { signOut } from "../../shared/api/auth";
+import { stopLive } from "../../shared/api/realtime";
 import { LLD, setRouteGuard, store } from "./core";
 import { setGuestRoutes } from "./core/router";
 import { creatorApi, loadCreator, loadGuest } from "./live/creator";
