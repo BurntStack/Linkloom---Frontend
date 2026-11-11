@@ -1,0 +1,147 @@
+/* Linkloom Creator Dashboard: motion layer styles (owned by the motion agent; catalogue in review/MOTION.md).
+   Decoration that motion.js adds and removes, and gentler timing on core components (sheet, toast, focus
+   ring, skeleton, hover lift). Colours are core tokens only. The ui-select dropdown is left alone. */
+:root{
+  --mo-out:cubic-bezier(.22,1,.36,1);
+  --mo-in:cubic-bezier(.5,0,.75,0);
+  --mo-io:cubic-bezier(.65,0,.35,1);
+  --mo-press:cubic-bezier(.3,.7,.4,1);
+  /* springs: motion.js replaces these with the exact linear() curves it also uses in JS */
+  --mo-land:cubic-bezier(.3,1.15,.45,1);
+  --mo-settle:cubic-bezier(.22,1,.36,1);
+  --mo-pop:cubic-bezier(.34,1.4,.64,1);
+  --mo-d1:160ms;--mo-d2:240ms;--mo-d3:320ms;--mo-d4:400ms;--mo-d5:480ms;
+}
+
+/* number ticks: a digit span exists only while it ticks; the leaving digit is drawn by ::before */
+.mo-dg{display:inline-block;position:relative}
+.mo-dg[data-o]::before{content:attr(data-o);position:absolute;left:0;top:0;opacity:0;pointer-events:none}
+.mo-num{font-variant-numeric:tabular-nums}
+
+/* scroll reveal pre-state: added by JS only for blocks below the fold, removed when they arrive */
+.mo-pre{opacity:0}
+@media print{.mo-pre{opacity:1!important}.mo-threads,.mo-pl,.mo-cel-pill{display:none!important}}
+
+/* the thread layer: exists only while a thread runs */
+.mo-threads{position:fixed;inset:0;width:100%;height:100%;z-index:78;pointer-events:none;overflow:visible}
+.mo-th{fill:none;stroke-width:1.5px;stroke-linecap:round;stroke-linejoin:round}
+.mo-check{width:1em;height:1em;vertical-align:-.125em;flex:none}
+
+/* sidebar: the coral dot leads, the underline travels as a running stitch and tightens on landing */
+.side .nav{position:relative}
+.mo-dot{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;background:var(--ll-coral);pointer-events:none;transition:opacity var(--mo-d1)}
+.mo-ul{position:absolute;left:0;top:0;height:1.5px;color:var(--ll-white);transform-origin:0 50%;pointer-events:none;transition:opacity var(--mo-d1)}
+.mo-ul::before,.mo-ul::after{content:"";position:absolute;inset:0;transition:opacity var(--mo-d1) var(--mo-out)}
+.mo-ul::before{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 8px);opacity:0}
+.mo-ul::after{background:currentColor}
+.mo-ul.is-stitch::before{opacity:.85}
+.mo-ul.is-stitch::after{opacity:0}
+.nav.mo-ind-on a[aria-current=page]::before{content:none}
+.nav.mo-ind-on a[aria-current=page],.nav.mo-ind-on a[aria-current=page]:hover{background-size:0 1.5px;transition:color .25s}
+
+/* phone tab bar: the butter cell glides; a short ink stitch inside it tightens as it lands, then fades */
+.tabbar.mo-ind-on a{position:relative}
+.mo-cell{position:absolute;left:0;top:0;border-radius:var(--r-tab);background:var(--ll-butter);pointer-events:none;transition:opacity var(--mo-d1)}
+.mo-cell::after{content:"";position:absolute;left:34%;right:34%;bottom:4px;height:1.5px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,var(--ll-ink-900) 0 3px,transparent 3px 6px);opacity:0;transition:opacity var(--mo-d2) var(--mo-out)}
+.mo-cell.is-glide::after{opacity:.45}
+.mo-cell.is-tight::after{background:var(--ll-ink-900);opacity:.45;transition:none}
+@media (max-width:900px){
+  .tabbar.mo-ind-on a[aria-current=page]{background:transparent;transition:color .2s .1s}
+}
+@media (min-width:901px){.mo-cell{display:none}}
+
+/* segment glide: a temporary fill, concentric with the track (top/height/radius set from the track's inset) */
+.seg.mo-seg-on{position:relative;isolation:isolate}
+.seg.mo-seg-on button{position:relative;z-index:1}
+.mo-seg-g{position:absolute;z-index:0;pointer-events:none;box-shadow:none;border:0}
+.seg.mo-seg-gliding button{background:transparent!important;box-shadow:none!important}
+.seg.mo-seg-gliding button,.seg.mo-seg-settle button{transition:color var(--mo-d2) var(--mo-out)!important}
+
+/* swipe: the action revealed under a card while it is dragged */
+.mo-swipe{touch-action:pan-y}
+.mo-swipe.is-drag{cursor:grabbing;user-select:none;-webkit-user-select:none}
+body.mo-dragging{user-select:none;-webkit-user-select:none}
+.mo-sw-under{position:absolute;z-index:0;display:flex;align-items:center;padding:0 24px;pointer-events:none;overflow:hidden;
+  font:600 15px/20px var(--ll-sans);transition:opacity .15s}
+.mo-sw-under::after{content:"";position:absolute;inset:0;background:var(--ll-paper);opacity:.5;transition:opacity .2s}
+.mo-sw-under.is-armed::after{opacity:0}
+.mo-sw-under[data-dir=left]{justify-content:flex-end}
+.mo-sw-lab{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;opacity:0}
+.mo-sw-lab svg{width:20px;height:20px;flex:none}
+
+/* the ₹ coin (escrow token): butter face, ink rim. Screens may use <span class="mo-coin">₹</span> */
+.mo-coin{--coin:44px;display:grid;place-items:center;width:var(--coin);height:var(--coin);border-radius:50%;background:var(--ll-butter);color:var(--ll-ink-text);
+  font:400 calc(var(--coin) * .5)/1 var(--ll-display);user-select:none;
+  box-shadow:inset 0 0 0 2.5px var(--ll-ink-text),inset 0 0 0 calc(var(--coin) * .12) var(--ll-butter),inset 0 0 0 calc(var(--coin) * .12 + 1.5px) rgba(18,18,18,.3)}
+
+/* celebrate: the optional ink pill under the linked rings */
+.mo-cel-pill{position:fixed;left:0;top:0;z-index:78;padding:6px 12px;border-radius:var(--r-full);background:var(--ll-ink-900);color:var(--ll-white);
+  font:600 13px/18px var(--ll-sans);white-space:nowrap;box-shadow:var(--ll-shadow-pin);pointer-events:none;opacity:0}
+
+/* brand glyph for data-motion="rings": size it with font-size on the host */
+.mo-knot{position:relative;display:inline-block;width:.9em;height:.54em;vertical-align:middle}
+.mo-r{position:absolute;top:0;width:.54em;height:.54em;border-radius:50%;border:.085em solid var(--ll-coral)}
+.mo-rc{left:0}
+.mo-rv{right:0;border-color:var(--ll-violet)}
+.mo-rc2{clip-path:inset(0 0 50% 50%)}
+
+/* flood: the circle grows behind the content, clipped to the target's shape */
+.mo-flooding{isolation:isolate}
+.mo-flood{position:absolute;inset:0;z-index:-1;border-radius:inherit;overflow:hidden;pointer-events:none}
+.mo-flood>i{position:absolute;border-radius:50%;transform:scale(0)}
+
+/* hover lift on clickable cards: 2px and a soft shadow (fine pointers only) */
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .mo-lift,a.card,button.card,.card[data-go],.card:has(a[class*="card-link"]){transition:translate var(--mo-d3) var(--mo-out),box-shadow var(--mo-d3) var(--mo-out)}
+  .mo-lift:hover,a.card:hover,button.card:hover,.card[data-go]:hover,.card:has(a[class*="card-link"]):hover{translate:0 -2px;box-shadow:var(--ll-shadow-card),0 16px 28px -20px rgba(18,18,18,.22)}
+}
+
+/* sheets: a weighty settle in (spring, under 1% overshoot; the hidden overhang means no gap shows), a quick exit */
+.scrim{transition:opacity var(--mo-d3) var(--mo-out)}
+.sheet{transition:transform 260ms var(--mo-in)}
+.sheet.on{transition:transform 460ms var(--mo-settle)}
+.sheet::after{content:"";position:absolute;top:0;bottom:0;left:100%;width:64px;background:inherit;pointer-events:none}
+.sheet-b{overscroll-behavior:contain}
+@media (max-width:900px){
+  .sheet{top:auto;left:0;right:0;width:100%;max-height:calc(100dvh - 32px - env(safe-area-inset-top,0px));border-radius:var(--r-lg) var(--r-lg) 0 0;transform:translateY(104%)}
+  .sheet.on{transform:none}
+  .sheet::after{left:0;right:0;top:100%;bottom:auto;width:auto;height:64px}
+  .sheet-h{position:relative;padding-top:28px;touch-action:none}
+  .sheet-h::before{content:"";position:absolute;top:10px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:4px;background:var(--ll-rule)}
+  .sheet-b{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
+}
+
+/* toast: settles up with a slight landing; leaves quickly (the icon stitches or pops from motion.js) */
+.toast{transform:translate(-50%,12px) scale(.97);transform-origin:50% 100%;transition:opacity 200ms var(--mo-in),transform 240ms var(--mo-in)}
+.toast.on{transform:translate(-50%,0) scale(1);transition:opacity 200ms var(--mo-out),transform 460ms var(--mo-land)}
+
+/* focus ring eases in from 6px out instead of snapping on (not inside the ui-select dropdown) */
+@media (prefers-reduced-motion:no-preference){
+  :focus-visible{animation:moFocus var(--mo-d1) var(--mo-out)}
+  :where(.ui-select,[class*="ui-select"],[data-ui-select],[role=listbox],[role=combobox]) :focus-visible,:where([role=option],[role=combobox]):focus-visible{animation:none}
+  @keyframes moFocus{from{outline-offset:6px;outline-color:transparent}}
+}
+
+/* skeleton: one slow paper-tone sweep, then a pause; rows offset into a wave (the only loop) */
+.skel{position:relative;overflow:hidden;animation:none;background:var(--ll-paper-raised)}
+.skel::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,var(--ll-paper) 44%,var(--ll-white) 50%,var(--ll-paper) 56%,transparent 70%);
+  transform:translateX(-100%);animation:moSk 1.4s var(--mo-io) infinite}
+.skel:nth-child(2)::after{animation-delay:.08s}.skel:nth-child(3)::after{animation-delay:.16s}.skel:nth-child(4)::after{animation-delay:.24s}.skel:nth-child(5)::after{animation-delay:.32s}
+@keyframes moSk{70%,100%{transform:translateX(100%)}}
+
+/* preloader (first load only): cut-paper creator objects on paper; never takes input */
+.mo-pl{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:var(--ll-paper);pointer-events:none}
+.mo-pl-row{position:relative;display:flex;align-items:center;gap:clamp(12px,2.4vw,28px);--s:64px}
+.mo-pl-o{position:relative;display:block;width:var(--s);height:var(--s);opacity:0;filter:drop-shadow(0 2px 0 rgba(18,18,18,.08))}
+.mo-pl-o.is-up{z-index:2}
+.mo-pl-o svg{display:block;width:100%;height:100%;overflow:visible}
+.mo-pl-th{position:absolute;inset:0;width:100%;height:100%;z-index:1;overflow:visible}
+.mo-pl-th path{fill:none;stroke:var(--ll-coral);stroke-width:1.5px;stroke-linecap:round}
+@media (max-width:600px){.mo-pl-row{--s:46px}}
+
+@media (prefers-reduced-motion:reduce){
+  .mo-pre{opacity:1!important}
+  .skel::after{display:none}
+  .mo-pl,.mo-threads,.mo-cel-pill{display:none!important}
+}
