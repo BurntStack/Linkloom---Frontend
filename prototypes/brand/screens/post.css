@@ -1,0 +1,134 @@
+/* Post / edit a job (#post, #post-<id>): numbered job slip and an ink preview. Brand side, Builder C. Mirrors the creator bid form. */
+.pj{gap:24px}
+.pj-h{display:flex;flex-direction:column;gap:8px}
+.pj-h .t-h1{max-width:22ch}
+
+/* KYC banner: status first, one line, one action */
+
+.pj-layout{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:32px;align-items:start}
+
+/* the slip */
+.pj-slip{display:flex;flex-direction:column;padding:8px 32px 32px;border-radius:var(--r-lg);background:var(--ll-white);box-shadow:var(--ll-shadow-card)}
+.pj-sec{display:grid;grid-template-columns:40px minmax(0,1fr);gap:0 16px;padding:24px 0;border-bottom:1.5px dashed var(--ll-rule)}
+/* post date + views share one numbered row; both labels start on the same column as every other label */
+.pj-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px;align-items:start}
+.pj-n{font-family:var(--ll-display);font-size:20px;line-height:24px;color:var(--ll-slate);font-variant-numeric:tabular-nums;padding-top:0}
+.pj-sec .field>label,.pj-sec .field>.lab,.pj-why-h label{font-size:14px;line-height:20px;color:var(--ll-ink-text)}
+.field.is-err .pj-money{border-bottom-color:var(--ll-err-fg)}
+
+/* price: big money-in with steppers, like the homepage bid field */
+.pj-money{align-items:center;gap:8px;margin-top:2px;border-bottom-color:rgba(18,18,18,.5)}
+.pj-money>span{font-size:clamp(34px,3vw,44px);color:var(--ll-ink-text)}
+.pj-money input{font-size:clamp(44px,4.4vw,60px);color:var(--ll-ink-text)}
+.pj-money input::placeholder{color:var(--ll-mist)}
+.pj-step{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--ll-paper-raised);color:var(--ll-ink-text);transition:background-color .25s,color .25s,transform .2s}
+.pj-step svg{width:18px;height:18px}
+.pj-step:hover{background:var(--ll-ink-text);color:var(--ll-white)}
+.pj-step:active{transform:scale(.92)}
+
+/* why this price */
+.pj-why-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pj-note{color:var(--creator,var(--ll-coral-deep));transform:rotate(-2deg);font-size:20px;line-height:24px}
+.pj-why-f{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.pj-sec .help{text-wrap:pretty}
+.pj-count{flex:none;font-size:13px;line-height:18px;color:var(--ll-slate)}
+.pj-count.is-short{color:var(--ll-ink-text)}
+.pj-count.is-near{color:var(--ll-warn-fg);font-weight:600}
+.pj-opt{font-weight:500;color:var(--ll-slate)}
+
+/* similar work links */
+.pj-links-f{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;min-height:44px}
+.pj-links-f .btn-q svg{width:16px;height:16px}
+.pj-links-f .btn-q[disabled]{color:var(--ll-slate);pointer-events:none}
+
+.pj-foot{display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;padding-top:24px}
+.pj-sum{flex-basis:100%;display:flex;align-items:flex-start;gap:8px;font-weight:600;font-size:14px;line-height:20px;color:var(--ll-err-fg)}
+.pj-sum:empty{display:none}
+.pj-sum svg{width:18px;height:18px;flex:none}
+
+/* receipt: ink payout slip with a torn bottom edge (homepage "No surprises at payout") */
+.pj-side{position:sticky;top:92px;display:flex;flex-direction:column;gap:16px}
+.pj-receipt{display:flex;flex-direction:column;gap:8px;padding:24px 24px 40px;box-shadow:var(--ll-shadow-float);
+  -webkit-mask:radial-gradient(circle 8px at 12px 100%,#0000 97%,#000 100%) 0 0/24px 100% repeat-x;mask:radial-gradient(circle 8px at 12px 100%,#0000 97%,#000 100%) 0 0/24px 100% repeat-x}
+.pj-rc-h{font-weight:500;font-size:14px;line-height:20px;color:var(--ll-mist)}
+.pj-rows{margin:0 0 8px;display:flex;flex-direction:column}
+.pj-rows>div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--ll-ink-700);font-size:15px;line-height:22px}
+.pj-rows dt{color:var(--ll-mist)}
+.pj-rows dd{margin:0;text-align:right;color:var(--ll-white);font-variant-numeric:tabular-nums}
+.pj-rc-l{font-size:15px;line-height:22px;color:var(--ll-mist)}
+.pj-rc-net{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-top:-4px}
+.pj-rc-net .t-money{font-size:clamp(40px,3.6vw,52px);line-height:1.05;color:var(--ll-butter)}
+.pj-rc-s{max-width:30ch;font-size:14px;line-height:20px;color:var(--ll-mist);text-wrap:pretty}
+.pj-receipt .pill{align-self:flex-start;margin-top:8px}
+.pj-side-note{display:flex;align-items:flex-start;gap:8px;padding:0 24px;text-wrap:pretty}
+.pj-side-note svg{width:16px;height:16px;flex:none;margin-top:1px}
+
+/* phone dock */
+.pj-dock{display:none}
+
+/* review sheet */
+
+@media (max-width:1100px){ .pj-layout{grid-template-columns:minmax(0,1fr) 320px;gap:24px} .pj-slip{padding:0 24px 24px} .pj-pair{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:900px){
+  .pj{padding-bottom:96px}
+  .pj-layout{grid-template-columns:minmax(0,1fr);gap:24px}
+  .pj-side{position:static}
+  .pj-slip{padding:0 16px 24px}
+  .pj-sec{grid-template-columns:minmax(0,1fr);row-gap:8px}
+  .pj-pair{row-gap:24px}
+  .pj-n{font-size:16px;line-height:20px}
+  .pj-side-note{padding:0 16px}
+  .pj-foot .lq{width:100%}
+  .pj-dock{position:fixed;z-index:35;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(90px + env(safe-area-inset-bottom,0px));
+    display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;border-radius:var(--r-lg);background:var(--ll-ink-800);color:var(--ll-white);box-shadow:var(--ll-shadow-float)}
+  .pj-dock-t{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:12px;line-height:16px;color:var(--ll-mist)}
+  .pj-dock-t>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pj-dock-v{font-weight:400;font-size:24px;line-height:1.1;color:var(--ll-butter);white-space:nowrap}
+  .pj-dock .lq{flex:none}
+}
+
+/* the total ticks: each change nudges the figure up 3px and it settles as the digits roll (count does the digits) */
+.pj-tick{animation:pjTick .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pjTick{0%{translate:0 3px}100%{translate:0 0}}
+@media (prefers-reduced-motion:reduce){.pj-tick{animation:none}}
+
+/* ---------- brand side additions ---------- */
+.pj-h{display:flex;flex-direction:column;gap:8px}
+.pj-h .t-h1{max-width:22ch}
+.pj-h .muted{max-width:64ch}
+.pj-stack{gap:24px}
+.pj-sec-h{font-weight:600;font-size:14px;line-height:20px;color:var(--ll-ink-text)}
+.pj-sec>.pj-stack .pj-sec-h{margin-bottom:-8px}
+.pj-seg{align-self:flex-start;--seg-pad:16px}
+.pj-seg svg{width:16px;height:16px}
+.pj-date{max-width:320px}
+.pj-opt{font-weight:500;color:var(--ll-slate)}
+#pjLangs .chip svg,#pjFormats .chip svg{width:14px;height:14px}
+.pj-dels{display:flex;flex-direction:column;gap:8px}
+.pj-del{display:flex;align-items:center;gap:12px}
+.pj-del-n{flex:none;width:24px;font-family:var(--ll-display);font-size:16px;line-height:20px;color:var(--ll-slate);font-variant-numeric:proportional-nums}
+.pj-del .input{flex:1;min-width:0}
+.pj-del-x{flex:none}
+.pj-dels-f{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;min-height:44px}
+.pj-dels-f .btn-q svg{width:16px;height:16px}
+.pj-dels-f .btn-q[disabled]{color:var(--ll-slate);pointer-events:none}
+.pj-foot .lq{min-width:0}
+.pj-foot-h{flex-basis:100%}
+.pj-danger{display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;margin-top:32px;padding:16px 20px;border-radius:var(--r-md);box-shadow:inset 0 0 0 1.5px var(--ll-rule)}
+.pj-danger>div:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pj-danger .lq svg{width:16px;height:16px}
+.pj-pv-plat{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px;line-height:18px;color:var(--ll-mist)}
+.pj-pv-plat svg{width:16px;height:16px;color:var(--ll-white)}
+.pj-pv-t{font-family:var(--ll-display);font-size:26px;line-height:1.15;letter-spacing:-.02em;color:var(--ll-white);text-wrap:balance;overflow-wrap:anywhere;margin-bottom:8px}
+.pj-pv-t.is-ph{color:var(--ll-mist)}
+.pj-rows{margin-top:8px}
+.pj-locked-cta{justify-content:center;margin-top:8px}
+.pj-count.is-near{color:var(--ll-warn-fg);font-weight:600}
+@media (max-width:900px){
+  .pj-foot .lq{width:100%}
+  .pj-date{max-width:none}
+  .pj-danger{padding:16px}
+  .pj-danger .row{width:100%}
+  .pj-danger .row .lq{flex:1}
+  .pj-pv-t{font-size:22px}
+}
