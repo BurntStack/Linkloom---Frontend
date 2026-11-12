@@ -9,7 +9,7 @@ data and never calls the server; every other build swaps the seed files for empt
 | Path | What it does |
 |---|---|
 | `src/shared/api/client.ts` | Requests, the `{success,data,error,meta}` envelope, tokens (localStorage when "Keep me signed in", else sessionStorage), automatic refresh, `ApiError` with the backend's error `code` |
-| `src/shared/api/auth.ts` | One-time code (SMS or email), Google, `/auth/me`, sign-up completion, sign-out |
+| `src/shared/api/auth.ts` | Password sign-in (`POST /auth/login/` `{identifier, password}`), sign-up completion with the password (`/auth/signup/complete/` `password` + `confirmPassword`), one-time code (verifies the mobile number once at sign-up; "Forgot password?" signs in with a code until the backend has a reset endpoint), Google, `/auth/me`, sign-out |
 | `src/shared/api/google.ts` | Google Identity Services: Google's real button laid invisibly over the designed one |
 | `src/shared/api/uploads.ts` | The three-step upload (ticket → PUT → complete) and 5-minute download links |
 | `src/shared/api/realtime.ts` | WebSocket live updates with ticket, ping and reconnect |
@@ -19,7 +19,7 @@ data and never calls the server; every other build swaps the seed files for empt
 
 ## What each screen uses
 
-**Creator:** Find jobs `GET /campaigns/` · Bid `POST /campaigns/{id}/bids/` · My bids `GET /creators/me/campaigns/`, withdraw, direct offers `GET/PATCH /creators/me/offers/` · Active jobs `GET /creators/me/orders/`, deliverables (file upload or link) · Messages `/conversations/` · Earnings `GET /creators/me/earnings/` (withdrawals hidden while `payoutsEnabled` is false) · KYC `/kyc/` (PAN, ID document, bank, submit) · Profile `PATCH /creators/me/`, avatar upload.
+**Creator:** Find jobs `GET /campaigns/` · Bid `POST /campaigns/{id}/bids/` · My bids `GET /creators/me/bids/`, withdraw, direct offers `GET/PATCH /creators/me/offers/` · Active jobs `GET /creators/me/orders/`, deliverables (file upload or link) · Messages `/conversations/` · Earnings `GET /creators/me/earnings/` (withdrawals hidden while `payoutsEnabled` is false) · KYC `/kyc/` (PAN, ID document, bank, submit) · Profile `PATCH /creators/me/`, avatar upload.
 
 **Brand:** Find creators `GET /creators/` and `/creators/{id}/` · Saved `/lists/` ("Favourites") · Cart → `POST /offers/` · Jobs `GET/POST/PATCH /campaigns/`, close, bids, select · Campaigns = orders + open offers: approve, revisions, review, withdraw offer · Messages · Payments and Reports derived from orders · Profile `PATCH /brands/me/`, logo upload · Verification `/kyc/`.
 

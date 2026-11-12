@@ -112,5 +112,27 @@ body[data-role=brand] .seg-glide{transform:translateX(100%)}
   *,*::before,*::after{transition-duration:.01ms!important;animation:none!important}
 }
 
-/* the code step, the sign-up step and the Google block are toggled with [hidden] */
+/* sign-up: the mobile number with its Verify button, password rules, form-level errors */
+.link{padding:0;border:0;background:none;cursor:pointer}
+.err .link{display:inline;font:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px}
+.in input.has-eye{padding-right:48px}
+.in-row{display:flex;gap:8px}
+.in-row .in{flex:1;min-width:0}
+.in input[readonly]{background:var(--raised)}
+.vbtn{flex:none;min-width:104px;height:48px;padding:0 18px;border:1.5px solid var(--ink);border-radius:12px;background:var(--ink);color:var(--white);font-weight:600;font-size:15px;cursor:pointer;transition:background-color .25s,color .25s,border-color .25s}
+.vbtn:hover:not(:disabled){background:var(--role);border-color:var(--role);color:var(--ink)}
+.vbtn:disabled{cursor:default;opacity:.6}
+.vbtn.is-ok{opacity:1;background:var(--ok);border-color:var(--ok);color:var(--white)}
+.ok{margin:0;font-size:13px;line-height:18px;font-weight:600;color:var(--ok)}
+.ok:empty{display:none}
+.rules{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;padding:0;list-style:none;font-size:13px;line-height:18px;color:var(--slate)}
+.rules li::before{content:"○";display:inline-block;width:16px}
+.rules li.is-met{color:var(--ok);font-weight:600}
+.rules li.is-met::before{content:"✓"}
+.form-err{margin:-8px 0 16px}
+.form-err:empty{display:none}
+.join p{margin:0}
+.join .alt{margin-top:10px}
+
+/* each form, the Google block and the join lines are toggled with [hidden] */
 [hidden]{display:none!important}

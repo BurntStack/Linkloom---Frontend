@@ -7,3 +7,6 @@ tests/parity/out
 
 .vercel
 test-results
+
+# local Vercel token written by `vercel link`
+.env*.local

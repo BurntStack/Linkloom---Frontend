@@ -11,7 +11,10 @@ export function toneOf(key: string): Tone {
 }
 
 export function initialsOf(name: string): string {
-  const w = String(name || "").trim().split(/\s+/).filter(Boolean);
+  const w = String(name || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
   if (!w.length) return "?";
   return (w.length === 1 ? w[0].slice(0, 2) : w[0][0] + w[w.length - 1][0]).toUpperCase();
 }
@@ -42,10 +45,17 @@ export const amount = (m: Money | number | null | undefined): number => paise(m)
 
 /** Backend platforms are free text; the screens know two. */
 export const platformOf = (p: unknown): "instagram" | "youtube" =>
-  String(p || "").toLowerCase().includes("you") ? "youtube" : "instagram";
+  String(p || "")
+    .toLowerCase()
+    .includes("you")
+    ? "youtube"
+    : "instagram";
 
 /** "1 Reel + 2 Stories" → "Reel". */
-export function formatOf(deliverables: unknown, platform?: string): "Reel" | "Video" | "Carousel" | "Short" | "Story" {
+export function formatOf(
+  deliverables: unknown,
+  platform?: string,
+): "Reel" | "Video" | "Carousel" | "Short" | "Story" {
   const d = String(deliverables || "").toLowerCase();
   if (d.includes("short")) return "Short";
   if (d.includes("carousel")) return "Carousel";
@@ -55,9 +65,38 @@ export function formatOf(deliverables: unknown, platform?: string): "Reel" | "Vi
   return platformOf(platform) === "youtube" ? "Video" : "Reel";
 }
 
+/** Usage rights are an object since 2026-11-12 ({ duration, channels, exclusivity, exclusivityCategory, territory });
+    older rows and the sample data are text. Either way the screens get one line. */
+export function usageText(v: unknown): string {
+  if (!v) return "";
+  if (typeof v === "string") return v;
+  const r = v as Record<string, unknown>;
+  const DUR: Record<string, string> = {
+    perpetual: "Perpetual",
+    "12m": "12 months",
+    "6m": "6 months",
+    "3m": "3 months",
+  };
+  const CH: Record<string, string> = { organic_social: "organic social", paid_ads: "paid ads" };
+  const parts: string[] = [];
+  const d = String(r.duration || "");
+  if (d) parts.push(DUR[d] || d);
+  const ch = Array.isArray(r.channels)
+    ? (r.channels as string[]).map(c => CH[c] || String(c).replace(/_/g, " "))
+    : [];
+  if (ch.length) parts.push(ch.join(" + "));
+  if (r.exclusivity) parts.push("exclusive" + (r.exclusivityCategory ? ` in ${r.exclusivityCategory}` : ""));
+  const t = String(r.territory || "");
+  if (t) parts.push(t.length <= 3 ? t.toUpperCase() : t[0].toUpperCase() + t.slice(1));
+  return parts.join(" · ");
+}
+
 /** "1 Reel + 2 Stories" or a list → ["1 Reel", "2 Stories"]. */
 export function listOf(v: unknown): string[] {
-  if (Array.isArray(v)) return v.map(x => (typeof x === "string" ? x : String((x as { title?: string })?.title ?? ""))).filter(Boolean);
+  if (Array.isArray(v))
+    return v
+      .map(x => (typeof x === "string" ? x : String((x as { title?: string })?.title ?? "")))
+      .filter(Boolean);
   return String(v || "")
     .split(/\s*(?:\+|\n|;|•)\s*/)
     .map(s => s.trim())
@@ -88,7 +127,10 @@ export function idOf(o: unknown): string {
 }
 
 /** Per-account extras the backend has no field for yet, kept on this device. */
-export function extras<T extends object>(scope: string, userId: string): { get(): Partial<T>; set(v: Partial<T>): void } {
+export function extras<T extends object>(
+  scope: string,
+  userId: string,
+): { get(): Partial<T>; set(v: Partial<T>): void } {
   const key = `ll-extra-${scope}-${userId}`;
   return {
     get() {

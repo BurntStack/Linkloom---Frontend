@@ -2,7 +2,8 @@
    - Signed in (tokens stored): load everything from the API, then open the dashboard. A brand account is sent to the
      brand dashboard; an account that hasn't finished sign-up goes to #setup.
    - Signed out: a read-only guest view of Home and Find Jobs with the public briefs. Any other click asks them to sign in.
-   - Session lost (refresh token expired or revoked): back to #login with the "session expired" note.
+   - Session lost (refresh token expired or revoked): to the shared sign-in page with the "session expired" note.
+   - The prototype's own #login screen hands over to the shared sign-in page, which has the creator / brand toggle.
 
    The parity build runs on the prototype's sample data and skips all of this. */
 import { clearAuth, isSignedIn, setSessionLostHandler, type ApiUser } from "../../shared/api/client";
@@ -54,7 +55,7 @@ function promptSignIn(why = "Sign in to continue"): void {
       <p class="muted">Create a free creator account or sign in to bid on briefs, message brands and get paid from escrow.</p>
       <div class="row wrap">
         <a class="lq lq-p" href="signin.html?role=creator">Sign in</a>
-        <a class="lq lq-s" href="#login" data-close-sheet>Create a creator account</a>
+        <a class="lq lq-s" href="signin.html?role=creator&join=1">Create a creator account</a>
       </div>
     </div>`,
     onMount(b: HTMLElement, close: () => void) {
@@ -173,11 +174,7 @@ export function initSession(): boolean | Promise<boolean> {
 
   setSessionLostHandler(() => {
     stopLive();
-    store.set(s => {
-      s.session.signedIn = false;
-      s.session.expired = true;
-    }, "session-expired");
-    LLD.go("#login-expired");
+    location.href = "signin.html?role=creator&expired=1";
   });
 
   setGuestRoutes(GUEST_ROUTES);
@@ -187,6 +184,13 @@ export function initSession(): boolean | Promise<boolean> {
 
   setRouteGuard(name => {
     const { signedIn, firstLogin } = store.s.session;
+    /* The dashboard's own sign-in screen is the prototype's. Real sign-in and sign-up happen on the shared page,
+       which has the creator / brand toggle. */
+    if (name === "login") {
+      if (signedIn) return firstLogin ? "#setup" : "#home";
+      location.replace(`signin.html?role=creator${/expired/.test(location.hash) ? "&expired=1" : ""}`);
+      return null;
+    }
     return signedIn && firstLogin && !OPEN_DURING_SETUP.has(name) ? "#setup" : null;
   });
 

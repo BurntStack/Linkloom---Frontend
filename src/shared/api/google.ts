@@ -48,7 +48,7 @@ function load(): Promise<Gsi> {
     };
     s.onerror = () => {
       loading = null;
-      reject(new Error("Google sign-in could not load. Check your connection, or sign in with a code."));
+      reject(new Error("Google sign-in could not load. Check your connection, or sign in with your password."));
     };
     document.head.appendChild(s);
   });

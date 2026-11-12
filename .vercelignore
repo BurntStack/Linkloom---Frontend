@@ -4,3 +4,4 @@ docs
 dist
 .parity-dist
 .env.parity
+.env*.local

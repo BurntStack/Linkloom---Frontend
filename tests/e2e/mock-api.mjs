@@ -28,7 +28,7 @@ export function fixtures(role) {
     "GET /v1/campaigns/k1/": campaign("k1", "Morning routine Reel"),
     "GET /v1/campaigns/k1/bids/": [{ id: "bid1", campaign: "k1", creator: creatorRef, price: money(12000), message: "I post daily food Reels.\n\nSimilar work:\ninstagram.com/reel/x", expectedViews: 40000, deliveryDays: 6, status: "pending", createdAt: now }],
     "GET /v1/campaigns/k2/bids/": [],
-    "GET /v1/creators/me/campaigns/": [{ id: "bid1", campaign: campaign("k1", "Morning routine Reel"), price: money(12000), message: "I post daily food Reels.", expectedViews: 40000, deliveryDays: 6, status: "pending", createdAt: now }],
+    "GET /v1/creators/me/bids/": [{ id: "bid1", campaign: campaign("k1", "Morning routine Reel"), price: money(12000), message: "I post daily food Reels.", expectedViews: 40000, deliveryDays: 6, status: "pending", createdAt: now }],
     "GET /v1/creators/me/orders/": [order("o1", "in_progress"), order("o2", "submitted"), order("o3", "completed", { approvedAt: now })],
     "GET /v1/orders/": [order("o1", "in_progress"), order("o2", "submitted", { allowedActions: ["approve", "request_revision"] }), order("o3", "completed", { approvedAt: now })],
     "GET /v1/orders/o2/deliverables/": [{ id: "d1", fileUploadId: "up1", fileName: "draft-v1.mp4", note: "First cut", createdAt: now }],

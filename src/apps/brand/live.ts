@@ -27,6 +27,7 @@ import {
   settle,
   splitLocation,
   toneOf,
+  usageText,
 } from "@/shared/live";
 
 type Obj = Record<string, unknown>;
@@ -44,7 +45,13 @@ const ex = () => extras<{ budget: unknown; cart: string[]; drafts: unknown[] }>(
 
 /* ---------- mappers ---------- */
 
-const FORMAT_KEY: Record<string, string> = { Reel: "reel", Story: "story", Carousel: "carousel", Video: "video", Short: "short" };
+const FORMAT_KEY: Record<string, string> = {
+  Reel: "reel",
+  Story: "story",
+  Carousel: "carousel",
+  Video: "video",
+  Short: "short",
+};
 
 export function mapCreator(c: Obj): S {
   const name = String(c.displayName || c.name || "Creator");
@@ -95,7 +102,16 @@ export function mapCreator(c: Obj): S {
   };
 }
 
-const JOB_STATUS: Record<string, string> = { open: "open", active: "open", live: "open", closed: "closed", awarded: "hired", hired: "hired", filled: "hired", draft: "draft" };
+const JOB_STATUS: Record<string, string> = {
+  open: "open",
+  active: "open",
+  live: "open",
+  closed: "closed",
+  awarded: "hired",
+  hired: "hired",
+  filled: "hired",
+  draft: "draft",
+};
 
 function mapJob(c: Obj, bidCount: number): S {
   const [city] = splitLocation(c.location);
@@ -115,7 +131,7 @@ function mapJob(c: Obj, bidCount: number): S {
     languages: Array.isArray(c.languages) ? c.languages : [],
     minFollowers: Number(c.minFollowers) || 0,
     deliverables: listOf(c.deliverables),
-    usage: String(c.usageRights || ""),
+    usage: usageText(c.usageRights),
     brief: String(c.brief || ""),
     bids: Number(c.bidCount ?? c.bidsCount ?? bidCount) || bidCount,
   };
@@ -155,7 +171,10 @@ function mapBid(b: Obj, jobId: string): S | null {
     postDate: days ? d.toISOString().slice(0, 10) : "",
     views: b.expectedViews == null ? 0 : Number(b.expectedViews),
     pitch,
-    links: links.split("\n").map(x => x.trim()).filter(Boolean),
+    links: links
+      .split("\n")
+      .map(x => x.trim())
+      .filter(Boolean),
   };
 }
 
@@ -184,7 +203,10 @@ function mapOrder(o: Obj, deliveries: Obj[]): S {
     .sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)))
     .map((d, i) => ({
       v: i + 1,
-      file: String(d.fileName || (d.contentUrl ? String(d.contentUrl).replace(/^https?:\/\//, "") : `delivery-v${i + 1}`)),
+      file: String(
+        d.fileName ||
+          (d.contentUrl ? String(d.contentUrl).replace(/^https?:\/\//, "") : `delivery-v${i + 1}`),
+      ),
       at: isoOr(d.createdAt, created),
       note: String(d.note || ""),
       uploadId: idOf(d.file || d.fileUpload) || String(d.fileUploadId || ""),
@@ -194,7 +216,8 @@ function mapOrder(o: Obj, deliveries: Obj[]): S {
   const log: [string, string][] = [[created, "accepted"]];
   if (funded) log.push([funded, "funded"]);
   dv.forEach(d => log.push([d.at, "submitted"]));
-  if (stage === "released") log.push([isoOr(o.approvedAt || o.completedAt || o.updatedAt, created), "released"]);
+  if (stage === "released")
+    log.push([isoOr(o.approvedAt || o.completedAt || o.updatedAt, created), "released"]);
   const review = o.review as Obj | null;
   return {
     id: String(o.id),
@@ -219,12 +242,22 @@ function mapOrder(o: Obj, deliveries: Obj[]): S {
     deliverables: listOf(deliverablesTxt),
     deliveries: dv,
     revisionNote: String((revs[revs.length - 1] as Obj | undefined)?.feedback || o.revisionFeedback || ""),
-    review: review ? { rating: Number(review.stars) || 0, text: String(review.text || ""), at: day(review.createdAt) } : null,
+    review: review
+      ? { rating: Number(review.stars) || 0, text: String(review.text || ""), at: day(review.createdAt) }
+      : null,
     log,
   };
 }
 
-const OFFER_STAGE: Record<string, string> = { pending: "invited", sent: "invited", open: "invited", rejected: "declined", declined: "declined", withdrawn: "cancelled", expired: "cancelled" };
+const OFFER_STAGE: Record<string, string> = {
+  pending: "invited",
+  sent: "invited",
+  open: "invited",
+  rejected: "declined",
+  declined: "declined",
+  withdrawn: "cancelled",
+  expired: "cancelled",
+};
 
 function mapOffer(o: Obj): S | null {
   const st = String(o.status || "pending").toLowerCase();
@@ -267,7 +300,13 @@ function mapThread(c: Obj): S {
     loaded: false,
     messages:
       last && (last.text || last.hasAttachment)
-        ? [{ from: last.fromMe ? "brand" : "creator", text: String(last.text || "📎 Attachment"), at: isoOr(last.sentAt, nowIso()) }]
+        ? [
+            {
+              from: last.fromMe ? "brand" : "creator",
+              text: String(last.text || "📎 Attachment"),
+              at: isoOr(last.sentAt, nowIso()),
+            },
+          ]
         : [],
   };
 }
@@ -279,8 +318,50 @@ export function mapMessage(m: Obj): S {
     from: m.fromMe ? "brand" : "creator",
     text: String(m.text || ""),
     at: isoOr(m.sentAt, nowIso()),
-    ...(att ? { file: { name: att.contentType.startsWith("image/") ? "Image" : "File", size: att.size ? Math.round(att.size / 1024) + " KB" : "", uploadId: att.uploadId } } : {}),
+    ...(att
+      ? {
+          file: {
+            name: att.contentType.startsWith("image/") ? "Image" : "File",
+            size: att.size ? Math.round(att.size / 1024) + " KB" : "",
+            uploadId: att.uploadId,
+          },
+        }
+      : {}),
   };
+}
+
+/** billingAddress is an object on the backend ({} when unset; otherwise line1, line2, city, state, pincode or similar).
+    Older rows and the sample data are text. The profile shows one line either way. */
+function addressText(v: unknown): string {
+  if (!v) return "";
+  if (typeof v === "string") return v;
+  if (typeof v !== "object") return "";
+  const r = v as Record<string, unknown>;
+  const order = [
+    "line1",
+    "line2",
+    "street",
+    "area",
+    "city",
+    "district",
+    "state",
+    "pincode",
+    "postalCode",
+    "zip",
+    "country",
+  ];
+  const seen = new Set<string>();
+  const parts: string[] = [];
+  for (const k of [...order, ...Object.keys(r)]) {
+    if (seen.has(k)) continue;
+    seen.add(k);
+    const x = r[k];
+    if (typeof x === "string" || typeof x === "number") {
+      const t = String(x).trim();
+      if (t) parts.push(t);
+    }
+  }
+  return parts.join(", ");
 }
 
 const NOTIF_KIND: Record<string, string> = {
@@ -307,18 +388,54 @@ function mapNotification(n: Obj): S {
         : d.campaignId
           ? "#job-" + d.campaignId
           : "#home";
-  return { id: String(n.id), kind: NOTIF_KIND[type] || "accepted", text: String(n.title || n.text || "Update"), at: isoOr(n.createdAt, nowIso()), go, read: !!n.read };
+  return {
+    id: String(n.id),
+    kind: NOTIF_KIND[type] || "accepted",
+    text: String(n.title || n.text || "Update"),
+    at: isoOr(n.createdAt, nowIso()),
+    go,
+    read: !!n.read,
+  };
 }
 
 /** GST state codes → state names (the backend stores the code). */
 const GST_STATE: Record<string, string> = {
-  "01": "Jammu and Kashmir", "02": "Himachal Pradesh", "03": "Punjab", "04": "Chandigarh", "05": "Uttarakhand",
-  "06": "Haryana", "07": "Delhi", "08": "Rajasthan", "09": "Uttar Pradesh", "10": "Bihar", "11": "Sikkim",
-  "12": "Arunachal Pradesh", "13": "Nagaland", "14": "Manipur", "15": "Mizoram", "16": "Tripura", "17": "Meghalaya",
-  "18": "Assam", "19": "West Bengal", "20": "Jharkhand", "21": "Odisha", "22": "Chhattisgarh", "23": "Madhya Pradesh",
-  "24": "Gujarat", "26": "Dadra and Nagar Haveli and Daman and Diu", "27": "Maharashtra", "29": "Karnataka", "30": "Goa",
-  "31": "Lakshadweep", "32": "Kerala", "33": "Tamil Nadu", "34": "Puducherry", "35": "Andaman and Nicobar Islands",
-  "36": "Telangana", "37": "Andhra Pradesh", "38": "Ladakh",
+  "01": "Jammu and Kashmir",
+  "02": "Himachal Pradesh",
+  "03": "Punjab",
+  "04": "Chandigarh",
+  "05": "Uttarakhand",
+  "06": "Haryana",
+  "07": "Delhi",
+  "08": "Rajasthan",
+  "09": "Uttar Pradesh",
+  "10": "Bihar",
+  "11": "Sikkim",
+  "12": "Arunachal Pradesh",
+  "13": "Nagaland",
+  "14": "Manipur",
+  "15": "Mizoram",
+  "16": "Tripura",
+  "17": "Meghalaya",
+  "18": "Assam",
+  "19": "West Bengal",
+  "20": "Jharkhand",
+  "21": "Odisha",
+  "22": "Chhattisgarh",
+  "23": "Madhya Pradesh",
+  "24": "Gujarat",
+  "26": "Dadra and Nagar Haveli and Daman and Diu",
+  "27": "Maharashtra",
+  "29": "Karnataka",
+  "30": "Goa",
+  "31": "Lakshadweep",
+  "32": "Kerala",
+  "33": "Tamil Nadu",
+  "34": "Puducherry",
+  "35": "Andaman and Nicobar Islands",
+  "36": "Telangana",
+  "37": "Andhra Pradesh",
+  "38": "Ladakh",
 };
 
 function mapMe(b: Obj, u: ApiUser): S {
@@ -339,7 +456,7 @@ function mapMe(b: Obj, u: ApiUser): S {
     billing: {
       legal: String(b.legalName || ""),
       gstin: String(b.gstin || ""),
-      address: String(b.billingAddress || ""),
+      address: addressText(b.billingAddress),
       email: String(b.billingEmail || u.email || ""),
     },
   };
@@ -350,9 +467,41 @@ function payments(camps: S[]): S[] {
   const out: S[] = [];
   for (const c of camps) {
     if (!c.funded || String(c.id).startsWith("offer-")) continue;
-    out.push({ id: "p-" + c.id, date: day(c.funded), kind: "escrow", campaign: c.id, creator: c.creator, amount: c.price, status: c.stage === "released" ? "released" : c.stage === "refunded" ? "refunded" : "held", method: "Escrow", invoice: "" });
-    if (c.stage === "released") out.push({ id: "r-" + c.id, date: day(c.released), kind: "release", campaign: c.id, creator: c.creator, amount: c.price, status: "released", method: "From escrow", invoice: "" });
-    if (c.stage === "refunded") out.push({ id: "f-" + c.id, date: day(c.refunded), kind: "refund", campaign: c.id, creator: c.creator, amount: c.price, status: "refunded", method: "To your account", invoice: "" });
+    out.push({
+      id: "p-" + c.id,
+      date: day(c.funded),
+      kind: "escrow",
+      campaign: c.id,
+      creator: c.creator,
+      amount: c.price,
+      status: c.stage === "released" ? "released" : c.stage === "refunded" ? "refunded" : "held",
+      method: "Escrow",
+      invoice: "",
+    });
+    if (c.stage === "released")
+      out.push({
+        id: "r-" + c.id,
+        date: day(c.released),
+        kind: "release",
+        campaign: c.id,
+        creator: c.creator,
+        amount: c.price,
+        status: "released",
+        method: "From escrow",
+        invoice: "",
+      });
+    if (c.stage === "refunded")
+      out.push({
+        id: "f-" + c.id,
+        date: day(c.refunded),
+        kind: "refund",
+        campaign: c.id,
+        creator: c.creator,
+        amount: c.price,
+        status: "refunded",
+        method: "To your account",
+        invoice: "",
+      });
   }
   return out.sort((a, b) => String(b.date).localeCompare(String(a.date)));
 }
@@ -365,7 +514,12 @@ function addCreators(s: S, rows: Obj[]): void {
     const c = mapCreator(r);
     const i = s.creators.findIndex((x: S) => x.id === c.id);
     if (i < 0) s.creators.push(c);
-    else s.creators[i] = { ...s.creators[i], ...c, packages: c.packages.length ? c.packages : s.creators[i].packages };
+    else
+      s.creators[i] = {
+        ...s.creators[i],
+        ...c,
+        packages: c.packages.length ? c.packages : s.creators[i].packages,
+      };
   }
 }
 
@@ -378,11 +532,10 @@ export async function loadBrandGuest(): Promise<void> {
 }
 
 export async function loadBrand(): Promise<ApiUser> {
-  const user = await fetchMe();
-  userId = user.id;
-  if (user.role !== "brand") return user;
+  /* Everything is asked for at once: the account check no longer holds the other requests back. */
+  const me = fetchMe();
   const errors: string[] = [];
-  const [bme, kyc, creators, camps, offers, orders, convs, notifs, lists] = await Promise.all([
+  const wave = Promise.all([
     settle(api<Obj>("/v1/brands/me/"), {} as Obj, "profile", errors),
     settle(api<Obj>("/v1/kyc/"), null as Obj | null, "kyc", errors),
     settle(apiAll<Obj>("/v1/creators/"), [] as Obj[], "creators", errors),
@@ -393,6 +546,10 @@ export async function loadBrand(): Promise<ApiUser> {
     settle(apiAll<Obj>("/v1/notifications/", {}, 100), [] as Obj[], "notifications", errors),
     settle(apiAll<Obj>("/v1/lists/"), [] as Obj[], "lists", errors),
   ]);
+  const user = await me;
+  userId = user.id;
+  if (user.role !== "brand") return user;
+  const [bme, kyc, creators, camps, offers, orders, convs, notifs, lists] = await wave;
   brandId = String(bme.id || "");
   /* only this brand's own briefs: the list endpoint may also return other brands' open briefs */
   const mine = camps.filter(c => !c.brand || !brandId || idOf(c.brand) === brandId);
@@ -421,7 +578,9 @@ export async function loadBrand(): Promise<ApiUser> {
       }
     });
     /* drafts never reach the server: keep the ones in memory and the ones saved on this device */
-    const drafts = [...(s.jobs || []), ...((x.drafts as S[]) || [])].filter((j: S) => j && j.status === "draft");
+    const drafts = [...(s.jobs || []), ...((x.drafts as S[]) || [])].filter(
+      (j: S) => j && j.status === "draft",
+    );
     const seen = new Set<string>();
     s.jobs = mine
       .map((c, i) => mapJob(c, bidsBy[i].filter(b => String(b.status) !== "withdrawn").length))
@@ -564,12 +723,19 @@ export const brandApi = {
     set(s => {
       addCreators(s, [c]);
       const cc = s.creators.find((x: S) => x.id === id);
-      if (cc) cc.reviewList = reviews.map(r => ({ brand: nameOf(r.brand || r.author, "Brand"), rating: Number(r.stars) || 0, text: String(r.text || ""), at: day(r.createdAt) }));
+      if (cc)
+        cc.reviewList = reviews.map(r => ({
+          brand: nameOf(r.brand || r.author, "Brand"),
+          rating: Number(r.stars) || 0,
+          text: String(r.text || ""),
+          at: day(r.createdAt),
+        }));
     }, "live-refresh");
   },
 
   async setFavorite(creatorId: string, on: boolean): Promise<void> {
-    if (!favListId) favListId = String((await api<Obj>("/v1/lists/", { method: "POST", body: { name: "Favourites" } })).id);
+    if (!favListId)
+      favListId = String((await api<Obj>("/v1/lists/", { method: "POST", body: { name: "Favourites" } })).id);
     if (on) await api(`/v1/lists/${favListId}/creators/`, { method: "POST", body: { creatorId } });
     else await api(`/v1/lists/${favListId}/creators/${creatorId}/`, { method: "DELETE" });
   },
@@ -610,7 +776,14 @@ export const brandApi = {
   },
 
   /* direct offers (the hiring cart) */
-  async sendOffer(o: { creatorId: string; deliverable: string; budget: number; deadline: string; message: string; usageRights: string }): Promise<void> {
+  async sendOffer(o: {
+    creatorId: string;
+    deliverable: string;
+    budget: number;
+    deadline: string;
+    message: string;
+    usageRights: string;
+  }): Promise<void> {
     await api("/v1/offers/", { method: "POST", body: o });
   },
   async withdrawOffer(offerId: string): Promise<void> {
@@ -707,7 +880,10 @@ export const brandApi = {
     set(s => (s.kyc = k), "kyc-live");
   },
   async kycBank(accountHolderName: string, accountNumber: string, ifsc: string): Promise<void> {
-    const k = await api<Obj>("/v1/kyc/bank/", { method: "PUT", body: { accountHolderName, accountNumber, ifsc: ifsc.toUpperCase() } });
+    const k = await api<Obj>("/v1/kyc/bank/", {
+      method: "PUT",
+      body: { accountHolderName, accountNumber, ifsc: ifsc.toUpperCase() },
+    });
     set(s => (s.kyc = k), "kyc-live");
   },
   async kycSubmit(): Promise<void> {

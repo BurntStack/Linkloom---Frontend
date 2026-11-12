@@ -23,6 +23,8 @@ export interface ApiUser {
   email?: string | null;
   fullName?: string | null;
   needsOnboarding?: boolean;
+  /** false for accounts made with a one-time code before passwords existed (2026-11-12). */
+  hasPassword?: boolean;
   kycStatus?: KycState;
   [k: string]: unknown;
 }
@@ -71,14 +73,20 @@ export function readAuth(): Tokens | null {
 
 export function saveAuth(t: Tokens, remember?: boolean): void {
   const prev = readAuth();
-  const keep = remember ?? (() => {
-    try {
-      return !!localStorage.getItem(AUTH_KEY);
-    } catch {
-      return false;
-    }
-  })();
-  const next: Tokens = { access: t.access, refresh: t.refresh || prev?.refresh || "", user: t.user ?? prev?.user ?? null };
+  const keep =
+    remember ??
+    (() => {
+      try {
+        return !!localStorage.getItem(AUTH_KEY);
+      } catch {
+        return false;
+      }
+    })();
+  const next: Tokens = {
+    access: t.access,
+    refresh: t.refresh || prev?.refresh || "",
+    user: t.user ?? prev?.user ?? null,
+  };
   clearAuth();
   try {
     (keep ? localStorage : sessionStorage).setItem(AUTH_KEY, JSON.stringify(next));
@@ -134,6 +142,8 @@ export class ApiError extends Error {
 
 const OFFLINE = "We couldn't reach Linkloom. Check your connection and try again.";
 const FALLBACK = "Something went wrong. Please try again.";
+/** A 5xx: the server failed, whatever the person typed. Its own message ("Something went wrong.") reads like a wrong password. */
+const SERVER_DOWN = "Linkloom's server had a problem. Please try again in a minute.";
 
 /** Called once when the session can no longer be refreshed. The dashboards send the person to sign-in. */
 let onSessionLost: (() => void) | null = null;
@@ -162,7 +172,8 @@ interface Envelope<T> {
 const url = (path: string, query?: RequestOptions["query"]): string => {
   const u = new URL(API_BASE + path);
   if (query)
-    for (const [k, v] of Object.entries(query)) if (v !== undefined && v !== null && v !== "") u.searchParams.set(k, String(v));
+    for (const [k, v] of Object.entries(query))
+      if (v !== undefined && v !== null && v !== "") u.searchParams.set(k, String(v));
   return u.toString();
 };
 
@@ -184,7 +195,10 @@ export function refreshSession(): Promise<boolean> {
         clearAuth();
         return false;
       }
-      const env = (await res.json().catch(() => null)) as Envelope<{ access: string; refresh?: string }> | null;
+      const env = (await res.json().catch(() => null)) as Envelope<{
+        access: string;
+        refresh?: string;
+      }> | null;
       const d = env?.data;
       if (!res.ok || !d?.access) return false;
       saveAuth({ access: d.access, refresh: d.refresh || t.refresh, user: t.user });
@@ -198,9 +212,27 @@ export function refreshSession(): Promise<boolean> {
   return refreshing;
 }
 
-async function raw<T>(path: string, o: RequestOptions, retried = false): Promise<{ data: T; meta: Envelope<T>["meta"] }> {
+/** True when the access token is a JWT whose expiry has passed (or is seconds away). Anything unreadable is "not known". */
+function expired(token: string): boolean {
+  try {
+    const part = token.split(".")[1];
+    if (!part) return false;
+    const exp = Number(JSON.parse(atob(part.replace(/-/g, "+").replace(/_/g, "/"))).exp);
+    return exp > 0 && exp * 1000 < Date.now() + 10_000;
+  } catch {
+    return false;
+  }
+}
+
+async function raw<T>(
+  path: string,
+  o: RequestOptions,
+  retried = false,
+): Promise<{ data: T; meta: Envelope<T>["meta"] }> {
   const useAuth = o.auth !== false;
-  const token = useAuth ? getToken() : null;
+  let token = useAuth ? getToken() : null;
+  /* A returning visitor's 15-minute token has almost always run out: renew it first rather than spend a round trip on a 401. */
+  if (token && !retried && expired(token) && (await refreshSession())) token = getToken();
   let res: Response;
   try {
     res = await fetch(url(path, o.query), {
@@ -226,7 +258,12 @@ async function raw<T>(path: string, o: RequestOptions, retried = false): Promise
   }
   if (!res.ok || env?.success === false) {
     const err = env?.error;
-    const msg = typeof err?.message === "string" && err.message ? err.message : FALLBACK;
+    const msg =
+      res.status >= 500
+        ? SERVER_DOWN
+        : typeof err?.message === "string" && err.message
+          ? err.message
+          : FALLBACK;
     throw new ApiError(res.status, msg, err?.code || "", err?.details ?? null);
   }
   return { data: (env && "data" in env ? env.data : env) as T, meta: env?.meta ?? null };
@@ -243,7 +280,10 @@ export async function apiPage<T>(
   o: RequestOptions = {},
 ): Promise<{ items: T[]; next: string | null }> {
   const r = await raw<T[]>(path, o);
-  return { items: Array.isArray(r.data) ? r.data : [], next: r.meta?.hasMore === false ? null : (r.meta?.nextCursor ?? null) };
+  return {
+    items: Array.isArray(r.data) ? r.data : [],
+    next: r.meta?.hasMore === false ? null : (r.meta?.nextCursor ?? null),
+  };
 }
 
 /** Every page of a list, up to `max` rows. */
@@ -271,4 +311,5 @@ export const money = (p: number): Money => ({ amount: Math.round(p), currency: "
 
 /** Random key for POSTs that must not run twice. */
 export const idemKey = (): string =>
-  (crypto as Crypto & { randomUUID?: () => string }).randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now();
+  (crypto as Crypto & { randomUUID?: () => string }).randomUUID?.() ??
+  Math.random().toString(36).slice(2) + Date.now();

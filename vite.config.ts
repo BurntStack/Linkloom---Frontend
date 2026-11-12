@@ -22,12 +22,27 @@ function noSampleData(enabled: boolean): Plugin {
   };
 }
 
+/* The dashboards and the sign-in page call the API as soon as their script runs. Opening the connection while the
+   script is still downloading takes the DNS and TLS setup off that first request. */
+function apiPreconnect(origin: string): Plugin {
+  return {
+    name: "linkloom-api-preconnect",
+    transformIndexHtml(_html, ctx) {
+      if (!origin || /(^|\/)index\.html$/.test(ctx.filename.replace(/\\/g, "/"))) return;
+      return [{ tag: "link", attrs: { rel: "preconnect", href: origin, crossorigin: true }, injectTo: "head" }]; // after the Google tag, which Google wants first in <head>
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const parity = !!(env.VITE_TEST_HOOKS || process.env.VITE_TEST_HOOKS);
   return {
     base: "./",
-    plugins: [noSampleData(!parity)],
+    plugins: [
+      noSampleData(!parity),
+      apiPreconnect(parity ? "" : (env.VITE_API_BASE_URL || "https://collab-api-ewju.onrender.com").replace(/\/+$/, "")),
+    ],
     resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
     build: {
       target: "es2022",

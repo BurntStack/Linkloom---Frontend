@@ -21,7 +21,11 @@
   const Q_FROM = `${QY}-${pad2(QM)}-01`,
     Q_TO = `${QY}-${pad2(QM + 2)}-${pad2(new Date(Date.UTC(QY, QM + 2, 0)).getUTCDate())}`,
     Q_MONTHS = [0, 1, 2].map(i => `${QY}-${pad2(QM + i)}`);
-  const FY_START = (() => { const y = +TODAY.slice(0, 4), m = +TODAY.slice(5, 7); return (m >= 4 ? y : y - 1) + "-04-01"; })();
+  const FY_START = (() => {
+    const y = +TODAY.slice(0, 4),
+      m = +TODAY.slice(5, 7);
+    return (m >= 4 ? y : y - 1) + "-04-01";
+  })();
   const sum = (rows, f) => rows.reduce((n, r) => n + f(r), 0);
   const addDays = (iso, n) => {
     const d = L.D(iso);
@@ -61,8 +65,7 @@
   function model(k) {
     const s = L.store.s,
       quarterFrom = Q_FROM;
-    const from =
-      k === "q" ? quarterFrom : k === "90" ? addDays(TODAY, -90) : k === "fy" ? FY_START : null;
+    const from = k === "q" ? quarterFrom : k === "90" ? addDays(TODAY, -90) : k === "fy" ? FY_START : null;
     const inP = d => !!d && (!from || d >= from) && d <= TODAY;
     const pay = s.payments,
       escrowOf = id => pay.find(p => p.kind === "escrow" && p.campaign === id);
@@ -183,7 +186,7 @@
       left,
       months,
       pace: b.total / 3,
-      used: spent / b.total,
+      used: b.total ? spent / b.total : 0, // no budget set: 0 of nothing, never NaN
       elapsed,
       over: spent + committed > b.total,
     };
@@ -425,7 +428,13 @@
         <section class="rp-sec rp-card" aria-labelledby="rpBuH">
           <div class="rp-sec-top"><div><h2 class="rp-h" id="rpBuH">Budget &amp; spending</h2>
             <p class="rp-bu-l"><span class="t-money rp-big">${L.inr(B.spent)}</span><span class="rp-bu-of">of ${L.inr(B.b.total)} spent · ${esc(B.b.label)}</span></p></div>
-            <p class="rp-pace${B.over ? " is-over" : ""}">${ic(B.over ? "alert" : "check")}<span>${B.over ? `Spent and waiting payments come to ${L.inr(B.spent + B.committed)}, over the budget.` : `${Math.round(B.used * 100)}% used with ${Math.round(B.elapsed * 100)}% of the quarter gone. ${B.used <= B.elapsed ? "You are under pace." : "You are ahead of pace."}`}</span></p></div>
+            <p class="rp-pace${B.over ? " is-over" : ""}">${ic(B.over ? "alert" : !B.b.total ? "info" : "check")}<span>${
+              !B.b.total
+                ? `No budget set. Add one in <a href="#profile">your profile</a> to see spend against it.`
+                : B.over
+                  ? `Spent and waiting payments come to ${L.inr(B.spent + B.committed)}, over the budget.`
+                  : `${Math.round(B.used * 100)}% used with ${Math.round(B.elapsed * 100)}% of the quarter gone. ${B.used <= B.elapsed ? "You are under pace." : "You are ahead of pace."}`
+            }</span></p></div>
           <div class="rp-seg-bar" role="img" aria-label="${esc(`Budget ${L.inr(B.b.total)}: ` + segs.map(x => `${x[1]} ${L.inr(x[2])}, ${share(x[2])}%`).join("; "))}">
             ${segs.map(x => `<span class="rp-part is-${x[0]}" style="flex:${x[2]} 1 0" title="${esc(`${x[1]} ${L.inr(x[2])}`)}">${share(x[2]) >= 9 ? `<b>${share(x[2])}%</b>` : ""}</span>`).join("")}
           </div>

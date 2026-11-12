@@ -40,6 +40,7 @@ import {
   splitLocation,
   todayIst,
   toneOf,
+  usageText,
 } from "../../../shared/live";
 
 /* ---------- backend rows (only the fields the app reads) ---------- */
@@ -56,7 +57,7 @@ export interface ApiCampaign extends Obj {
   budgetMax: { amount: number } | number;
   closesAt: string;
   status: string;
-  usageRights: string | null;
+  usageRights: unknown;
   brand: Obj | null;
   createdAt: string;
 }
@@ -119,7 +120,16 @@ export function emptyCreatorState(): State {
     plan: null,
     withdrawals: [],
     notifications: [],
-    jobsUI: { q: "", city: "", platform: "", category: "", minBudget: 0, sort: "newest", savedOnly: false, showHidden: false },
+    jobsUI: {
+      q: "",
+      city: "",
+      platform: "",
+      category: "",
+      minBudget: 0,
+      sort: "newest",
+      savedOnly: false,
+      showHidden: false,
+    },
     hiddenJobs: [],
     reports: [],
     bidDrafts: {},
@@ -195,7 +205,7 @@ export function mapJob(c: ApiCampaign, me?: Me): Job {
     deliverables: listOf(c.deliverables),
     brief: c.brief || "",
     min: c.minFollowers ? `Min ${Number(c.minFollowers).toLocaleString("en-IN")} followers` : "",
-    usage: c.usageRights || "",
+    usage: usageText(c.usageRights),
   };
   if (c.status && !/open|active|live/i.test(String(c.status))) j.status = "hired";
   if (me) scoreJob(j, me);
@@ -285,7 +295,9 @@ export function mapOrder(o: Obj): ActiveJob {
   const platform = platformOf(o.platform ?? camp.platform ?? (o.package as Obj | undefined)?.platform);
   const created = isoOr(o.createdAt, nowIso());
   const funded = isoOr(o.fundedAt || o.paidAt, created);
-  const due = day(o.dueAt || o.deadline || o.dueDate || camp.closesAt) || addDaysIso(created, Number(o.deliveryDays) || 7);
+  const due =
+    day(o.dueAt || o.deadline || o.dueDate || camp.closesAt) ||
+    addDaysIso(created, Number(o.deliveryDays) || 7);
   const stage = stageOf(status);
   const released = /approved|completed|released/.test(status.toLowerCase());
   const a: ActiveJob = {
@@ -304,7 +316,7 @@ export function mapOrder(o: Obj): ActiveJob {
     thread: "",
     revisionsIncluded: Number(o.revisionsIncluded ?? o.revisionsAllowed ?? 1) || 1,
     brief: String(o.brief || camp.brief || ""),
-    usage: String(o.usageRights || camp.usageRights || ""),
+    usage: usageText(o.usageRights ?? camp.usageRights),
     languages: [],
     accepted: created,
     funded,
@@ -320,7 +332,9 @@ export function mapOrder(o: Obj): ActiveJob {
     a.log.push({ at: a.revisionAt, kind: "revision" });
   }
   if (stage === "approved") a.log.push({ at: isoOr(o.approvedAt || o.updatedAt, created), kind: "approved" });
-  (a as ActiveJob & { allowed: string[]; brandId: string; status: string }).allowed = Array.isArray(o.allowedActions)
+  (a as ActiveJob & { allowed: string[]; brandId: string; status: string }).allowed = Array.isArray(
+    o.allowedActions,
+  )
     ? (o.allowedActions as string[])
     : [];
   (a as ActiveJob & { brandId: string }).brandId = idOf(o.brand || camp.brand);
@@ -330,7 +344,8 @@ export function mapOrder(o: Obj): ActiveJob {
 
 export function mapMessage(m: Obj): Message {
   const att = m.attachment as { uploadId: string; contentType: string } | null;
-  const text = String(m.text || "") || (att ? (att.contentType.startsWith("image/") ? "📎 Image" : "📎 File") : "");
+  const text =
+    String(m.text || "") || (att ? (att.contentType.startsWith("image/") ? "📎 Image" : "📎 File") : "");
   const out: Message = { from: m.fromMe ? "me" : "brand", at: isoOr(m.sentAt, nowIso()), text };
   if (m.fromMe) out.status = "delivered";
   if (att) (out as Message & { attachment: unknown }).attachment = att;
@@ -381,7 +396,9 @@ const NOTIF_GO: Record<string, (d: Obj) => string> = {
 export function mapNotification(n: Obj): Notification {
   const data = (n.data || {}) as Obj;
   const type = String(n.type || "");
-  const go = NOTIF_GO[type]?.(data) || (data.orderId ? "#work-" + data.orderId : data.campaignId ? "#job-" + data.campaignId : "#home");
+  const go =
+    NOTIF_GO[type]?.(data) ||
+    (data.orderId ? "#work-" + data.orderId : data.campaignId ? "#job-" + data.campaignId : "#home");
   return {
     id: String(n.id),
     at: isoOr(n.createdAt || n.at, nowIso()),
@@ -441,7 +458,10 @@ function mapMe(c: Obj, user: ApiUser | null, x: Partial<CreatorExtras>, prev: Me
       updated: todayIst(),
       source: "Self-reported",
     };
-  const handle = platforms.instagram?.handle || platforms.youtube?.handle || (c.slug ? "@" + String(c.slug).replace(/-[a-z0-9]{6}$/, "") : "");
+  const handle =
+    platforms.instagram?.handle ||
+    platforms.youtube?.handle ||
+    (c.slug ? "@" + String(c.slug).replace(/-[a-z0-9]{6}$/, "") : "");
   return {
     ...prev,
     name,
@@ -481,24 +501,40 @@ export async function loadGuest(st: Store): Promise<void> {
 /** Everything for a signed-in creator. Returns the user so the session can route (onboarding, wrong role). */
 export async function loadCreator(st: Store): Promise<ApiUser> {
   store = st;
-  const user = await fetchMe();
-  userId = user.id;
+  /* Everything is asked for at once: the account check no longer holds the other requests back. */
+  const me = fetchMe();
   const errors: string[] = [];
-  const [cme, kyc, camps, myBids, orders, convs, notifs, earnings] = await Promise.all([
+  /* The reviews need the creator's profile id. It is remembered from the last visit so they can load alongside the rest. */
+  const knownUser = storedUser()?.id || "";
+  const knownCreator = knownUser
+    ? extras<{ creatorId: string }>("creator", knownUser).get().creatorId || ""
+    : "";
+  const loadReviews = (id: string) =>
+    settle(apiAll<Obj>(`/v1/creators/${id}/reviews/`, {}, 50), [] as Obj[], "reviews", errors); // needs a token since 2026-11-12
+  const earlyReviews = knownCreator ? loadReviews(knownCreator) : null;
+  const wave = Promise.all([
     settle(api<Obj>("/v1/creators/me/"), {} as Obj, "profile", errors),
     settle(api<Obj>("/v1/kyc/"), null as Obj | null, "kyc", errors),
     settle(apiAll<ApiCampaign>("/v1/campaigns/"), [] as ApiCampaign[], "jobs", errors),
-    settle(apiAll<Obj>("/v1/creators/me/campaigns/"), [] as Obj[], "bids", errors),
+    settle(apiAll<Obj>("/v1/creators/me/bids/"), [] as Obj[], "bids", errors),
     settle(apiAll<Obj>("/v1/creators/me/orders/"), [] as Obj[], "orders", errors),
     settle(apiAll<Obj>("/v1/conversations/"), [] as Obj[], "messages", errors),
     settle(apiAll<Obj>("/v1/notifications/", {}, 100), [] as Obj[], "notifications", errors),
     settle(api<Obj>("/v1/creators/me/earnings/"), null as Obj | null, "earnings", errors),
   ]);
+  const user = await me;
+  userId = user.id;
+  if (user.role === "brand") return user; // the session sends a brand account to its own dashboard
+  const [cme, kyc, camps, myBids, orders, convs, notifs, earnings] = await wave;
   creatorId = String(cme.id || "");
   const x = ex().get();
-  const reviews = creatorId
-    ? await settle(apiAll<Obj>(`/v1/creators/${creatorId}/reviews/`, { auth: false }, 50), [] as Obj[], "reviews", errors)
-    : [];
+  if (creatorId && creatorId !== knownCreator)
+    extras<{ creatorId: string }>("creator", userId).set({ creatorId });
+  const reviews = !creatorId
+    ? []
+    : earlyReviews && creatorId === knownCreator
+      ? await earlyReviews
+      : await loadReviews(creatorId);
 
   st.set(s => {
     s.session.signedIn = true;
@@ -510,9 +546,16 @@ export async function loadCreator(st: Store): Promise<ApiUser> {
     if (kyc) s.kyc = mapKyc(kyc, s.kyc);
     else if (user.kycStatus) s.kyc.status = KYC_STATUS[user.kycStatus] || "not_started";
     s.jobs = camps.map(c => mapJob(c, s.me));
-    /* /creators/me/campaigns/ lists the creator's bids, each with its campaign; some builds nest the bid instead */
+    /* /creators/me/bids/ (since 2026-11-12; /creators/me/campaigns/ is the old name) lists the creator's bids, each with its
+       campaign; some builds nest the bid instead */
     s.bids = myBids
-      .map(r => (r.price !== undefined ? r : ((r.myBid || r.bid) as Obj | undefined) ? { ...(r.myBid || r.bid) as Obj, campaign: r } : null))
+      .map(r =>
+        r.price !== undefined
+          ? r
+          : ((r.myBid || r.bid) as Obj | undefined)
+            ? { ...((r.myBid || r.bid) as Obj), campaign: r }
+            : null,
+      )
       .filter((r): r is Obj => !!r)
       .map(b => mapBid(b, s.jobs));
     s.active = orders.map(mapOrder);
@@ -543,16 +586,14 @@ function maskPhone(p: string): string {
 /** Earnings: the ledger is the approved orders; withdrawals stay hidden while payouts are off. */
 function applyEarnings(s: State, e: Obj | null): void {
   const approved = s.active.filter(a => a.pay === "released");
-  s.ledger = approved.map(
-    (a): LedgerEntry => ({
-      id: "l-" + a.id,
-      date: day(a.log.find(l => l.kind === "approved")?.at || a.funded),
-      brand: a.brand,
-      job: a.title,
-      amount: a.price,
-      status: "paid",
-    }),
-  );
+  s.ledger = approved.map((a): LedgerEntry => ({
+    id: "l-" + a.id,
+    date: day(a.log.find(l => l.kind === "approved")?.at || a.funded),
+    brand: a.brand,
+    job: a.title,
+    amount: a.price,
+    status: "paid",
+  }));
   const payouts = !!e?.payoutsEnabled;
   (s as State & { payoutsEnabled: boolean }).payoutsEnabled = payouts;
   (s as State & { earningsSummary: unknown }).earningsSummary = e
@@ -590,7 +631,9 @@ function wireLive(): void {
         if (id && t.msgs.some(x => (x as Message & { id?: string }).id === id)) return;
         /* the echo of a message this tab just sent: match it to the one already on screen */
         if (m.from === "me") {
-          const mine = t.msgs.find(x => x.from === "me" && !(x as Message & { id?: string }).id && x.text === m.text);
+          const mine = t.msgs.find(
+            x => x.from === "me" && !(x as Message & { id?: string }).id && x.text === m.text,
+          );
           if (mine) {
             (mine as Message & { id?: string }).id = id;
             return;
@@ -641,14 +684,20 @@ async function refreshThreads(): Promise<void> {
 /** Bids, orders and notifications: the slices other people change. */
 export async function refreshSoft(): Promise<void> {
   const [myBids, orders, notifs] = await Promise.all([
-    apiAll<Obj>("/v1/creators/me/campaigns/").catch(() => null),
+    apiAll<Obj>("/v1/creators/me/bids/").catch(() => null),
     apiAll<Obj>("/v1/creators/me/orders/").catch(() => null),
     apiAll<Obj>("/v1/notifications/", {}, 100).catch(() => null),
   ]);
   store.set(s => {
     if (myBids)
       s.bids = myBids
-        .map(r => (r.price !== undefined ? r : ((r.myBid || r.bid) as Obj | undefined) ? { ...(r.myBid || r.bid) as Obj, campaign: r } : null))
+        .map(r =>
+          r.price !== undefined
+            ? r
+            : ((r.myBid || r.bid) as Obj | undefined)
+              ? { ...((r.myBid || r.bid) as Obj), campaign: r }
+              : null,
+        )
         .filter((r): r is Obj => !!r)
         .map(b => mapBid(b, s.jobs));
     if (orders) {
@@ -679,7 +728,10 @@ export const isKycRequired = (e: unknown): boolean => e instanceof ApiError && e
 
 export const creatorApi = {
   errorText,
-  async placeBid(jobId: string, p: { price: number; why: string; views: number | null; postDate: string; links: string[] }): Promise<Bid> {
+  async placeBid(
+    jobId: string,
+    p: { price: number; why: string; views: number | null; postDate: string; links: string[] },
+  ): Promise<Bid> {
     const days = Math.max(1, daysUntil(p.postDate));
     const message = p.links.length ? `${p.why}\n\nSimilar work:\n${p.links.join("\n")}` : p.why;
     const body: Obj = { price: p.price, message, deliveryDays: days };
@@ -754,7 +806,10 @@ export const creatorApi = {
   },
 
   /* work */
-  async submitDeliverable(orderId: string, d: { file?: File; url?: string; note?: string }): Promise<UploadedFile | null> {
+  async submitDeliverable(
+    orderId: string,
+    d: { file?: File; url?: string; note?: string },
+  ): Promise<UploadedFile | null> {
     let up: UploadedFile | null = null;
     const body: Obj = {};
     if (d.file) {
@@ -793,7 +848,8 @@ export const creatorApi = {
     if (p.name !== undefined) body.displayName = p.name.trim();
     if (p.bio !== undefined) body.bio = p.bio.trim();
     if (p.categories !== undefined) body.categories = p.categories;
-    if (p.city !== undefined) body.location = [p.city.trim(), (p.region || "").trim()].filter(Boolean).join(", ");
+    if (p.city !== undefined)
+      body.location = [p.city.trim(), (p.region || "").trim()].filter(Boolean).join(", ");
     if (p.primaryPlatform) body.primaryPlatform = p.primaryPlatform;
     if (Object.keys(body).length) await api("/v1/creators/me/", { method: "PATCH", body });
     if (p.extras) ex().set(p.extras);
@@ -816,7 +872,10 @@ export const creatorApi = {
       "Driving licence": "driving_licence",
     };
     const up = await uploadFile("kyc_document", file);
-    const k = await api<Obj>("/v1/kyc/id/", { method: "PUT", body: { idType: ID[idType] || "aadhaar", uploadId: up.id } });
+    const k = await api<Obj>("/v1/kyc/id/", {
+      method: "PUT",
+      body: { idType: ID[idType] || "aadhaar", uploadId: up.id },
+    });
     store.set(s => (s.kyc = mapKyc(k, s.kyc)), "kyc-live");
   },
   async kycBank(accountHolderName: string, accountNumber: string, ifsc: string): Promise<void> {

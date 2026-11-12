@@ -507,51 +507,56 @@
       }
       next.disabled = true;
       setLabel(next, "Saving…");
-      setTimeout(() => {
-        if (!alive) return;
-        store.set(s => {
-          const me = s.me;
-          me.brand = D.brand.trim();
-          me.website = D.website
-            .trim()
-            .replace(/^https?:\/\//i, "")
-            .replace(/\/$/, "");
-          me.industry = D.industry;
-          me.name = D.name.trim().replace(/\s+/g, " ");
-          me.role = D.role.trim();
-          me.logo = D.logo || null;
-          me.billing = {
-            legal: D.legal.trim(),
-            gstin: D.gstin.trim().toUpperCase(),
-            address: D.address.trim(),
-            email: D.bemail.trim(),
+      setTimeout(
+        () => {
+          if (!alive) return;
+          store.set(s => {
+            const me = s.me;
+            me.brand = D.brand.trim();
+            me.website = D.website
+              .trim()
+              .replace(/^https?:\/\//i, "")
+              .replace(/\/$/, "");
+            me.industry = D.industry;
+            me.name = D.name.trim().replace(/\s+/g, " ");
+            me.role = D.role.trim();
+            me.logo = D.logo || null;
+            me.billing = {
+              legal: D.legal.trim(),
+              gstin: D.gstin.trim().toUpperCase(),
+              address: D.address.trim(),
+              email: D.bemail.trim(),
+            };
+            if (s.session.email) me.email = s.session.email;
+            s.session.firstRun = false;
+          }, "brand-profile-saved");
+          const done = () => {
+            D = null;
+            L.toast("Brand profile saved", "check");
+            L.go("#home");
           };
-          if (s.session.email) me.email = s.session.email;
-          s.session.firstRun = false;
-        }, "brand-profile-saved");
-        const done = () => {
-          D = null;
-          L.toast("Brand profile saved", "check");
-          L.go("#home");
-        };
-        if (!L.live) return done();
-        const me = store.s.me;
-        L.live
-          .saveBrand(me)
-          .then(() =>
-            me.logo && String(me.logo).startsWith("data:")
-              ? import("@/shared/api/uploads").then(u => L.live.uploadLogo(u.dataUrlToBlob(me.logo))).then(url => url && store.set(s => (s.me.logo = url), "profile-edited"))
-              : null,
-          )
-          .then(done, e => {
-            store.set(s => (s.session.firstRun = true), "brand-profile-saved");
-            next.disabled = false;
-            setLabel(next, "Save");
-            const f = $("[data-ferr]");
-            f.hidden = false;
-            f.textContent = L.live.errorText(e);
-          });
-      }, L.live ? 0 : 500);
+          if (!L.live) return done();
+          const me = store.s.me;
+          L.live
+            .saveBrand(me)
+            .then(() =>
+              me.logo && String(me.logo).startsWith("data:")
+                ? import("@/shared/api/uploads")
+                    .then(u => L.live.uploadLogo(u.dataUrlToBlob(me.logo)))
+                    .then(url => url && store.set(s => (s.me.logo = url), "profile-edited"))
+                : null,
+            )
+            .then(done, e => {
+              store.set(s => (s.session.firstRun = true), "brand-profile-saved");
+              next.disabled = false;
+              setLabel(next, "Save");
+              const f = $("[data-ferr]");
+              f.hidden = false;
+              f.textContent = L.live.errorText(e);
+            });
+        },
+        L.live ? 0 : 500,
+      );
     });
     paint(false);
     return () => {
@@ -624,8 +629,8 @@
                 <div><dt>Website</dt><dd>${me.website ? esc(me.website) : "—"}</dd></div>
                 <div><dt>City</dt><dd>${esc([me.city, me.state].filter(Boolean).join(", ") || "—")}</dd></div>
                 <div><dt>Contact person</dt><dd>${esc(me.name)}${me.role ? `<span class="t-cap muted">${esc(me.role)}</span>` : ""}</dd></div>
-                <div><dt>Sign-in email</dt><dd>${esc(me.email)}<span class="profile-ok">${icon("check")}Verified by link</span></dd></div>
-                <div><dt>Mobile</dt><dd class="num">${esc(fmtMobile(me.mobile))}<span class="profile-ok">${icon("check")}Verified by OTP</span></dd></div>
+                ${me.email ? `<div><dt>Sign-in email</dt><dd>${esc(me.email)}<span class="profile-ok">${icon("check")}Verified by link</span></dd></div>` : ""}
+                ${me.mobile ? `<div><dt>Mobile</dt><dd class="num">${esc(fmtMobile(me.mobile))}<span class="profile-ok">${icon("check")}Verified by OTP</span></dd></div>` : ""}
               </dl>
               <p class="t-cap muted">Creators see your brand name, logo, website, industry and city. Never your mobile or billing details.</p>
             </section>
@@ -668,7 +673,7 @@
             <section class="profile-sec profile-card" aria-labelledby="profile-sec">
               <h2 class="t-h3" id="profile-sec">${icon("shield")}Sign-in and security</h2>
               <ul class="profile-rows">
-                ${L.live ? `<li><span><b>Sign-in</b><span class="t-cap muted">One-time code to ${esc(me.email || "your email")}${me.mobile ? " or +91 " + esc(me.mobile) : ""}, or Google</span></span><a class="lq lq-s lq-sm" href="#kyc">Verification</a></li>` : `<li><span><b>Password</b><span class="t-cap muted">Last changed ${me.passwordChanged ? esc(L.fmtDate(me.passwordChanged, { year: true })) : "never"}</span></span><button type="button" class="lq lq-s lq-sm" data-pw>Change password</button></li>`}
+                ${L.live ? `<li><span><b>Sign-in</b><span class="t-cap muted">Password with ${esc([me.email, me.mobile ? "+91 " + me.mobile : ""].filter(Boolean).join(" or ") || "your email or mobile")}, a one-time code, or Google</span></span><a class="lq lq-s lq-sm" href="signin.html?role=brand&forgot=1">Change password</a></li>` : `<li><span><b>Password</b><span class="t-cap muted">Last changed ${me.passwordChanged ? esc(L.fmtDate(me.passwordChanged, { year: true })) : "never"}</span></span><button type="button" class="lq lq-s lq-sm" data-pw>Change password</button></li>`}
                 <li><span><b>This device</b><span class="t-cap muted">${sess.remember !== false ? "Remembered. You stay signed in for 30 days." : "Not remembered. You're signed out when the tab closes."}</span></span></li>
                 <li><span><b>Sign out</b><span class="t-cap muted">Ends your session on this device.</span></span><button type="button" class="lq lq-s lq-sm" data-signout>${icon("logout", "ic")}Sign out</button></li>
               </ul>
@@ -779,7 +784,7 @@
     function openSignOut() {
       L.openSheet({
         title: "Sign out?",
-        body: `<div class="profile-q"><p class="muted">${L.live ? "You'll sign back in with a one-time code or Google." : "You'll need your email and password to sign back in."} Jobs, campaigns and money in escrow are not affected.</p>
+        body: `<div class="profile-q"><p class="muted">${L.live ? "You'll sign back in with your password, a one-time code or Google." : "You'll need your email and password to sign back in."} Jobs, campaigns and money in escrow are not affected.</p>
           <div class="row wrap"><button class="lq lq-p" type="button" data-yes>${icon("logout", "ic")}Sign out</button><button class="lq lq-s" type="button" data-no>Stay signed in</button></div></div>`,
         onMount(b, close) {
           b.querySelector("[data-no]").addEventListener("click", () => close());
@@ -1020,7 +1025,9 @@
                 .saveBrand(me)
                 .then(() =>
                   me.logo && String(me.logo).startsWith("data:")
-                    ? import("@/shared/api/uploads").then(u => L.live.uploadLogo(u.dataUrlToBlob(me.logo))).then(url => url && store.set(s => (s.me.logo = url), "profile-edited"))
+                    ? import("@/shared/api/uploads")
+                        .then(u => L.live.uploadLogo(u.dataUrlToBlob(me.logo)))
+                        .then(url => url && store.set(s => (s.me.logo = url), "profile-edited"))
                     : null,
                 )
                 .catch(e => L.toast(L.live.errorText(e), "alert"));

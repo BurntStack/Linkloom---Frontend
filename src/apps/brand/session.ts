@@ -2,8 +2,8 @@
    - Signed in (tokens stored): load everything from the API. A creator account is sent to the creator dashboard;
      an account that hasn't finished its brand profile goes to #setup.
    - Signed out: a read-only guest view of the creator directory. Any other click asks them to sign in.
-   - The old email-and-password screens (#login, #signup, #forgot, #reset) hand over to the shared sign-in page,
-     because sign-in is by one-time code or Google.
+   - The prototype's own account screens (#login, #signup, #forgot, #reset) hand over to the shared sign-in page,
+     opening its sign-in, sign-up or forgot-password form with the brand side selected.
 
    The parity build runs on the prototype's sample data and skips all of this. */
 import { clearAuth, isSignedIn, setSessionLostHandler, type ApiUser } from "../../shared/api/client";
@@ -147,7 +147,9 @@ export function initBrandSession(): boolean | Promise<boolean> {
     const s = w.LLD_DATA.session;
     if (PASSWORD_SCREENS.has(name)) {
       if (s.signedIn) return "#home";
-      location.replace("signin.html?role=brand");
+      /* open the matching form on the shared page: sign up, forgot password, or sign in */
+      const to = name === "signup" ? "&join=1" : name === "forgot" || name === "reset" ? "&forgot=1" : "";
+      location.replace(`signin.html?role=brand${to}`);
       return null;
     }
     return s.signedIn && s.firstRun && !OPEN_DURING_SETUP.has(name) ? "#setup" : null;
