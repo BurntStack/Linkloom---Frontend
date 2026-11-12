@@ -226,6 +226,9 @@ function paint() {
   $$("[data-names]").forEach(e => (e.hidden = !names || (e.hasAttribute("data-brand-only") && !brand)));
   /* the password is chosen with the new account's details; signing in with a code needs none */
   $$("[data-new-only]").forEach(e => (e.hidden = !names && !setPw));
+  /* consent is only required for new account creation, not for password reset */
+  const cf = $("#suConsentField");
+  if (cf) cf.hidden = !names;
   $("#skipPw").hidden = !setPw;
   $("#suPhoneField").hidden = verifiedBy === "other";
   goLabel.textContent = COPY[role].btn;
@@ -548,11 +551,20 @@ $("#signupForm").addEventListener("submit", async e => {
           : "",
     );
   }
+  /* DPDP Act consent: required when creating a new account */
+  const consentEl = document.getElementById("suConsent");
+  const consentErr = document.getElementById("suConsentErr");
+  if (names && consentEl && !consentEl.checked) {
+    if (consentErr) consentErr.textContent = "Please agree to the Terms and Privacy Policy to continue.";
+    if (!bad) bad = consentEl;
+  }
+
   if (bad) {
     bad.focus();
     shake();
     return;
   }
+  if (consentEl && consentErr) consentErr.textContent = "";
   if (setPw) {
     setBusy(suGo, suGoLabel, true, "Saving…");
     try {

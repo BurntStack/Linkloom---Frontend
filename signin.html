@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- Consent Mode v2: set defaults BEFORE GTM loads -->
+<script src="/consent.js"></script>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KKJG6LRD');</script>
 <!-- End Google Tag Manager -->
@@ -123,6 +125,10 @@
           <p class="err" id="suPw2Err" aria-live="polite"></p>
         </div>
         <p class="err form-err" id="suErr" aria-live="assertive"></p>
+        <div class="field" data-new-only id="suConsentField">
+          <label class="check"><input type="checkbox" id="suConsent" aria-describedby="suConsentErr"> I agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></label>
+          <p class="err" id="suConsentErr" aria-live="assertive"></p>
+        </div>
         <p class="join" id="skipPw" hidden><button class="link" type="button" id="skipPwBtn">Not now, open my dashboard</button></p>
         <button class="lq" type="submit" id="suGo" data-new-only><span id="suGoL">Create creator account</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
