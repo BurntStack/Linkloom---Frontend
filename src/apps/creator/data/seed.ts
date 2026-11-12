@@ -1,6 +1,6 @@
 /* Linkloom Creator Dashboard: sample data. Every name, brand, number and amount here is a sample.
    Money is integer paise (₹1 = 100). "Today" is 4 Nov 2026, 10:42 IST (LLD.today()). */
-import type { ActiveJob, PayoutMethod, State, WorkUI } from "@/creator/types";
+import type { ActiveJob, PayoutMethod, State, WorkUI } from "@/apps/creator/types";
 
 /* The rows and fields below are assembled in three passes, like the prototype's data.js: the base literal, the Builder B
    additions, then the Builder C fill(). `SeedDraft` is the state before those passes have run. */

@@ -24,7 +24,7 @@ Do not add features, dependencies, frameworks, persistence, or a backend.
 ## How to work
 
 - Convert with targeted edits. Do not retype whole files from memory: templates must stay byte-identical.
-- Keep module-load side effects (`register`, listeners) in the same relative order. `src/creator/main.ts` import order is
+- Keep module-load side effects (`register`, listeners) in the same relative order. `src/apps/creator/main.ts` import order is
   the prototype's script order and the cascade order; do not reorder it, and leave the CSS alone.
 - Modules are strict and the prototype was sloppy. Watch for implicit globals and `this` at function level.
 - Stay inside the paths you own. If you need something changed elsewhere, finish what you can and report it.
@@ -64,14 +64,14 @@ Cover every branch a user can reach: happy paths, validation errors, cancel/back
 Put fixtures in `tests/parity/fixtures/`. `Date` is frozen at 2026-11-04 10:42 IST and `Math.random` is seeded
 on both sides, so timers that compare `Date.now()` never elapse; use `eval` with a preset or the state to reach those branches.
 
-## Shared API (`src/creator/core`)
+## Shared API (`src/apps/creator/core`)
 
-Import from `@/creator/core`. `LLD` is the typed runtime object, and screens may keep the short alias:
+Import from `@/apps/creator/core`. `LLD` is the typed runtime object, and screens may keep the short alias:
 
 ```ts
-import { LLD as L, type State } from "@/creator/core";
+import { LLD as L, type State } from "@/apps/creator/core";
 ```
 
-`L.store.s` is the typed state. `L.motion` is the typed motion API. `src/creator/types.ts` holds the data model.
+`L.store.s` is the typed state. `L.motion` is the typed motion API. `src/apps/creator/types.ts` holds the data model.
 
 The test hooks `window.LLD` / `window.LLD_DATA` exist only when `VITE_TEST_HOOKS` is set (parity build). No app code may read them.

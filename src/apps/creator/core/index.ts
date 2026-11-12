@@ -1,4 +1,4 @@
-/* Core barrel: `import { LLD as L, type State } from "@/creator/core"`, or import the named helpers directly.
+/* Core barrel: `import { LLD as L, type State } from "@/apps/creator/core"`, or import the named helpers directly.
    Evaluating this module has the prototype's core.js load-time effects, in order: renderChrome subscribes to the store
    (first subscriber) and the router listens for hashchange. Nothing here touches the DOM until boot(). */
 import { boot } from "./boot";

@@ -1,4 +1,5 @@
 /* Brand dashboard entry. Import order is the prototype's order. Mechanical port: still uses window.LLD like the original. */
+import "../../shared/analytics";
 import "./core.css";
 import "./motion.css";
 import "./screens/auth.css";
@@ -15,11 +16,11 @@ import "./screens/messages.css";
 import "./screens/payments.css";
 import "./screens/reports.css";
 import "./chrome.css";
-import "../shared/vendor-gsap";
+import "../../shared/vendor-gsap";
 import "./seed";
 import "./core";
 import "./select";
-import "./motion";
+import "../../shared/motion";
 import "./screens/auth";
 import "./screens/profile";
 import "./screens/home";

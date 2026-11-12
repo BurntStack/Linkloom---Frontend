@@ -13,9 +13,9 @@ data and never calls the server; every other build swaps the seed files for empt
 | `src/shared/api/google.ts` | Google Identity Services: Google's real button laid invisibly over the designed one |
 | `src/shared/api/uploads.ts` | The three-step upload (ticket → PUT → complete) and 5-minute download links |
 | `src/shared/api/realtime.ts` | WebSocket live updates with ticket, ping and reconnect |
-| `src/creator/live/creator.ts`, `src/creator/live/creator-offers.ts` | Creator data: backend rows → the screens' model, plus every creator action |
-| `src/brand/live.ts`, `src/brand/kyc.ts` | Brand data and actions, and the brand verification screen |
-| `src/creator/session.ts`, `src/brand/session.ts` | Signed-in loading, read-only guest view, session expiry, sign-out |
+| `src/apps/creator/live/creator.ts`, `src/apps/creator/live/creator-offers.ts` | Creator data: backend rows → the screens' model, plus every creator action |
+| `src/apps/brand/live.ts`, `src/apps/brand/kyc.ts` | Brand data and actions, and the brand verification screen |
+| `src/apps/creator/session.ts`, `src/apps/brand/session.ts` | Signed-in loading, read-only guest view, session expiry, sign-out |
 
 ## What each screen uses
 

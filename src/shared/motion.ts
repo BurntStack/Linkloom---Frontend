@@ -13,6 +13,7 @@
 (() => {
   const LLD = window.LLD;
   if (!LLD || !LLD.motion) return;
+  const defaultColor = document.body.dataset.motionColor === "coral" ? "coral" : "violet";
   const G = window.gsap || null;
   const doc = document,
     root = doc.documentElement;
@@ -1230,7 +1231,7 @@
     if (!ok(fromEl, toEl)) return Promise.resolve();
     const A = tracker(fromEl),
       B = tracker(toEl),
-      c = col(o.color || "coral");
+      c = col(o.color || defaultColor);
     const DRAW = 420,
       TIGHT = 200,
       PULL = 260,
@@ -1355,7 +1356,7 @@
     if (!ok(fromEl, toEl)) return Promise.resolve();
     const A = tracker(fromEl),
       B = tracker(toEl),
-      c = col(o.color || "coral");
+      c = col(o.color || defaultColor);
     const RUN = 380,
       HOLD = 140,
       FADE = 200,
@@ -1405,7 +1406,7 @@
     if (!ok(fromEl, toEl)) return Promise.resolve();
     const A = tracker(fromEl),
       B = tracker(toEl),
-      c = col(o.color || (isDarkBg(fromEl) ? "butter" : "coral"));
+      c = col(o.color || (isDarkBg(fromEl) ? "butter" : defaultColor));
     const RUN = 520,
       TIGHT = 180,
       PULL = 260,

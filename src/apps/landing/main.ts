@@ -1,5 +1,6 @@
 /* Landing page entry. Import order is the original page's script order: each section reads helpers from window.LL. */
 import "./landing.css";
+import "../../shared/analytics";
 import "./vendor";
 import "./core";
 import "./hero";

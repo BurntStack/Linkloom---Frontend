@@ -1,10 +1,11 @@
 /* Shared sign-in page: pick a side, sign in, and the chosen colour carries you into that dashboard. */
 import "./signin.css";
-import { gsap } from "../shared/vendor-gsap";
+import "../../shared/analytics";
+import { gsap } from "../../shared/vendor-gsap";
 import { type Role } from "./handoff";
-import { attachGoogle } from "../shared/api/google";
-import { authMessage, completeSignup, destinationOf, fetchMe, googleSignIn, requestOtp, verifyOtp } from "../shared/api/auth";
-import { clearAuth, isSignedIn, type ApiUser } from "../shared/api/client";
+import { attachGoogle } from "../../shared/api/google";
+import { authMessage, completeSignup, destinationOf, fetchMe, googleSignIn, requestOtp, verifyOtp } from "../../shared/api/auth";
+import { clearAuth, isSignedIn, type ApiUser } from "../../shared/api/client";
 
 const $ = <T extends Element = HTMLElement>(s: string): T => document.querySelector<T>(s)!;
 const esc = (v: unknown): string =>

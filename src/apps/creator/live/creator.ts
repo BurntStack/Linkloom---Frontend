@@ -21,7 +21,7 @@ import type {
   State,
   Thread,
   WorkStage,
-} from "@/creator/types";
+} from "@/apps/creator/types";
 import {
   addDaysIso,
   amount,
@@ -40,7 +40,7 @@ import {
   splitLocation,
   todayIst,
   toneOf,
-} from "../../shared/live";
+} from "../../../shared/live";
 
 /* ---------- backend rows (only the fields the app reads) ---------- */
 
