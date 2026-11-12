@@ -49,13 +49,22 @@ export default defineConfig(({ mode }) => {
     build: {
       target: "es2022",
       cssTarget: "chrome120",
-      sourcemap: true,
+      sourcemap: false,
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         input: {
           landing: fileURLToPath(new URL("./index.html", import.meta.url)),
           app: fileURLToPath(new URL("./app.html", import.meta.url)),
           brand: fileURLToPath(new URL("./brand.html", import.meta.url)),
           signin: fileURLToPath(new URL("./signin.html", import.meta.url)),
+        },
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return;
+            if (id.includes("/react/") || id.includes("/react-dom/") || id.includes("scheduler") || id.includes("react-is")) return "react";
+            if (id.includes("/gsap/")) return "gsap";
+            return "vendor";
+          },
         },
       },
     },
