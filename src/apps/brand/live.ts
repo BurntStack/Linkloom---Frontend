@@ -891,5 +891,3 @@ export const brandApi = {
     set(s => (s.kyc = k), "kyc-live");
   },
 };
-
-export const currentBrandId = (): string => brandId;

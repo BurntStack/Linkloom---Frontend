@@ -3,7 +3,7 @@
    - loadCreator(): fills the store from the API, slice by slice, and keeps it current over the live socket.
    - creatorApi: the actions the screens call. Each one talks to the server first and only then changes the store,
      so the screen never shows something the server refused. */
-import { api, apiAll, ApiError, idemKey, storedUser, type ApiUser } from "@/shared/api/client";
+import { api, apiAll, ApiError, storedUser, type ApiUser } from "@/shared/api/client";
 import { fetchMe } from "@/shared/api/auth";
 import { onLive, startLive, type LiveEvent } from "@/shared/api/realtime";
 import { uploadFile, type UploadedFile } from "@/shared/api/uploads";
@@ -487,8 +487,6 @@ let creatorId = "";
 let userId = "";
 const ex = () => extras<CreatorExtras>("creator", userId || "anon");
 
-export const creatorProfileId = (): string => creatorId;
-
 /** Loads only what a signed-out visitor may see. */
 export async function loadGuest(st: Store): Promise<void> {
   store = st;
@@ -890,6 +888,3 @@ export const creatorApi = {
     store.set(s => (s.kyc = mapKyc(k, s.kyc)), "kyc-live");
   },
 };
-
-export const idempotencyKey = idemKey;
-export const currentUser = storedUser;

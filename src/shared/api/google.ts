@@ -138,5 +138,3 @@ export function attachGoogle(
     host.remove();
   };
 }
-
-export const googleConfigured = (): boolean => !!CLIENT_ID;
