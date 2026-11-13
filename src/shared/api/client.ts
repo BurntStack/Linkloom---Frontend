@@ -177,14 +177,24 @@ const url = (path: string, query?: RequestOptions["query"]): string => {
   return u.toString();
 };
 
-let refreshing: Promise<boolean> | null = null;
+/** "ok": a fresh access token is stored. "rejected": the backend says the session is over (signed out, revoked, or
+    past its 7 days). "failed": the server couldn't be reached or errored, so nothing is known and the session stays. */
+type Renewal = "ok" | "rejected" | "failed";
 
-/** Renews the access token once, however many requests are waiting on it. */
-export function refreshSession(): Promise<boolean> {
+let refreshing: Promise<Renewal> | null = null;
+
+/* The backend rotates the refresh token on every renewal and rejects the old one. Two tabs renewing at the same moment
+   would send the same token, and the slower one would be told the session expired, signing every tab out. So renewals
+   queue on a lock shared by all of this site's tabs, and a tab that finds the stored token already replaced by another
+   tab simply uses the new one. */
+function renew(): Promise<Renewal> {
   if (refreshing) return refreshing;
-  const t = readAuth();
-  if (!t?.refresh) return Promise.resolve(false);
-  refreshing = (async () => {
+  const started = readAuth()?.refresh;
+  if (!started) return Promise.resolve("rejected");
+  const run = async (): Promise<Renewal> => {
+    const t = readAuth();
+    if (!t?.refresh) return "rejected";
+    if (t.refresh !== started) return "ok"; // another tab renewed while this one waited
     try {
       const res = await fetch(url("/v1/auth/token/refresh/"), {
         method: "POST",
@@ -192,25 +202,33 @@ export function refreshSession(): Promise<boolean> {
         body: JSON.stringify({ refresh: t.refresh }),
       });
       if (res.status === 401 || res.status === 400) {
+        const now = readAuth();
+        if (now?.refresh && now.refresh !== t.refresh) return "ok"; // renewed by a tab without the lock (older browsers)
         clearAuth();
-        return false;
+        return "rejected";
       }
       const env = (await res.json().catch(() => null)) as Envelope<{
         access: string;
         refresh?: string;
       }> | null;
       const d = env?.data;
-      if (!res.ok || !d?.access) return false;
+      if (!res.ok || !d?.access) return "failed";
+      if (!readAuth()) return "rejected"; // signed out in another tab meanwhile
       saveAuth({ access: d.access, refresh: d.refresh || t.refresh, user: t.user });
-      return true;
+      return "ok";
     } catch {
-      return false;
-    } finally {
-      setTimeout(() => (refreshing = null), 0);
+      return "failed";
     }
-  })();
+  };
+  const locks = (navigator as Navigator & { locks?: LockManager }).locks;
+  refreshing = (locks?.request ? locks.request("ll-auth-refresh", run) : run()).finally(() =>
+    setTimeout(() => (refreshing = null), 0),
+  );
   return refreshing;
 }
+
+/** Renews the access token once, however many requests (and tabs) are waiting on it. */
+export const refreshSession = (): Promise<boolean> => renew().then(r => r === "ok");
 
 /** True when the access token is a JWT whose expiry has passed (or is seconds away). Anything unreadable is "not known". */
 function expired(token: string): boolean {
@@ -252,7 +270,11 @@ async function raw<T>(
   if (res.status === 204) return { data: undefined as T, meta: null };
   const env = (await res.json().catch(() => null)) as Envelope<T> | null;
   if (res.status === 401 && useAuth && token && !retried) {
-    if (await refreshSession()) return raw<T>(path, o, true);
+    const r = await renew();
+    if (r === "ok") return raw<T>(path, o, true);
+    /* Couldn't renew because the server is asleep, restarting or offline: keep the person signed in and let them retry.
+       Only the backend rejecting the session itself ends it. */
+    if (r === "failed") throw new ApiError(0, navigator.onLine === false ? OFFLINE : SERVER_DOWN, "NETWORK");
     clearAuth();
     onSessionLost?.();
   }
