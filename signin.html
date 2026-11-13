@@ -47,7 +47,7 @@
     <div class="card">
       <a class="back" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back to linkloom</a>
       <h2 class="t-h2" id="formH">Sign in</h2>
-      <p class="help" id="formHelp">Welcome back. Use the email or mobile number and password you signed up with.</p>
+      <p class="help" id="formHelp">Welcome back. Use the email and password you signed up with.</p>
       <p class="flash" id="flash" role="status" hidden></p>
 
       <div class="seg" role="radiogroup" aria-label="I am signing in as">
@@ -56,11 +56,11 @@
         <button type="button" role="radio" aria-checked="false" data-role="brand">I'm a brand</button>
       </div>
 
-      <!-- sign in: email or mobile, password -->
+      <!-- sign in: email, password -->
       <form id="form" novalidate>
         <div class="field">
-          <label for="email">Email or mobile number</label>
-          <div class="in"><input id="email" name="username" type="text" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com or 98765 43210" aria-describedby="emailErr"></div>
+          <label for="email">Email</label>
+          <div class="in"><input id="email" name="username" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" aria-describedby="emailErr"></div>
           <p class="err" id="emailErr"></p>
         </div>
         <div class="field">
@@ -76,7 +76,7 @@
         <button class="lq" type="submit" id="go"><span id="goL">Sign in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
 
-      <!-- sign up: name (+ brand name), mobile + Verify, the code underneath, password, confirm. Also "Forgot password?". -->
+      <!-- sign up: name (+ brand name), email + Verify, the emailed code underneath, password, confirm. Also "Forgot password?". -->
       <form id="signupForm" novalidate hidden>
         <div class="field" data-names>
           <label for="suName">Your name</label>
@@ -88,14 +88,14 @@
           <div class="in"><input id="suBrand" name="organization" type="text" autocomplete="organization" placeholder="Your brand" aria-describedby="suBrandErr"></div>
           <p class="err" id="suBrandErr"></p>
         </div>
-        <div class="field" id="suPhoneField">
-          <label for="suPhone" id="suPhoneL">Mobile number</label>
+        <div class="field" id="suEmailField">
+          <label for="suEmail">Email</label>
           <div class="in-row">
-            <div class="in"><input id="suPhone" name="tel" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="98765 43210" aria-describedby="suPhoneErr suPhoneOk"></div>
+            <div class="in"><input id="suEmail" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" aria-describedby="suEmailErr suEmailOk"></div>
             <button class="vbtn" type="button" id="suVerify">Verify</button>
           </div>
-          <p class="err" id="suPhoneErr"></p>
-          <p class="ok" id="suPhoneOk" aria-live="polite"></p>
+          <p class="err" id="suEmailErr"></p>
+          <p class="ok" id="suEmailOk" aria-live="polite"></p>
         </div>
         <div class="field" id="suOtpField" hidden>
           <label for="suOtp">6-digit code</label>
@@ -125,7 +125,7 @@
       </div>
       <div class="join" id="join"><p>New to Linkloom?</p><button class="alt" type="button" id="toSignup">Sign up</button></div>
       <p class="join" id="haveAcc" hidden>Already have an account? <button class="link" type="button" id="toSignin">Sign in</button></p>
-      <p class="fine">Your mobile number is verified once, when you sign up. After that you sign in with your password.<br><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z"/></svg>Money stays in escrow until work is approved</span></p>
+      <p class="fine">Your email is verified once with a code, when you sign up. After that you sign in with your email and password.<br><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z"/></svg>Money stays in escrow until work is approved</span></p>
     </div>
   </main>
 </div>

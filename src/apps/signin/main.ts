@@ -1,9 +1,10 @@
-/* Shared sign-in page: pick a side, then sign in with a password, or sign up.
-   - Sign in: email or mobile number, password.
-   - Sign up: name (and brand name for brands), mobile number with Verify beside it, the one-time code underneath,
-     then password and confirm password. The number is verified once, here; after that the account signs in with its password.
-   - Forgot password: sign in with a one-time code instead. The backend has no password reset yet (API reference v1),
-     so this keeps people from being locked out. A new account found this way finishes signing up as usual.
+/* Shared sign-in page: pick a side, then sign in with a password, or sign up. Everything is email-only: there is no
+   mobile-number sign-in or SMS code anywhere in the app.
+   - Sign in: email, password.
+   - Sign up: name (and brand name for brands), email with Verify beside it, the emailed one-time code underneath,
+     then password and confirm password. The email is verified once, here; after that the account signs in with it.
+   - Forgot password: a code emailed to them signs them in, then they choose a new password (/auth/password/change/).
+     A new account found this way finishes signing up as usual.
    The chosen colour carries the person into that dashboard. */
 import "./signin.css";
 import "../../shared/analytics";
@@ -14,7 +15,7 @@ import {
   authMessage,
   changePassword,
   completeSignup,
-  destinationOf,
+  emailDestination,
   fetchMe,
   googleSignIn,
   passwordSignIn,
@@ -65,14 +66,14 @@ type Mode = "signin" | "signup" | "reset";
 let mode: Mode = "signin";
 /** Set once a code (or Google, or a password) has signed the person in on this page. */
 let verifiedUser: ApiUser | null = null;
-/** "code": verified with the mobile/email code here, so the number row shows as verified. "other": Google or an existing session. */
+/** "code": verified with the emailed code here, so the email row shows as verified. "other": Google or an existing session. */
 let verifiedBy: "code" | "other" | null = null;
 /** The account is new and still needs its name (and brand name). Fixed when the account is verified. */
 let needsProfile = false;
 /** An existing account that signed in with a code ("Forgot password?") and is choosing the password to use from now on. */
 let setPw = false;
 let challengeId = "";
-let dest: ReturnType<typeof destinationOf> = null;
+let dest: ReturnType<typeof emailDestination> = null;
 let cooldownEnd = 0;
 let cooldownTimer = 0;
 let busy = false;
@@ -161,7 +162,7 @@ const goBtn = $<HTMLButtonElement>("#go");
 const goLabel = $("#goL");
 const suName = $<HTMLInputElement>("#suName");
 const suBrand = $<HTMLInputElement>("#suBrand");
-const phone = $<HTMLInputElement>("#suPhone");
+const suEmail = $<HTMLInputElement>("#suEmail");
 const verifyBtn = $<HTMLButtonElement>("#suVerify");
 const otpField = $("#suOtpField");
 const otp = $<HTMLInputElement>("#suOtp");
@@ -186,16 +187,9 @@ const setBusy = (btn: HTMLButtonElement, label: HTMLElement, on: boolean, text: 
   btn.setAttribute("aria-busy", String(on));
   label.textContent = text;
 };
-const pretty = (d: NonNullable<ReturnType<typeof destinationOf>>): string =>
-  d.channel === "sms" ? "+91 " + d.destination.slice(0, 5) + " " + d.destination.slice(5) : d.destination;
-const badId = (v: string, emailOk: boolean): string =>
-  !v.trim()
-    ? emailOk
-      ? "Enter your email or mobile number."
-      : "Enter your mobile number."
-    : !emailOk || /^\+?[\d\s()-]+$/.test(v.trim())
-      ? "Enter a 10-digit Indian mobile number, like 98765 43210."
-      : "That email looks incomplete, for example you@brand.in.";
+const pretty = (d: NonNullable<ReturnType<typeof emailDestination>>): string => d.destination;
+const badEmail = (v: string): string =>
+  !v.trim() ? "Enter your email." : "That email looks incomplete, for example you@brand.in.";
 
 /* show / hide password */
 $$<HTMLButtonElement>("[data-eye]").forEach(b =>
@@ -232,11 +226,9 @@ function paint(): void {
   /* the password is chosen with the new account's details; signing in with a code needs none */
   $$("[data-new-only]").forEach(e => (e.hidden = !names && !setPw));
   $("#skipPw").hidden = !setPw;
-  $("#suPhoneField").hidden = verifiedBy === "other";
+  $("#suEmailField").hidden = verifiedBy === "other";
   goLabel.textContent = COPY[role].btn;
   if (!busy) suGoLabel.textContent = setPw ? "Save password and sign in" : COPY[role].create;
-  $("#suPhoneL").textContent = mode === "reset" && !verifiedUser ? "Email or mobile number" : "Mobile number";
-  phone.placeholder = mode === "reset" && !verifiedUser ? "you@example.com or 98765 43210" : "98765 43210";
   $("#formH").textContent = signin
     ? "Sign in"
     : setPw
@@ -247,14 +239,14 @@ function paint(): void {
           : "Create your creator account"
         : "Sign in with a code";
   $("#formHelp").textContent = signin
-    ? "Welcome back. Use the email or mobile number and password you signed up with."
+    ? "Welcome back. Use the email and password you signed up with."
     : setPw
       ? "You're signed in. Choose the password you'll sign in with from now on."
       : names
         ? verifiedBy === "other"
           ? "Almost there. Add your details and choose a password."
-          : "Verify your mobile number once, then choose a password. You'll sign in with it from now on."
-        : "Forgot your password? We'll send a one-time code to your email or mobile number and sign you in.";
+          : "Verify your email with a code once, then choose a password. You'll sign in with your email and password from now on."
+        : "Forgot your password? We'll email you a one-time code to sign you in, then you can choose a new password.";
   $(".seg").setAttribute("aria-label", signin ? "I am signing in as" : "I am signing up as");
   /* an existing account keeps its side; a new one can still switch until the account is made */
   const locked = !!verifiedUser && !needsProfile;
@@ -273,7 +265,7 @@ function resetVerification(): void {
   otpField.hidden = true;
   otp.value = "";
   otp.readOnly = false;
-  $("#suPhoneOk").textContent = "";
+  $("#suEmailOk").textContent = "";
   verifyState("verify");
 }
 
@@ -285,23 +277,23 @@ function setMode(m: Mode, focus = true): void {
   );
   $$(".card .err").forEach(e => (e.textContent = ""));
   paint();
-  if (focus) (m === "signin" ? idInput : verifiedUser ? suPw : showNames() ? suName : phone).focus();
+  if (focus) (m === "signin" ? idInput : verifiedUser ? suPw : showNames() ? suName : suEmail).focus();
 }
 $("#toSignup").addEventListener("click", () => setMode("signup"));
 $("#toSignin").addEventListener("click", () => setMode("signin"));
 $("#forgot").addEventListener("click", () => setMode("reset"));
 
-/* ---------- sign in: email or mobile, password ---------- */
+/* ---------- sign in: email, password ---------- */
 $("#form").addEventListener("submit", async e => {
   e.preventDefault();
   if (busy) return;
-  const d = destinationOf(idInput.value);
+  const d = emailDestination(idInput.value);
   let bad: HTMLInputElement | null = null;
   const flag = (el: HTMLInputElement, id: string, msg: string): void => {
     setErr(el, id, msg);
     if (msg && !bad) bad = el;
   };
-  flag(idInput, "emailErr", d ? "" : badId(idInput.value, true));
+  flag(idInput, "emailErr", d ? "" : badEmail(idInput.value));
   flag(pwInput, "pwErr", pwInput.value ? "" : "Enter your password.");
   if (bad) {
     (bad as HTMLInputElement).focus();
@@ -323,7 +315,7 @@ $("#form").addEventListener("submit", async e => {
   }
 });
 
-/* ---------- sign up: the number and its code ---------- */
+/* ---------- sign up: the email and its code ---------- */
 type VState = "verify" | "sending" | "change" | "done";
 let vstate: VState = "verify";
 function verifyState(s: VState): void {
@@ -331,7 +323,7 @@ function verifyState(s: VState): void {
   verifyBtn.textContent = { verify: "Verify", sending: "Sending…", change: "Change", done: "Verified" }[s];
   verifyBtn.disabled = s === "sending" || s === "done";
   verifyBtn.classList.toggle("is-ok", s === "done");
-  phone.readOnly = s !== "verify";
+  suEmail.readOnly = s !== "verify";
 }
 
 function paintResend(): void {
@@ -352,11 +344,10 @@ function paintResend(): void {
 
 async function sendCode(resend = false): Promise<void> {
   if (busy) return;
-  const emailOk = mode === "reset";
-  const d = destinationOf(phone.value);
-  if (!d || (d.channel === "email" && !emailOk)) {
-    setErr(phone, "suPhoneErr", badId(phone.value, emailOk));
-    phone.focus();
+  const d = emailDestination(suEmail.value);
+  if (!d) {
+    setErr(suEmail, "suEmailErr", badEmail(suEmail.value));
+    suEmail.focus();
     shake();
     return;
   }
@@ -376,7 +367,7 @@ async function sendCode(resend = false): Promise<void> {
     otp.focus();
   } catch (e) {
     verifyState(otpField.hidden ? "verify" : "change");
-    if (otpField.hidden) setErr(phone, "suPhoneErr", authMessage(e));
+    if (otpField.hidden) setErr(suEmail, "suEmailErr", authMessage(e));
     else setErr(otp, "suOtpErr", authMessage(e));
     shake();
   } finally {
@@ -404,27 +395,27 @@ async function checkCode(): Promise<void> {
   }
 }
 
-/** The sign-up code matched a number that already has an account. */
+/** The sign-up code matched an email that already has an account. */
 async function alreadyRegistered(): Promise<void> {
-  const number = phone.value;
+  const email = suEmail.value;
   /* finish signing out first, so it can't clear a password sign-in made straight after */
   busy = true;
   codeHelp.textContent = "Checking…";
   await signOut();
   busy = false;
   resetVerification();
-  phone.value = number;
-  phone.setAttribute("aria-invalid", "true");
-  $("#suPhoneErr").innerHTML =
-    'This number already has a Linkloom account. <button class="link" type="button" data-to-signin>Sign in with your password</button>, or use <button class="link" type="button" data-to-code>Forgot password?</button> to sign in with a code.';
+  suEmail.value = email;
+  suEmail.setAttribute("aria-invalid", "true");
+  $("#suEmailErr").innerHTML =
+    'This email already has a Linkloom account. <button class="link" type="button" data-to-signin>Sign in with your password</button>, or use <button class="link" type="button" data-to-code>Forgot password?</button> to get a code by email.';
   $("[data-to-signin]").addEventListener("click", () => {
     setMode("signin");
-    idInput.value = number.replace(/\D/g, "").slice(-10);
+    idInput.value = email.trim();
     pwInput.focus();
   });
   $("[data-to-code]").addEventListener("click", () => {
     setMode("reset");
-    phone.value = number;
+    suEmail.value = email;
   });
   shake();
 }
@@ -432,7 +423,7 @@ async function alreadyRegistered(): Promise<void> {
 /** The person is signed in (code, Google, or an existing session). A new account adds its details and a password. */
 function verified(user: ApiUser, by: "code" | "other"): void {
   if (!isNew(user)) {
-    /* Creating an account with a number that already has one: never sign in silently. End the session the code
+    /* Creating an account with an email that already has one: never sign in silently. End the session the code
        just opened and point them to sign-in. */
     if (mode === "signup") {
       void alreadyRegistered();
@@ -447,8 +438,8 @@ function verified(user: ApiUser, by: "code" | "other"): void {
     otp.readOnly = false;
     clearInterval(cooldownTimer);
     verifyState("done");
-    setErr(phone, "suPhoneErr", "");
-    $("#suPhoneOk").textContent = by === "code" && dest ? `${pretty(dest)} is verified.` : "";
+    setErr(suEmail, "suEmailErr", "");
+    $("#suEmailOk").textContent = by === "code" && dest ? `${pretty(dest)} is verified.` : "";
     if (user.role && user.role !== role) setRole(user.role as Role, false);
     else paint();
     suPw.focus();
@@ -461,8 +452,8 @@ function verified(user: ApiUser, by: "code" | "other"): void {
   otp.readOnly = false;
   clearInterval(cooldownTimer);
   verifyState("done");
-  setErr(phone, "suPhoneErr", "");
-  $("#suPhoneOk").textContent = by === "code" && dest ? `${pretty(dest)} is verified.` : "";
+  setErr(suEmail, "suEmailErr", "");
+  $("#suEmailOk").textContent = by === "code" && dest ? `${pretty(dest)} is verified.` : "";
   if (mode === "signin") mode = "signup";
   if (!suName.value && user.fullName) suName.value = String(user.fullName);
   paint();
@@ -474,10 +465,10 @@ $("#skipPwBtn").addEventListener("click", () => verifiedUser && open((verifiedUs
 verifyBtn.addEventListener("click", () => {
   if (vstate === "change") {
     resetVerification();
-    phone.focus();
+    suEmail.focus();
   } else void sendCode();
 });
-phone.addEventListener("keydown", e => {
+suEmail.addEventListener("keydown", e => {
   if (e.key === "Enter" && vstate === "verify") {
     e.preventDefault();
     void sendCode();
@@ -529,12 +520,7 @@ $("#signupForm").addEventListener("submit", async e => {
     if (brand) flag(suBrand, "suBrandErr", b.length < 2 ? "Enter your brand name." : "");
   }
   if (!verifiedUser) {
-    if (otpField.hidden)
-      flag(
-        phone,
-        "suPhoneErr",
-        mode === "reset" ? "Verify your email or mobile number first." : "Verify your mobile number first.",
-      );
+    if (otpField.hidden) flag(suEmail, "suEmailErr", "Verify your email first.");
     else flag(otp, "suOtpErr", "Enter the 6-digit code we sent you.");
   }
   if (names || setPw) {

@@ -604,7 +604,7 @@
             <h1 class="t-display profile-name">${esc(me.brand)}</h1>
             ${me.website ? `<p class="profile-web"><a href="${esc(href(me.website))}" target="_blank" rel="noopener noreferrer">${icon("link")}<span>${esc(me.website)}</span><span class="sr-only">, opens in a new tab</span></a></p>` : ""}
             ${me.about ? `<p class="profile-bio">${esc(me.about)}</p>` : ""}
-            <p class="profile-meta"><span class="pill pill-ok">${icon("verified")}Email and mobile verified</span><span class="profile-langs">Contact: ${esc(me.name)}${me.role ? ", " + esc(me.role) : ""}</span></p>
+            <p class="profile-meta"><span class="pill pill-ok">${icon("verified")}${me.mobile ? "Email and mobile verified" : "Email verified"}</span><span class="profile-langs">Contact: ${esc(me.name)}${me.role ? ", " + esc(me.role) : ""}</span></p>
           </div>
           <div class="profile-act"><button class="lq lq-p" type="button" data-edit>${icon("edit", "ic")}Edit profile</button></div>
         </header>
@@ -673,7 +673,7 @@
             <section class="profile-sec profile-card" aria-labelledby="profile-sec">
               <h2 class="t-h3" id="profile-sec">${icon("shield")}Sign-in and security</h2>
               <ul class="profile-rows">
-                ${L.live ? `<li><span><b>Sign-in</b><span class="t-cap muted">Password with ${esc([me.email, me.mobile ? "+91 " + me.mobile : ""].filter(Boolean).join(" or ") || "your email or mobile")}, a one-time code, or Google</span></span><a class="lq lq-s lq-sm" href="signin.html?role=brand&forgot=1">Change password</a></li>` : `<li><span><b>Password</b><span class="t-cap muted">Last changed ${me.passwordChanged ? esc(L.fmtDate(me.passwordChanged, { year: true })) : "never"}</span></span><button type="button" class="lq lq-s lq-sm" data-pw>Change password</button></li>`}
+                ${L.live ? `<li><span><b>Sign-in</b><span class="t-cap muted">Email and password${me.email ? ` (${esc(me.email)})` : ""}, a code sent to your email, or Google</span></span><a class="lq lq-s lq-sm" href="signin.html?role=brand&forgot=1">Change password</a></li>` : `<li><span><b>Password</b><span class="t-cap muted">Last changed ${me.passwordChanged ? esc(L.fmtDate(me.passwordChanged, { year: true })) : "never"}</span></span><button type="button" class="lq lq-s lq-sm" data-pw>Change password</button></li>`}
                 <li><span><b>This device</b><span class="t-cap muted">${sess.remember !== false ? "Remembered. You stay signed in for 30 days." : "Not remembered. You're signed out when the tab closes."}</span></span></li>
                 <li><span><b>Sign out</b><span class="t-cap muted">Ends your session on this device.</span></span><button type="button" class="lq lq-s lq-sm" data-signout>${icon("logout", "ic")}Sign out</button></li>
               </ul>

@@ -18,13 +18,11 @@ export interface OtpChallenge {
   expiresIn: number;
 }
 
-/** "9876543210", "+91 98765 43210" or an email address → what /otp/request/ wants. */
-export function destinationOf(input: string): { channel: OtpChannel; destination: string } | null {
+/** An email address → what /otp/request/ and /login/ want. Sign-in, sign-up and one-time codes are email-only:
+    there is no mobile-number sign-in anywhere in the app (2026-11-13). */
+export function emailDestination(input: string): { channel: OtpChannel; destination: string } | null {
   const v = input.trim();
-  if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return { channel: "email", destination: v.toLowerCase() };
-  const digits = v.replace(/[\s()-]/g, "");
-  const m = /^(?:\+?91)?([6-9]\d{9})$/.exec(digits);
-  return m ? { channel: "sms", destination: m[1] } : null;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? { channel: "email", destination: v.toLowerCase() } : null;
 }
 
 export const requestOtp = (channel: OtpChannel, destination: string): Promise<OtpChallenge> =>
@@ -47,11 +45,11 @@ export async function googleSignIn(idToken: string, role: Role, remember = true)
 }
 
 /* ---------- passwords ----------
-   Sign-up checks the mobile number once with a one-time code and sets the password in /signup/complete/.
-   After that the account signs in with its password (Collab Backend API Reference v1, section 2.1). */
+   Sign-up checks the email once with a one-time code and sets the password in /signup/complete/.
+   After that the account signs in with its email and password (Collab Backend API Reference v1, section 2.1). */
 export const PASSWORD_LOGIN = "/v1/auth/login/";
 
-/** POST { identifier, password }: the identifier is an email or a 10-digit mobile number. Returns tokens + user. */
+/** POST { identifier, password }: the identifier is the account's email. Returns tokens + user. */
 export async function passwordSignIn(
   d: { channel: OtpChannel; destination: string },
   password: string,
@@ -122,15 +120,15 @@ export function authMessage(e: unknown): string {
   switch (e.code) {
     case "AUTH_INVALID":
     case "INVALID_CREDENTIALS":
-      return 'That email or number and password don\'t match. Try again, or use "Forgot password?" to sign in with a code.';
+      return 'That email and password don\'t match. Try again, or use "Forgot password?" to get a code by email.';
     case "OTP_INVALID":
       return "That code is wrong or has expired. Check it, or ask for a new one.";
+    case "OTP_DELIVERY_FAILED":
+      return "We couldn't email the code just now. Check the address, then try again in a minute.";
     case "GOOGLE_TOKEN_INVALID":
       return "Google sign-in didn't go through. Please try again.";
     case "GOOGLE_EMAIL_UNVERIFIED":
-      return "Your Google account's email isn't verified yet. Verify it with Google, or sign in with a code.";
-    case "INVALID_PHONE":
-      return "Enter a 10-digit Indian mobile number.";
+      return "Your Google account's email isn't verified yet. Verify it with Google, or sign in with your email.";
     default:
       return e.message;
   }
