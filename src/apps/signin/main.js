@@ -831,7 +831,7 @@ $("#signupForm").addEventListener("submit", async e => {
       role,
       fullName: n,
       ...(brand ? { brandName: b } : { displayName: n }),
-      phone: phone.value.trim() || undefined,
+      phone: destinationOf(phone.value)?.destination || undefined,
       password: pw,
     });
     const r = u.role || role;
@@ -845,10 +845,12 @@ $("#signupForm").addEventListener("submit", async e => {
     const pwMsg = e?.field("password") || e?.field("confirmPassword");
     const nameMsg = e?.field("fullName") || e?.field("displayName");
     const brandMsg = e?.field("brandName");
+    const phoneMsg = e?.field("phone") || e?.field("mobile") || e?.field("phoneNumber");
     if (pwMsg) setErr(suPw, "suPwErr", pwMsg);
     if (nameMsg) setErr(suName, "suNameErr", nameMsg);
     if (brandMsg) setErr(suBrand, "suBrandErr", brandMsg);
-    if (!pwMsg && !nameMsg && !brandMsg) $("#suErr").textContent = authMessage(err);
+    if (phoneMsg) setErr(phone, "suPhoneErr", phoneMsg);
+    if (!pwMsg && !nameMsg && !brandMsg && !phoneMsg) $("#suErr").textContent = authMessage(err);
     shake();
     setBusy(suGo, suGoLabel, false, COPY[role].create);
   }
