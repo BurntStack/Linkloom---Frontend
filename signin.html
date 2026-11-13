@@ -1,8 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!-- Consent Mode v2: set defaults BEFORE GTM loads -->
-<script src="./consent.js"></script>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KKJG6LRD');</script>
 <!-- End Google Tag Manager -->
@@ -86,23 +84,8 @@
         <button class="lq" type="submit" id="go"><span id="goL">Sign in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
 
-      <!-- sign up: email + Verify, name (+ brand name), mobile + Verify, codes, password, confirm. -->
+      <!-- sign up: name (+ brand name), mobile + Verify, the code underneath, password, confirm. Also "Forgot password?". -->
       <form id="signupForm" novalidate hidden>
-        <div class="field" id="suEmailField" hidden>
-          <label for="suEmail">Email</label>
-          <div class="in-row">
-            <div class="in"><input id="suEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" aria-describedby="suEmailErr suEmailOk"></div>
-            <button class="vbtn" type="button" id="suEmailVerify">Verify</button>
-          </div>
-          <p class="err" id="suEmailErr"></p>
-          <p class="ok" id="suEmailOk" aria-live="polite"></p>
-        </div>
-        <div class="field" id="suEmailOtpField" hidden>
-          <label for="suEmailOtp">6-digit code</label>
-          <div class="in"><input id="suEmailOtp" name="email-one-time-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" aria-describedby="suEmailOtpErr suEmailCodeHelp"></div>
-          <p class="err" id="suEmailOtpErr" aria-live="assertive"></p>
-          <p class="help" id="suEmailCodeHelp" aria-live="polite"></p>
-        </div>
         <div class="field" data-names>
           <label for="suName">Your name</label>
           <div class="in"><input id="suName" name="name" type="text" autocomplete="name" placeholder="Your name" aria-describedby="suNameErr"></div>
@@ -140,10 +123,6 @@
           <p class="err" id="suPw2Err" aria-live="polite"></p>
         </div>
         <p class="err form-err" id="suErr" aria-live="assertive"></p>
-        <div class="field" data-new-only id="suConsentField">
-          <label class="check"><input type="checkbox" id="suConsent" aria-describedby="suConsentErr"> I agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></label>
-          <p class="err" id="suConsentErr" aria-live="assertive"></p>
-        </div>
         <p class="join" id="skipPw" hidden><button class="link" type="button" id="skipPwBtn">Not now, open my dashboard</button></p>
         <button class="lq" type="submit" id="suGo" data-new-only><span id="suGoL">Create creator account</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
@@ -154,7 +133,7 @@
       </div>
       <div class="join" id="join"><p>New to Linkloom?</p><button class="alt" type="button" id="toSignup">Sign up</button></div>
       <p class="join" id="haveAcc" hidden>Already have an account? <button class="link" type="button" id="toSignin">Sign in</button></p>
-      <p class="fine">Your email and mobile number are each verified once, when you sign up. After that you sign in with your password.<br><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z"/></svg>Money stays in escrow until work is approved</span></p>
+      <p class="fine">Your mobile number is verified once, when you sign up. After that you sign in with your password.<br><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z"/></svg>Money stays in escrow until work is approved</span></p>
     </div>
   </main>
 </div>

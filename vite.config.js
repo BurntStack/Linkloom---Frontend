@@ -35,45 +35,27 @@ function apiPreconnect(origin) {
   };
 }
 
-export default defineConfig(({ mode, command }) => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const parity = !!(env.VITE_TEST_HOOKS || process.env.VITE_TEST_HOOKS);
-  const apiOrigin = (env.VITE_API_BASE_URL || "https://collab-api-ewju.onrender.com").replace(/\/+$/, "");
-  const isDev = command === "serve";
   return {
     base: "./",
     plugins: [
       react(),
       noSampleData(!parity),
-      /* In dev the proxy handles the connection, so no preconnect needed. */
-      apiPreconnect(isDev || parity ? "" : apiOrigin),
+      apiPreconnect(parity ? "" : (env.VITE_API_BASE_URL || "https://collab-api-ewju.onrender.com").replace(/\/+$/, "")),
     ],
     resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
-    /* Proxy /v1/ to the backend in dev so the browser sees same-origin requests — no CORS. */
-    server: {
-      proxy: {
-        "/v1": { target: apiOrigin, changeOrigin: true },
-      },
-    },
     build: {
       target: "es2022",
       cssTarget: "chrome120",
-      sourcemap: false,
-      chunkSizeWarningLimit: 1000,
+      sourcemap: true,
       rollupOptions: {
         input: {
           landing: fileURLToPath(new URL("./index.html", import.meta.url)),
           app: fileURLToPath(new URL("./app.html", import.meta.url)),
           brand: fileURLToPath(new URL("./brand.html", import.meta.url)),
           signin: fileURLToPath(new URL("./signin.html", import.meta.url)),
-        },
-        output: {
-          manualChunks(id) {
-            if (!id.includes("node_modules")) return;
-            if (id.includes("/react/") || id.includes("/react-dom/") || id.includes("scheduler") || id.includes("react-is")) return "react";
-            if (id.includes("/gsap/")) return "gsap";
-            return "vendor";
-          },
         },
       },
     },

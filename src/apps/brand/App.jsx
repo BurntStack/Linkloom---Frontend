@@ -55,15 +55,12 @@ export default function App() {
 
   const { name: rawName, param, _k: renderKey } = rawRoute;
   const guard = window.LLD.getGuard();
-  const redirectTo = guard ? guard(rawName) : undefined;
-
-  useEffect(() => {
-    if (!redirectTo) return;
-    if (redirectTo.startsWith("#")) window.LLD.go(redirectTo);
-    else location.replace(redirectTo);
-  }, [redirectTo]);
-
-  if (redirectTo) return null;
+  const redirectTo = guard ? guard(rawName) : null;
+  if (redirectTo === null) return null;
+  if (redirectTo) {
+    window.LLD.go(redirectTo);
+    return null;
+  }
 
   const guestRoutes = window.LLD.getGuestRoutes();
   const session = window.LLD_DATA?.session || {};
@@ -110,7 +107,7 @@ export default function App() {
 
   return (
     <>
-      <div id="app" className="app" hidden={isFocus || undefined}>
+      <div id="app" hidden={isFocus || undefined}>
         <aside className="side" aria-label="Main">
           <a className="sbox brand" href="#home" aria-label="Linkloom home">
             <img src="assets/logo-mark.svg" width="28" height="28" alt="" />

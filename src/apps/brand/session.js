@@ -87,28 +87,19 @@ async function enterSignedIn() {
     }
     document.documentElement.classList.remove("is-guest");
     w.LLD.store.set(s => {
-      s.session.signedIn = true;
       s.session.firstRun = !!user.needsOnboarding || !user.role;
     }, "signed-in");
     return true;
   } catch (e) {
     if (e.status === 401) {
       clearAuth();
-      return enterGuest(true);
+      return enterGuest();
     }
     return new Promise(resolve => failed(() => resolve(enterSignedIn())));
   }
 }
 
-async function enterGuest(fromExpiry = false) {
-  if (!fromExpiry) {
-    const hash = location.hash.replace(/^#/, "");
-    if (PASSWORD_SCREENS.has(hash)) {
-      const to = hash === "signup" ? "&join=1" : hash === "forgot" || hash === "reset" ? "&forgot=1" : "";
-      location.replace(`signin.html?role=brand${to}`);
-      return false;
-    }
-  }
+async function enterGuest() {
   loading("Loading Linkloom…");
   await loadBrandGuest();
   document.documentElement.classList.add("is-guest");
@@ -148,7 +139,8 @@ export function initBrandSession() {
     if (PASSWORD_SCREENS.has(name)) {
       if (s.signedIn) return "#home";
       const to = name === "signup" ? "&join=1" : name === "forgot" || name === "reset" ? "&forgot=1" : "";
-      return `signin.html?role=brand${to}`;
+      location.replace(`signin.html?role=brand${to}`);
+      return null;
     }
     return s.signedIn && s.firstRun && !OPEN_DURING_SETUP.has(name) ? "#setup" : null;
   });
