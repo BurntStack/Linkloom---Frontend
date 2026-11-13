@@ -420,48 +420,43 @@
             <h1 class="t-h1">Find jobs</h1>
             <p class="muted">${open} brands want creators this week. <span class="sample">Sample data</span></p>
           </div>
-          <div class="jobs-search">
-            <label class="sr-only" for="jobsQ">Search jobs</label>
-            ${L.icon("search")}
-            <input class="input" id="jobsQ" type="search" autocomplete="off" placeholder="Search brand, product, city" value="${esc(ui.q)}">
+          <div class="jobs-toolbar">
+            <div class="jobs-filterbar" role="group" aria-label="Filters">
+              <select class="select jobs-fsel" id="jobsCity" aria-label="City"><option value="">All cities</option>${cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("")}<option value="remote">Remote</option></select>
+              <div class="seg jobs-seg" role="group" aria-label="Platform">
+                <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${L.icon("ig")}Instagram</button><button type="button" data-plat="youtube">${L.icon("yt")}YouTube</button>
+              </div>
+              ${cats.length ? `<div class="jobs-chips-wrap" role="group" aria-label="Category">${cats.map(c => `<button class="chip" type="button" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div>` : ""}
+              <div class="jobs-chips-wrap" role="group" aria-label="Minimum budget">${BUDGETS.map(b => `<button class="chip" type="button" data-min="${b}">${budgetLabel(b)}</button>`).join("")}</div>
+              <label class="chip jobs-saved-chip" title="Saved jobs only"><input type="checkbox" id="jobsSaved" class="sr-only"><span>${L.icon("bookmark")}Saved</span></label>
+              <button class="btn-q jobs-clear" type="button" data-clear>Clear</button>
+            </div>
+            <div class="jobs-search">
+              <label class="sr-only" for="jobsQ">Search jobs</label>
+              ${L.icon("search")}
+              <input class="input" id="jobsQ" type="search" autocomplete="off" placeholder="Search brand, product, city" value="${esc(ui.q)}">
+            </div>
           </div>
         </header>
-        <div class="jobs-layout">
-          <aside class="jobs-filters" id="jobsFilters" aria-label="Filters">
-            <div class="jobs-f-h"><p class="t-label">Filters</p><button class="btn-q jobs-clear" type="button" data-clear>Clear filters</button></div>
-            <div class="field"><label for="jobsCity">City</label>
-              <select class="select" id="jobsCity"><option value="">All cities</option>${cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("")}<option value="remote">Any city · remote</option></select></div>
-            <div class="field"><span class="lab" id="jobsPlatL">Platform</span>
-              <div class="seg jobs-seg" role="group" aria-labelledby="jobsPlatL">
-                <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${L.icon("ig")}Instagram</button><button type="button" data-plat="youtube">${L.icon("yt")}YouTube</button>
-              </div></div>
-            <div class="field"${cats.length ? "" : " hidden"}><span class="lab" id="jobsCatL">Category</span>
-              <div class="chips" role="group" aria-labelledby="jobsCatL">${cats.map(c => `<button class="chip" type="button" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div></div>
-            <div class="field"><span class="lab" id="jobsMinL">Minimum budget</span>
-              <div class="chips" role="group" aria-labelledby="jobsMinL">${BUDGETS.map(b => `<button class="chip" type="button" data-min="${b}">${budgetLabel(b)}</button>`).join("")}</div></div>
-            <label class="check jobs-saved-only"><input type="checkbox" id="jobsSaved"> Saved jobs only</label>
-          </aside>
-          <section class="jobs-results" aria-label="Jobs">
-            <div class="jobs-bar">
-              <p class="jobs-count" id="jobsCount" aria-live="polite"></p>
-              <button class="lq lq-s lq-sm jobs-ftoggle" type="button" aria-expanded="false" aria-controls="jobsFilters">Filters</button>
-              <div class="jobs-sort"><label class="sr-only" for="jobsSort">Sort jobs</label>
-                <select class="select" id="jobsSort">${Object.entries(SORTS)
-                  .map(([k, v]) => `<option value="${k}">${v}</option>`)
-                  .join("")}</select></div>
-            </div>
-            <p class="jobs-live help">${L.icon("info")}Bid counts are live and leave out withdrawn bids.</p>
-            <p class="jobs-offline" role="status" hidden>${L.icon("alert")}You are offline. These are the jobs from your last visit.</p>
-            <div class="jobs-list" id="jobsList">${pool.map(j => card(j, { ctx: "list" })).join("")}</div>
-            <div class="empty jobs-empty" hidden>
-              <img src="assets/step-01-envelope.svg" width="160" height="117" alt="">
-              <p class="t-h2">No briefs match that.</p>
-              <p class="muted">Try a lower minimum budget or another city.</p>
-              <button class="lq lq-p" type="button" data-clear>Clear filters</button>
-            </div>
-            <p class="jobs-hidden-line" aria-live="polite"></p>
-          </section>
-        </div>
+        <section class="jobs-results" aria-label="Jobs">
+          <div class="jobs-bar">
+            <p class="jobs-count" id="jobsCount" aria-live="polite"></p>
+            <div class="jobs-sort"><label class="sr-only" for="jobsSort">Sort jobs</label>
+              <select class="select" id="jobsSort">${Object.entries(SORTS)
+                .map(([k, v]) => `<option value="${k}">${v}</option>`)
+                .join("")}</select></div>
+          </div>
+          <p class="jobs-live help">${L.icon("info")}Bid counts are live and leave out withdrawn bids.</p>
+          <p class="jobs-offline" role="status" hidden>${L.icon("alert")}You are offline. These are the jobs from your last visit.</p>
+          <div class="jobs-list" id="jobsList">${pool.map(j => card(j, { ctx: "list" })).join("")}</div>
+          <div class="empty jobs-empty" hidden>
+            <img src="assets/step-01-envelope.svg" width="160" height="117" alt="">
+            <p class="t-h2">No briefs match that.</p>
+            <p class="muted">Try a lower minimum budget or another city.</p>
+            <button class="lq lq-p" type="button" data-clear>Clear filters</button>
+          </div>
+          <p class="jobs-hidden-line" aria-live="polite"></p>
+        </section>
       </div>`;
 
       L.liquid(el);
@@ -494,12 +489,14 @@
         $("#jobsSort").value = ui.sort;
         const n = activeCount(ui);
         L.$$(".jobs-clear", el).forEach(b => {
-          b.textContent = n ? `Clear filters (${n})` : "Clear filters";
+          b.textContent = n ? `Clear (${n})` : "Clear";
           b.setAttribute("aria-disabled", String(!n));
         });
         const ft = $(".jobs-ftoggle");
-        const lab = n ? `Filters · ${n}` : "Filters";
-        ft.querySelectorAll(".t,.t2").forEach(x => (x.textContent = lab));
+        if (ft) {
+          const lab = n ? `Filters · ${n}` : "Filters";
+          ft.querySelectorAll(".t,.t2").forEach(x => (x.textContent = lab));
+        }
       }
       function apply(animate = true) {
         const { list: vis, hiddenCount } = filtered(ui);
