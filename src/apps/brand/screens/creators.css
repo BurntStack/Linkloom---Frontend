@@ -291,6 +291,8 @@
   align-items: flex-start;
   gap: 12px;
   min-width: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 .creators-filterbar {
   display: flex;

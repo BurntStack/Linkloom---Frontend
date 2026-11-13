@@ -332,6 +332,8 @@
   align-items: flex-start;
   gap: 12px;
   min-width: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border, var(--ll-rule));
 }
 .jobs-filterbar {
   display: flex;
