@@ -56,45 +56,19 @@ export function attachGoogle(button, onToken, onError) {
   if (parentStyle.position === "static") button.style.position = "relative";
   button.appendChild(host);
   let gone = false;
-  let stop = () => {};
   load()
     .then(g => {
       if (gone) return;
       const width = Math.max(200, Math.min(400, Math.round(button.getBoundingClientRect().width || 320)));
       g.accounts.id.renderButton(host, { type: "standard", size: "large", width, text: "continue_with", shape: "pill" });
-      /* Centre Google's iframe on the designed button and scale it once, just enough that Google's clickable button
-         covers all of it. Do NOT stretch and scale every nested layer: the scaling compounds, pushes Google's real
-         button below the designed one, and clicks land on nothing (the 2026-11-12 "Google login not working" bug).
-         The iframe is the button plus Google's padding: 10 px each side, 2 px top and bottom. */
-      const fit = () => {
-        const ifr = host.querySelector("iframe");
-        if (!ifr) return;
-        host.querySelectorAll("div").forEach(n => {
-          n.style.position = "static";
-          n.style.transform = "none";
-        });
-        const w = ifr.offsetWidth || width + 20;
-        const h = ifr.offsetHeight || 44;
-        const s = Math.max(host.clientWidth / Math.max(1, w - 20), host.clientHeight / Math.max(1, h - 4)) * 1.04;
-        Object.assign(ifr.style, {
-          position: "absolute",
-          left: "50%",
-          top: "50%",
-          margin: "0",
-          transformOrigin: "center",
-          transform: `translate(-50%, -50%) scale(${s.toFixed(3)})`,
-        });
-      };
-      /* Google adds the iframe a moment after renderButton, and the designed button can change size */
-      const mo = new MutationObserver(fit);
-      mo.observe(host, { childList: true, subtree: true });
-      const ro = new ResizeObserver(fit);
-      ro.observe(host);
-      stop = () => {
-        mo.disconnect();
-        ro.disconnect();
-      };
-      fit();
+      const fit = () => host.querySelectorAll("div, iframe").forEach(n => {
+        n.style.width = "100%";
+        n.style.height = "100%";
+        n.style.transform = "scale(1.6)";
+        n.style.transformOrigin = "center";
+      });
+      setTimeout(fit, 50);
+      setTimeout(fit, 600);
     })
     .catch(e => {
       host.remove();
@@ -102,7 +76,6 @@ export function attachGoogle(button, onToken, onError) {
     });
   return () => {
     gone = true;
-    stop();
     host.remove();
   };
 }
