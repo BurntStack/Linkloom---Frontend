@@ -608,11 +608,12 @@ import { submitCreatorOnboarding } from "@/shared/api/onboarding";
     function stepYou() {
       const verified = [];
       if (sess.method === "google" && sess.email) verified.push(["Email", sess.email, "Verified by Google"]);
+      if (sess.method === "email" && sess.email) verified.push(["Email", sess.email, "Verified"]);
       if (sess.method === "mobile" && sess.mobile) verified.push(["Mobile", sess.mobile, "Verified by OTP"]);
       return `
         ${fld("name", "Display name", `<input class="input" id="setup-name" autocomplete="name" value="${esc(D.name)}" aria-describedby="setup-name-h setup-name-e">`, "Shown on your profile and bids.")}
         ${verified.map(v => `<div class="setup-verified"><span class="setup-v-l">${esc(v[0])}</span><span class="setup-v-v num">${esc(v[1])}</span><span class="pill pill-ok" data-motion="check">${icon("check")}${esc(v[2])}</span></div>`).join("")}
-        ${sess.method !== "mobile" ? fld("mobile", "Mobile number", `<div class="setup-tel"><span aria-hidden="true">+91</span><input class="input" id="setup-mobile" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" value="${esc(D.mobile)}" placeholder="98765 43210" aria-describedby="setup-mobile-h setup-mobile-e"></div>`, "Private. Used for payout alerts, never shown to brands.") : ""}
+        ${sess.method === "google" ? fld("mobile", "Mobile number", `<div class="setup-tel"><span aria-hidden="true">+91</span><input class="input" id="setup-mobile" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" value="${esc(D.mobile)}" placeholder="98765 43210" aria-describedby="setup-mobile-h setup-mobile-e"></div>`, "Private. Used for payout alerts, never shown to brands.") : ""}
         ${sess.method === "mobile" ? fld("email", "Email", `<input class="input" id="setup-email" type="email" autocomplete="email" value="${esc(D.email)}" placeholder="name@example.com" aria-describedby="setup-email-h setup-email-e">`, "Private. For receipts and payout slips.") : ""}
         ${fld("dob", "Date of birth", `<input class="input setup-dob" id="setup-dob" type="date" min="1920-01-01" max="${todayISO()}" value="${esc(D.dob)}" aria-describedby="setup-dob-h setup-dob-e">`, "")}
         <div class="setup-age" data-age role="status" hidden></div>
@@ -685,7 +686,7 @@ import { submitCreatorOnboarding } from "@/shared/api/onboarding";
       const errs = [];
       const e1 = V.name(D.name);
       if (e1) errs.push(["name", e1]);
-      if (sess.method !== "mobile") {
+      if (sess.method === "google") {
         const e = V.mobile(D.mobile);
         if (e) errs.push(["mobile", e]);
       }

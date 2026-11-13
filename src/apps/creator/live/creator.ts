@@ -538,7 +538,8 @@ export async function loadCreator(st: Store): Promise<ApiUser> {
     s.session.signedIn = true;
     s.session.email = String(user.email || "");
     s.session.mobile = user.phone ? maskPhone(String(user.phone)) : "";
-    s.session.method = user.email && !user.phone ? "google" : "mobile";
+    /* email-only app: only older SMS-code accounts have a phone and no email */
+    s.session.method = user.phone && !user.email ? "mobile" : "email";
     s.session.firstLogin = !!user.needsOnboarding;
     s.me = mapMe(cme, user, x, s.me);
     if (kyc) s.kyc = mapKyc(kyc, s.kyc);

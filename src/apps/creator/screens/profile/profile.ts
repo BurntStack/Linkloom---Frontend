@@ -180,7 +180,7 @@
           <div class="profile-priv-h"><h2 class="t-h3" id="profile-priv">${icon("lock")}Private to you</h2><p class="t-cap muted">Brands never see this section.</p></div>
           <dl class="profile-priv-g">
             <div><dt>Email</dt><dd>${esc(sess.email || "Not added")}</dd></div>
-            <div><dt>Mobile</dt><dd class="num">${esc(sess.mobile || "Not added")}</dd></div>
+            ${sess.mobile ? `<div><dt>Mobile</dt><dd class="num">${esc(sess.mobile)}</dd></div>` : ""}
             <div><dt>Date of birth</dt><dd class="num">${me.dob ? esc(LLD.fmtDate(me.dob, { year: true })) + " · " + esc(age) : "—"}</dd></div>
             <div><dt>Verification</dt><dd><span class="pill ${kc}">${k.status === "verified" ? icon("check") : ["action_needed", "rejected"].includes(k.status) ? icon("alert") : ""}${kt}</span><span class="t-cap muted">${esc(kn)}</span>${k.status !== "verified" ? '<a class="btn-q" href="#kyc">' + (k.status === "not_started" ? "Start" : k.status === "under_review" ? "See status" : "Fix it") + "</a>" : ""}</dd></div>
             <div><dt>Payouts go to</dt><dd class="num">${esc(payout || "Not added yet")}</dd></div>
@@ -237,7 +237,7 @@
       so.addEventListener("click", () =>
         LLD.openSheet({
           title: "Sign out?",
-          body: `<div class="profile-sheet-q"><p class="muted">You'll need Google or an OTP to sign back in. Drafts on this device are cleared.</p>
+          body: `<div class="profile-sheet-q"><p class="muted">You'll need your email and password, or Google, to sign back in. Drafts on this device are cleared.</p>
           <div class="row wrap"><button class="lq lq-p" type="button" data-yes>Sign out</button><button class="lq lq-s" type="button" data-no>Stay signed in</button></div></div>`,
           onMount(b, close) {
             b.querySelector("[data-no]").addEventListener("click", () => close());

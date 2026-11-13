@@ -22,7 +22,9 @@ export type BrandTone = "c" | "b" | "y";
 
 /* ---------- session ---------- */
 
-export type SignInMethod = "google" | "mobile";
+/** "email": email + password or an emailed code, the only way to sign up since 2026-11-13. "mobile": older accounts
+    made with an SMS code. "google": the prototype's Google sign-in. */
+export type SignInMethod = "google" | "mobile" | "email";
 
 export interface Session {
   signedIn: boolean;
