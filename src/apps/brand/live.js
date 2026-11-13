@@ -844,6 +844,7 @@ export const brandApi = {
       legalName: me.billing?.legal || "",
       gstin: me.billing?.gstin || "",
       billingAddress: me.billing?.address || "",
+      billingEmail: me.billing?.email || "",
     };
     const sc = String(me.billing?.gstin || "").slice(0, 2);
     if (/^\d{2}$/.test(sc)) body.stateCode = sc;
