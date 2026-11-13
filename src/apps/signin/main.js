@@ -875,7 +875,10 @@ attachGoogle(
 async function afterSignIn(user) {
   /* Always fetch fresh user data — the Google response may have stale needsOnboarding/role */
   const fresh = await fetchMe().catch(() => user);
-  if (isNew(fresh)) {
+  /* Also treat signup-mode Google as a new-account flow: some backends assign a role during
+     Google sign-in without setting needsOnboarding, so isNew() alone would miss them.
+     verified() handles the already-registered case if the account actually exists. */
+  if (isNew(fresh) || mode === "signup") {
     mode = "signup";
     verified(fresh, "other");
     return;
