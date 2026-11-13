@@ -87,14 +87,14 @@
       </form>
 
       <!-- sign up: email + Verify, name (+ brand name), mobile + Verify, codes, password, confirm. -->
-      <form id="signupForm" novalidate hidden>
+      <form id="signupForm" novalidate autocomplete="off" hidden>
         <!-- dummy pair: Chrome finds these first and stops offering credential suggestions on real fields -->
         <input type="text" autocomplete="username" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
         <input type="password" autocomplete="new-password" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
         <div class="field" id="suEmailField" hidden>
           <label for="suEmail">Email</label>
           <div class="in-row">
-            <div class="in"><input id="suEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" aria-describedby="suEmailErr suEmailOk"></div>
+            <div class="in"><input id="suEmail" name="register-email" type="email" inputmode="email" autocomplete="off" placeholder="you@example.com" aria-describedby="suEmailErr suEmailOk"></div>
             <button class="vbtn" type="button" id="suEmailVerify">Verify</button>
           </div>
           <p class="err" id="suEmailErr"></p>
