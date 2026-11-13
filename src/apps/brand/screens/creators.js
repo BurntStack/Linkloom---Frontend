@@ -707,18 +707,14 @@
       all = s.creators;
     const uniq = a => [...new Set(a)].sort();
     const cats = uniq(all.flatMap(c => c.categories)),
-      langs = uniq(all.flatMap(c => c.languages)),
-      countries = uniq(all.map(c => c.country));
-    const chip = (attr, v, label, extra = "") =>
-      `<button class="chip" type="button" data-${attr}="${esc(v)}" ${extra}>${label}</button>`;
-    const chipRow = (
-      id,
-      label,
-      attr,
-      opts,
-      opt,
-    ) => `<div class="field"><span class="lab" id="${id}">${label}${opt ? ' <span class="creators-opt">Optional</span>' : ""}</span>
-        <div class="chips" role="group" aria-labelledby="${id}">${opts.map(([v, t]) => chip(attr, v, esc(t))).join("")}</div></div>`;
+      langs = uniq(all.flatMap(c => c.languages));
+    const creatorStates = uniq(all.map(c => c.state).filter(Boolean));
+    const chip = (attr, v, label) =>
+      `<button class="chip" type="button" data-${attr}="${esc(v)}">${label}</button>`;
+    const moreCount = () =>
+      [ui.content.length, +ui.er, ui.pmin || ui.pmax ? 1 : 0,
+       +ui.rating, ui.verified ? 1 : 0, ui.gender ? 1 : 0, ui.age ? 1 : 0]
+        .filter(Boolean).length;
     el.innerHTML = `<div class="view-in creators">
       <header class="creators-head">
         <div class="creators-head-t">
@@ -732,75 +728,39 @@
         </div>
       </header>
       ${tabs("all")}
-      <div class="creators-layout">
-        <aside class="creators-filters" id="crFilters" aria-label="Filters">
-          <div class="creators-f-h"><p class="t-label">Filters</p><button class="btn-q creators-clear" type="button" data-clear>Clear all</button></div>
-
-          <fieldset class="creators-g"><legend class="t-eyebrow">Niche and platform</legend>
-            <div class="field"><span class="lab" id="crCatL">Category</span>
-              <div class="chips" role="group" aria-labelledby="crCatL">${cats.map(c => chip("cat", c, esc(c))).join("")}</div></div>
-            <div class="field"><span class="lab" id="crPlatL">Platform</span>
-              <div class="seg creators-seg" role="group" aria-labelledby="crPlatL">
-                <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${L.icon("ig")}Instagram</button><button type="button" data-plat="youtube">${L.icon("yt")}YouTube</button>
-              </div></div>
-            <div class="field"><span class="lab" id="crCtL">Content type</span>
-              <div class="chips" role="group" aria-labelledby="crCtL">${CONTENT.map(c => chip("ct", c, esc(c))).join("")}</div></div>
-          </fieldset>
-
-          <fieldset class="creators-g"><legend class="t-eyebrow">Audience</legend>
-            ${chipRow("crFolL", "Followers", "fol", FOLLOW)}
-            ${chipRow("crErL", "Engagement rate", "er", ERS)}
-            <div class="field"><label for="crLang">Language</label>
-              <select class="select" id="crLang"><option value="">Any language</option>${langs.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select></div>
-            <div class="creators-loc">
-              <div class="field"><label for="crCountry">Country</label><select class="select" id="crCountry"><option value="">Any country</option>${countries.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select></div>
-              <div class="field"><label for="crState">State</label><select class="select" id="crState"></select></div>
-              <div class="field"><label for="crCity">City</label><select class="select" id="crCity"></select></div>
-            </div>
-          </fieldset>
-
-          <fieldset class="creators-g"><legend class="t-eyebrow">Price and trust</legend>
-            <div class="field creators-pricef"><span class="lab" id="crPriceL">Price per post</span>
-              <div class="creators-pin" role="group" aria-labelledby="crPriceL">
-                <label class="creators-pi"><span class="sr-only">Minimum, in rupees</span><span aria-hidden="true">₹</span><input class="input num" id="crPmin" inputmode="numeric" autocomplete="off" placeholder="Min" value="${esc(ui.pmin)}"></label>
-                <span class="creators-dash" aria-hidden="true">to</span>
-                <label class="creators-pi"><span class="sr-only">Maximum, in rupees</span><span aria-hidden="true">₹</span><input class="input num" id="crPmax" inputmode="numeric" autocomplete="off" placeholder="Max" value="${esc(ui.pmax)}"></label>
-              </div>
-              <p class="err" id="crPriceE" aria-live="polite"></p>
-              <p class="help">Any listed rate in this range counts. Narrow it with Content type.</p></div>
-            ${chipRow("crRateL", "Rating", "rating", RATINGS)}
-            ${chipRow("crAvL", "Availability", "avail", AVAIL)}
-            <label class="check creators-verified"><input type="checkbox" id="crVer"> <span>Verified creators only<span class="help">ID and platform checked by Linkloom</span></span></label>
-          </fieldset>
-
-          <fieldset class="creators-g"><legend class="t-eyebrow">Optional</legend>
-            ${chipRow("crGenL", "Gender", "gender", GENDERS, true)}
-            ${chipRow("crAgeL", "Age range", "age", AGES, true)}
-            <p class="help">Creators choose whether to share these. Leave them on Any unless the brief needs it.</p>
-          </fieldset>
-          <button class="lq lq-p creators-f-done" type="button" data-done>Show creators</button>
-        </aside>
-
-        <section class="creators-results" aria-label="Creators">
-          <div class="creators-bar">
-            <p class="creators-count" id="crCount" aria-live="polite"></p>
-            <button class="lq lq-s lq-sm creators-ftoggle" type="button" aria-expanded="false" aria-controls="crFilters">${L.icon("filter", "ic")}Filters</button>
-            <div class="creators-sort"><label class="sr-only" for="crSort">Sort creators</label>
-              <select class="select" id="crSort">${Object.entries(SORTS)
-                .map(([k, v]) => `<option value="${k}">${v}</option>`)
-                .join("")}</select></div>
+      <div class="creators-toolbar">
+        <div class="creators-filterbar" role="group" aria-label="Filters">
+          <div class="seg creators-seg" role="group" aria-label="Platform">
+            <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${L.icon("ig")}Instagram</button><button type="button" data-plat="youtube">${L.icon("yt")}YouTube</button>
           </div>
-          <div class="creators-active" id="crActive" aria-label="Active filters"></div>
-          <div class="creators-list" id="crList">${all.map(c => card(c, { ctx: "list" })).join("")}</div>
-          <div class="empty creators-empty" hidden>
-            <img src="assets/step-04-orbit.svg" width="160" height="117" alt="">
-            <p class="t-h2">No creators match all of that.</p>
-            <p class="muted" data-suggest>Remove a filter or two. Price and availability narrow the list fastest.</p>
-            <button class="lq lq-p" type="button" data-clear>Clear all filters</button>
-          </div>
-          <p class="creators-hidden-line" aria-live="polite"></p>
-        </section>
+          <select class="select creators-fsel" id="crState" aria-label="State"><option value="">All states</option>${creatorStates.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select>
+          <select class="select creators-fsel" id="crLang" aria-label="Language"><option value="">Any language</option>${langs.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select>
+          <div class="creators-fb-break" aria-hidden="true"></div>
+          ${cats.length ? `<div class="creators-chips-wrap" role="group" aria-label="Category">${cats.map(c => chip("cat", c, esc(c))).join("")}</div>` : ""}
+          <div class="creators-chips-wrap" role="group" aria-label="Followers">${FOLLOW.map(([v, t]) => chip("fol", v, esc(t))).join("")}</div>
+          <div class="creators-chips-wrap" role="group" aria-label="Availability">${AVAIL.map(([v, t]) => chip("avail", v, esc(t))).join("")}</div>
+          <button class="btn-q creators-more" type="button" data-more>${L.icon("filter", "ic")}More</button>
+          <button class="btn-q creators-clear" type="button" data-clear>Clear</button>
+        </div>
       </div>
+      <section class="creators-results" aria-label="Creators">
+        <div class="creators-bar">
+          <p class="creators-count" id="crCount" aria-live="polite"></p>
+          <div class="creators-sort"><label class="sr-only" for="crSort">Sort creators</label>
+            <select class="select" id="crSort">${Object.entries(SORTS)
+              .map(([k, v]) => `<option value="${k}">${v}</option>`)
+              .join("")}</select></div>
+        </div>
+        <div class="creators-active" id="crActive" aria-label="Active filters"></div>
+        <div class="creators-list" id="crList">${all.map(c => card(c, { ctx: "list" })).join("")}</div>
+        <div class="empty creators-empty" hidden>
+          <img src="assets/step-04-orbit.svg" width="160" height="117" alt="">
+          <p class="t-h2">No creators match all of that.</p>
+          <p class="muted" data-suggest>Remove a filter or two. Price and availability narrow the list fastest.</p>
+          <button class="lq lq-p" type="button" data-clear>Clear all filters</button>
+        </div>
+        <p class="creators-hidden-line" aria-live="polite"></p>
+      </section>
     </div>`;
 
     L.liquid(el);
@@ -816,39 +776,10 @@
       onFav: () => syncFavN(el),
     });
 
-    function locOptions() {
-      const st = $("#crState"),
-        ci = $("#crCity");
-      const pool = all.filter(c => !ui.country || c.country === ui.country);
-      const states = [...new Set(pool.map(c => c.state))].sort();
-      if (ui.state && !states.includes(ui.state)) ui.state = "";
-      const cities = [
-        ...new Set(pool.filter(c => !ui.state || c.state === ui.state).map(c => c.city)),
-      ].sort();
-      if (ui.city && !cities.includes(ui.city)) ui.city = "";
-      const html = (any, arr) =>
-        `<option value="">${any}</option>` +
-        arr.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("");
-      const sH = html("Any state", states),
-        cH = html(ui.state ? "Any city in " + esc(ui.state) : "Any city", cities);
-      if (st.dataset.h !== sH) {
-        st.innerHTML = sH;
-        st.dataset.h = sH;
-      }
-      if (ci.dataset.h !== cH) {
-        ci.innerHTML = cH;
-        ci.dataset.h = cH;
-      }
-      st.value = ui.state;
-      ci.value = ui.city;
-    }
     function syncControls(n) {
       if ($("#crQ").value !== ui.q && document.activeElement !== $("#crQ")) $("#crQ").value = ui.q;
       L.$$("[data-cat]", el).forEach(b =>
         b.setAttribute("aria-pressed", String(ui.cats.includes(b.dataset.cat))),
-      );
-      L.$$("[data-ct]", el).forEach(b =>
-        b.setAttribute("aria-pressed", String(ui.content.includes(b.dataset.ct))),
       );
       L.$$("[data-plat]", el).forEach(b =>
         b.setAttribute("aria-pressed", String(b.dataset.plat === ui.platform)),
@@ -856,37 +787,68 @@
       L.$$("[data-fol]", el).forEach(b =>
         b.setAttribute("aria-pressed", String(b.dataset.fol === ui.followers)),
       );
-      L.$$("[data-er]", $("#crFilters")).forEach(b =>
-        b.setAttribute("aria-pressed", String(+b.dataset.er === +ui.er)),
-      );
-      L.$$("[data-rating]", el).forEach(b =>
-        b.setAttribute("aria-pressed", String(+b.dataset.rating === +ui.rating)),
-      );
       L.$$("[data-avail]", el).forEach(b =>
         b.setAttribute("aria-pressed", String(b.dataset.avail === ui.avail)),
       );
-      L.$$("[data-gender]", el).forEach(b =>
-        b.setAttribute("aria-pressed", String(b.dataset.gender === ui.gender)),
-      );
-      L.$$("[data-age]", el).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.age === ui.age)));
-      $("#crLang").value = ui.lang;
-      $("#crCountry").value = ui.country;
-      locOptions();
-      $("#crVer").checked = !!ui.verified;
+      const st = $("#crState");
+      if (st && document.activeElement !== st) st.value = ui.state || "";
+      const la = $("#crLang");
+      if (la && document.activeElement !== la) la.value = ui.lang;
       $("#crSort").value = ui.sort;
-      if (document.activeElement !== $("#crPmin")) $("#crPmin").value = ui.pmin;
-      if (document.activeElement !== $("#crPmax")) $("#crPmax").value = ui.pmax;
-      const pe = priceErr(ui);
-      $("#crPriceE").textContent = pe;
-      $(".creators-pricef").classList.toggle("is-err", !!pe);
+      const mc = moreCount();
+      const mb = $(".creators-more");
+      if (mb) mb.innerHTML = `${L.icon("filter", "ic")}${mc ? `More (${mc})` : "More"}`;
       L.$$(".creators-clear", el).forEach(b => {
         b.textContent = n ? `Clear all (${n})` : "Clear all";
         b.setAttribute("aria-disabled", String(!n));
       });
-      const ft = $(".creators-ftoggle");
-      ft.querySelectorAll(".t,.t2").forEach(x => {
-        x.innerHTML = L.icon("filter", "ic") + (n ? `Filters · ${n}` : "Filters");
-      });
+    }
+    function moreFiltersBody() {
+      return `<div class="stack creators-more-sh">
+        <fieldset class="creators-g"><legend class="t-eyebrow">Content type</legend>
+          <div class="chips">${CONTENT.map(c => chip("ct", c, esc(c))).join("")}</div>
+        </fieldset>
+        <fieldset class="creators-g"><legend class="t-eyebrow">Engagement rate</legend>
+          <div class="chips">${ERS.map(([v, t]) => chip("er", v, esc(t))).join("")}</div>
+        </fieldset>
+        <fieldset class="creators-g"><legend class="t-eyebrow">Price per post</legend>
+          <div class="creators-pin" role="group">
+            <label class="creators-pi"><span class="sr-only">Minimum</span><span aria-hidden="true">₹</span><input class="input num" id="mcrPmin" inputmode="numeric" autocomplete="off" placeholder="Min" value="${esc(ui.pmin)}"></label>
+            <span class="creators-dash" aria-hidden="true">to</span>
+            <label class="creators-pi"><span class="sr-only">Maximum</span><span aria-hidden="true">₹</span><input class="input num" id="mcrPmax" inputmode="numeric" autocomplete="off" placeholder="Max" value="${esc(ui.pmax)}"></label>
+          </div>
+          <p class="err" id="mcrPriceE" aria-live="polite"></p>
+          <p class="help">Any listed rate in this range counts. Narrow it with Content type.</p>
+        </fieldset>
+        <fieldset class="creators-g"><legend class="t-eyebrow">Rating</legend>
+          <div class="chips">${RATINGS.map(([v, t]) => chip("rating", v, esc(t))).join("")}</div>
+        </fieldset>
+        <label class="check creators-verified"><input type="checkbox" id="mcrVer"> <span>Verified creators only<span class="help">ID and platform checked by Linkloom</span></span></label>
+        <fieldset class="creators-g"><legend class="t-eyebrow">Gender <span class="creators-opt">optional</span></legend>
+          <div class="chips">${GENDERS.map(([v, t]) => chip("gender", v, esc(t))).join("")}</div>
+        </fieldset>
+        <fieldset class="creators-g"><legend class="t-eyebrow">Age range <span class="creators-opt">optional</span></legend>
+          <div class="chips">${AGES.map(([v, t]) => chip("age", v, esc(t))).join("")}</div>
+          <p class="help">Creators choose whether to share these. Leave them on Any unless the brief needs it.</p>
+        </fieldset>
+      </div>`;
+    }
+    function syncMoreControls(b) {
+      if (!b) return;
+      b.querySelectorAll("[data-ct]").forEach(x => x.setAttribute("aria-pressed", String(ui.content.includes(x.dataset.ct))));
+      b.querySelectorAll("[data-er]").forEach(x => x.setAttribute("aria-pressed", String(+x.dataset.er === +ui.er)));
+      b.querySelectorAll("[data-rating]").forEach(x => x.setAttribute("aria-pressed", String(+x.dataset.rating === +ui.rating)));
+      b.querySelectorAll("[data-gender]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.gender === ui.gender)));
+      b.querySelectorAll("[data-age]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.age === ui.age)));
+      const ver = b.querySelector("#mcrVer");
+      if (ver) ver.checked = !!ui.verified;
+      const pe = priceErr(ui);
+      const pErr = b.querySelector("#mcrPriceE");
+      if (pErr) pErr.textContent = pe;
+      const pmin = b.querySelector("#mcrPmin");
+      if (pmin && document.activeElement !== pmin) pmin.value = ui.pmin;
+      const pmax = b.querySelector("#mcrPmax");
+      if (pmax && document.activeElement !== pmax) pmax.value = ui.pmax;
     }
     function apply(animate = true) {
       const { list: vis, hiddenCount } = filtered(ui),
@@ -900,7 +862,6 @@
         ids.forEach(id => list.append(cards.get(id)));
       };
       animate ? flip(mutate, [...cards.values()]) : mutate();
-      /* engagement follows the platform filter, the price follows the content type filter */
       vis.forEach(c => {
         const k = cards.get(c.id);
         const er = k.querySelector("[data-erv]");
@@ -915,12 +876,9 @@
       $("#crCount").innerHTML =
         `<b>${ids.length}</b> of ${all.length} creators · ${ui.sort === "match" ? "Best match first" : esc(SORTS[ui.sort])}`;
       $("#crActive").innerHTML = act.length
-        ? act
-            .map(
-              a =>
-                `<button class="chip creators-achip" type="button" data-off="${esc(a.k)}" aria-label="Remove filter: ${esc(a.label)}">${esc(a.label)}${L.icon("close")}</button>`,
-            )
-            .join("") + `<button class="btn-q" type="button" data-clear>Clear all</button>`
+        ? act.map(a =>
+            `<button class="chip creators-achip" type="button" data-off="${esc(a.k)}" aria-label="Remove filter: ${esc(a.label)}">${esc(a.label)}${L.icon("close")}</button>`
+          ).join("") + `<button class="btn-q" type="button" data-clear>Clear all</button>`
         : "";
       $("#crActive").hidden = !act.length;
       const empty = !ids.length;
@@ -928,22 +886,13 @@
       list.hidden = empty;
       if (empty) {
         const best = act
-          .map(a => ({
-            a,
-            n: S().creators.filter(c => keep(c, ui, a.k) && !ui.hidden.includes(c.id)).length,
-          }))
+          .map(a => ({ a, n: S().creators.filter(c => keep(c, ui, a.k) && !ui.hidden.includes(c.id)).length }))
           .sort((x, y) => y.n - x.n)[0];
         $("[data-suggest]").innerHTML =
           best && best.n
             ? `Removing <b>${esc(best.a.label)}</b> brings back ${best.n} ${best.n === 1 ? "creator" : "creators"}. <button class="btn-q" type="button" data-off="${esc(best.a.k)}">Remove it</button>`
             : "Remove a filter or two. Price and availability narrow the list fastest.";
       }
-      const done = $("[data-done]");
-      done.querySelectorAll(".t,.t2").forEach(x => {
-        x.textContent = ids.length
-          ? `Show ${ids.length} ${ids.length === 1 ? "creator" : "creators"}`
-          : "No matches yet";
-      });
       const hl = $(".creators-hidden-line");
       if (!hl.dataset.undo)
         hl.innerHTML = hiddenCount
@@ -967,38 +916,14 @@
       set(k, ui[k].includes(v) ? ui[k].filter(x => x !== v) : [...ui[k], v]);
     };
 
-    let qT = 0,
-      pT = 0;
+    let qT = 0;
     $("#crQ").addEventListener("input", e => {
       clearTimeout(qT);
       const v = e.target.value;
       qT = setTimeout(() => set("q", v), 140);
     });
-    const priceIn = (k, inp) => {
-      const clean = inp.value.replace(/[^\d]/g, "").slice(0, 7);
-      if (clean !== inp.value) inp.value = clean;
-      clearTimeout(pT);
-      pT = setTimeout(() => set(k, clean), 260);
-    };
-    $("#crPmin").addEventListener("input", e => priceIn("pmin", e.target));
-    $("#crPmax").addEventListener("input", e => priceIn("pmax", e.target));
     $("#crLang").addEventListener("change", e => set("lang", e.target.value));
-    $("#crCountry").addEventListener("change", e => {
-      ui.state = "";
-      ui.city = "";
-      set("country", e.target.value);
-    });
-    $("#crState").addEventListener("change", e => {
-      ui.city = "";
-      set("state", e.target.value);
-    });
-    $("#crCity").addEventListener("change", e => {
-      const v = e.target.value,
-        c = all.find(x => x.city === v);
-      if (v && c && !ui.state) ui.state = c.state; // picking a city fills in its state, so the chips read correctly
-      set("city", v);
-    });
-    $("#crVer").addEventListener("change", e => set("verified", e.target.checked));
+    $("#crState").addEventListener("change", e => { ui.city = ""; set("state", e.target.value); });
     $("#crSort").addEventListener("change", e => set("sort", e.target.value));
     const root = el.firstElementChild;
     root.addEventListener("click", e => {
@@ -1008,28 +933,13 @@
       if (d.cat !== undefined) {
         toggleIn("cats", d.cat);
         settle(t);
-      } else if (d.ct !== undefined) {
-        toggleIn("content", d.ct);
-        settle(t);
       } else if (d.plat !== undefined) {
         set("platform", d.plat);
       } else if (d.fol !== undefined) {
         set("followers", d.fol);
         settle(t);
-      } else if (d.er !== undefined && t.closest("#crFilters")) {
-        set("er", +d.er);
-        settle(t);
-      } else if (d.rating !== undefined) {
-        set("rating", +d.rating);
-        settle(t);
       } else if (d.avail !== undefined) {
         set("avail", d.avail);
-        settle(t);
-      } else if (d.gender !== undefined) {
-        set("gender", d.gender);
-        settle(t);
-      } else if (d.age !== undefined) {
-        set("age", d.age);
         settle(t);
       } else if (d.off !== undefined) {
         const a = actives(ui).find(x => x.k === d.off);
@@ -1057,24 +967,37 @@
         delete hl.dataset.undo;
         apply();
         hl.textContent = "Back in your list.";
-      } else if (t.classList.contains("creators-ftoggle")) {
-        const f = $("#crFilters"),
-          on = !f.classList.contains("is-open");
-        f.classList.toggle("is-open", on);
-        t.setAttribute("aria-expanded", String(on));
-        if (on) {
-          mo("reveal", f);
-          const first = f.querySelector("button.chip");
-          first && first.focus({ preventScroll: true });
-        }
-      } else if (t.hasAttribute("data-done")) {
-        const f = $("#crFilters"),
-          tg = $(".creators-ftoggle");
-        f.classList.remove("is-open");
-        tg.setAttribute("aria-expanded", "false");
-        const top = $(".creators-bar").getBoundingClientRect().top + scrollY - 80;
-        window.scrollTo({ top: Math.max(0, top), behavior: L.RM ? "auto" : "smooth" });
-        tg.focus({ preventScroll: true });
+      } else if (t.hasAttribute("data-more")) {
+        L.openSheet({
+          title: "More filters",
+          body: moreFiltersBody(),
+          onMount(b) {
+            syncMoreControls(b);
+            b.addEventListener("change", e => {
+              const inp = e.target;
+              if (inp.id === "mcrVer") { set("verified", inp.checked); syncMoreControls(b); return; }
+              if (inp.id === "mcrPmin" || inp.id === "mcrPmax") {
+                const pmin = b.querySelector("#mcrPmin"), pmax = b.querySelector("#mcrPmax");
+                ui.pmin = pmin.value.trim(); ui.pmax = pmax.value.trim();
+                const pe = priceErr(ui);
+                b.querySelector("#mcrPriceE").textContent = pe;
+                if (!pe) { persist(); apply(); syncControls(actives(ui).length); }
+                syncMoreControls(b);
+              }
+            });
+            b.addEventListener("click", e => {
+              const bt = e.target.closest("[data-ct],[data-er],[data-rating],[data-gender],[data-age]");
+              if (!bt || bt.tagName !== "BUTTON") return;
+              const d = bt.dataset;
+              if (d.ct !== undefined) toggleIn("content", d.ct);
+              else if (d.er !== undefined) set("er", +d.er === +ui.er ? 0 : +d.er);
+              else if (d.rating !== undefined) set("rating", +d.rating === +ui.rating ? 0 : +d.rating);
+              else if (d.gender !== undefined) set("gender", d.gender === ui.gender ? "" : d.gender);
+              else if (d.age !== undefined) set("age", d.age === ui.age ? "" : d.age);
+              syncMoreControls(b);
+            });
+          },
+        });
       }
     });
 
