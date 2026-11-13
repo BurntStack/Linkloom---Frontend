@@ -8,13 +8,20 @@ import { dataUrlToBlob, uploadFile } from "./uploads";
 
 export function toProfilePatch(a) {
   const name = a.name.trim().replace(/\s+/g, " ");
-  return {
+  const body = {
     displayName: name,
     bio: a.bio.trim(),
     categories: a.categories,
-    location: [a.city.trim(), a.region].filter(Boolean).join(", "),
+    languages: a.languages,
+    city: a.city.trim(),
+    region: a.region,
     primaryPlatform: a.instagram ? "instagram" : a.youtube ? "youtube" : "instagram",
   };
+  if (a.dob) body.dob = a.dob;
+  if (a.gender) body.gender = a.gender;
+  if (a.instagram) body.instagram = a.instagram;
+  if (a.youtube) body.youtube = a.youtube;
+  return body;
 }
 
 export async function submitCreatorOnboarding(a) {
