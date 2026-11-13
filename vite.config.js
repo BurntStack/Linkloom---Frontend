@@ -35,17 +35,26 @@ function apiPreconnect(origin) {
   };
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const parity = !!(env.VITE_TEST_HOOKS || process.env.VITE_TEST_HOOKS);
+  const apiOrigin = (env.VITE_API_BASE_URL || "https://collab-api-ewju.onrender.com").replace(/\/+$/, "");
+  const isDev = command === "serve";
   return {
     base: "./",
     plugins: [
       react(),
       noSampleData(!parity),
-      apiPreconnect(parity ? "" : (env.VITE_API_BASE_URL || "https://collab-api-ewju.onrender.com").replace(/\/+$/, "")),
+      /* In dev the proxy handles the connection, so no preconnect needed. */
+      apiPreconnect(isDev || parity ? "" : apiOrigin),
     ],
     resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
+    /* Proxy /v1/ to the backend in dev so the browser sees same-origin requests — no CORS. */
+    server: {
+      proxy: {
+        "/v1": { target: apiOrigin, changeOrigin: true },
+      },
+    },
     build: {
       target: "es2022",
       cssTarget: "chrome120",

@@ -8,7 +8,11 @@
 
    Tokens live in localStorage when the person ticked "Remember me", otherwise in sessionStorage for this tab. */
 const DEFAULT_BASE = "https://collab-api-ewju.onrender.com";
-export const API_BASE = (import.meta.env.VITE_API_BASE_URL || DEFAULT_BASE).replace(/\/+$/, "");
+/* In dev (vite serve) without an explicit base URL, use the Vite proxy (/v1 → backend) so
+   the browser sees same-origin requests and CORS never applies. */
+export const API_BASE = (import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL)
+  ? ""
+  : (import.meta.env.VITE_API_BASE_URL || DEFAULT_BASE).replace(/\/+$/, "");
 const AUTH_KEY = "ll-auth";
 
 /** The parity build runs on the prototype's sample data and must never call the server. */
@@ -91,16 +95,19 @@ export class ApiError extends Error {
 }
 
 const OFFLINE = "We couldn't reach Linkloom. Check your connection and try again.";
+const WAKING = "The server is starting up — this can take up to a minute on the free plan. Please wait a moment and try again.";
 const FALLBACK = "Something went wrong. Please try again.";
 /** A 5xx: the server failed, whatever the person typed. Its own message ("Something went wrong.") reads like a wrong password. */
 const SERVER_DOWN = "Linkloom's server had a problem. Please try again in a minute.";
+
+const TIMEOUT_MS = 25_000;
 
 /** Called once when the session can no longer be refreshed. The dashboards send the person to sign-in. */
 let onSessionLost = null;
 export const setSessionLostHandler = (f) => { onSessionLost = f; };
 
 const url = (path, query) => {
-  const u = new URL(API_BASE + path);
+  const u = new URL((API_BASE || location.origin) + path);
   if (query)
     for (const [k, v] of Object.entries(query))
       if (v !== undefined && v !== null && v !== "") u.searchParams.set(k, String(v));
@@ -155,6 +162,11 @@ async function raw(path, o, retried = false) {
   const useAuth = o.auth !== false;
   let token = useAuth ? getToken() : null;
   if (token && !retried && expired(token) && (await refreshSession())) token = getToken();
+
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  if (o.signal) o.signal.addEventListener("abort", () => ctrl.abort(), { once: true });
+
   let res;
   try {
     res = await fetch(url(path, o.query), {
@@ -165,12 +177,17 @@ async function raw(path, o, retried = false) {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: o.body === undefined ? undefined : JSON.stringify(o.body),
-      signal: o.signal,
+      signal: ctrl.signal,
     });
   } catch (e) {
-    if (e?.name === "AbortError") throw e;
+    clearTimeout(tid);
+    if (e?.name === "AbortError") {
+      if (o.signal?.aborted) throw e;
+      throw new ApiError(0, WAKING, "TIMEOUT");
+    }
     throw new ApiError(0, OFFLINE, "NETWORK");
   }
+  clearTimeout(tid);
   if (res.status === 204) return { data: undefined, meta: null };
   const env = await res.json().catch(() => null);
   if (res.status === 401 && useAuth && token && !retried) {

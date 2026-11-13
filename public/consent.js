@@ -11,9 +11,7 @@
   if (stored === 'all') {
     gtag('consent', 'default', {
       analytics_storage: 'granted',
-      ad_storage: 'granted',
       functionality_storage: 'granted',
-      personalization_storage: 'granted',
       security_storage: 'granted'
     });
   } else {
@@ -26,6 +24,12 @@
       wait_for_update: 500
     });
   }
+
+  /* Allow users to reset their choice (called from Cookie settings link on cookies.html) */
+  window.LLD_COOKIE_SETTINGS = function () {
+    try { localStorage.removeItem('ll_consent'); } catch (e) {}
+    location.reload();
+  };
 
   if (stored) return;
 
@@ -62,9 +66,7 @@
       try { localStorage.setItem('ll_consent', 'all'); } catch (e) {}
       gtag('consent', 'update', {
         analytics_storage: 'granted',
-        ad_storage: 'granted',
-        functionality_storage: 'granted',
-        personalization_storage: 'granted'
+        functionality_storage: 'granted'
       });
       b.remove();
     });
@@ -81,9 +83,4 @@
     showBanner();
   }
 
-  /* Allow users to reset their choice (called from Cookie settings link) */
-  window.LLD_COOKIE_SETTINGS = function () {
-    try { localStorage.removeItem('ll_consent'); } catch (e) {}
-    location.reload();
-  };
 })();
