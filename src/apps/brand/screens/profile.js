@@ -958,7 +958,7 @@
               ${fld("pe", "adcity", "City", `<input class="input" id="pe-adcity" autocomplete="address-level2" value="${esc(bl.addressObj?.city || "")}" placeholder="Mumbai">`)}
               ${fld("pe", "adpin", "PIN code", `<input class="input num" id="pe-adpin" inputmode="numeric" maxlength="6" autocomplete="postal-code" value="${esc(bl.addressObj?.pincode || "")}" placeholder="400013">`)}
             </div>
-            ${fld("pe", "adstate", "State", sel("pe-adstate", STATES, bl.addressObj?.state || "", "Choose state"))}`
+            ${fld("pe", "adstate", "State", sel("pe-adstate", STATES, bl.addressObj?.state || "", "Choose state"))}
             ${fld("pe", "bemail", "Send invoices to", `<input class="input" id="pe-bemail" type="email" spellcheck="false" autocapitalize="off" value="${esc(bl.email || "")}">`)}
             <p class="t-cap muted">Changes apply to invoices from today. Past invoices keep the details they were issued with.</p>
           </fieldset>
