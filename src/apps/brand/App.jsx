@@ -55,7 +55,8 @@ export default function App() {
 
   const { name: rawName, param, _k: renderKey } = rawRoute;
   const guard = window.LLD.getGuard();
-  const redirectTo = guard ? guard(rawName) : undefined;
+  const redirectTo = guard ? guard(rawName) : null;
+  if (redirectTo === null) return null;
   if (redirectTo) {
     window.LLD.go(redirectTo);
     return null;

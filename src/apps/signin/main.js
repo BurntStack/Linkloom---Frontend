@@ -2,8 +2,8 @@
    - Sign in: email or mobile number, password.
    - Sign up: name (and brand name for brands), mobile number with Verify beside it, the one-time code underneath,
      then password and confirm password. The number is verified once, here; after that the account signs in with its password.
-   - Forgot password: request a code with purpose "password_reset", then submit the code and new password together
-     to /v1/auth/password/reset/. The session opens after the new password is accepted.
+   - Forgot password: sign in with a one-time code instead. The backend has no password reset yet (API reference v1),
+     so this keeps people from being locked out. A new account found this way finishes signing up as usual.
    The chosen colour carries the person into that dashboard. */
 import "./signin.css";
 import "../../shared/analytics";
@@ -11,7 +11,7 @@ import { gsap } from "../../shared/vendor-gsap";
 import { attachGoogle } from "../../shared/api/google";
 import {
   authMessage,
-  resetPassword,
+  changePassword,
   completeSignup,
   destinationOf,
   fetchMe,
@@ -226,9 +226,6 @@ function paint() {
   $$("[data-names]").forEach(e => (e.hidden = !names || (e.hasAttribute("data-brand-only") && !brand)));
   /* the password is chosen with the new account's details; signing in with a code needs none */
   $$("[data-new-only]").forEach(e => (e.hidden = !names && !setPw));
-  /* consent is only required for new account creation, not for password reset */
-  const cf = $("#suConsentField");
-  if (cf) cf.hidden = !names;
   $("#skipPw").hidden = !setPw;
   $("#suPhoneField").hidden = verifiedBy === "other";
   goLabel.textContent = COPY[role].btn;
@@ -362,7 +359,7 @@ async function sendCode(resend = false) {
   verifyState("sending");
   if (resend) codeHelp.textContent = "Sending a new code…";
   try {
-    const ch = await requestOtp(d.channel, d.destination, mode === "reset" ? "password_reset" : undefined);
+    const ch = await requestOtp(d.channel, d.destination);
     challengeId = ch.challengeId;
     cooldownEnd = Date.now() + 30000;
     otp.value = "";
@@ -383,20 +380,6 @@ async function sendCode(resend = false) {
 
 async function checkCode() {
   if (busy || !/^\d{6}$/.test(otp.value)) return;
-  if (mode === "reset") {
-    /* Password reset: don't sign in here — the code is verified together with the new password
-       in one step at /v1/auth/password/reset/. Just advance to the password step. */
-    clearInterval(cooldownTimer);
-    otpField.hidden = true;
-    otp.readOnly = false;
-    verifyState("done");
-    setErr(phone, "suPhoneErr", "");
-    needsProfile = false;
-    setPw = true;
-    paint();
-    suPw.focus();
-    return;
-  }
   busy = true;
   otp.readOnly = true;
   clearInterval(cooldownTimer);
@@ -565,26 +548,18 @@ $("#signupForm").addEventListener("submit", async e => {
           : "",
     );
   }
-  /* DPDP Act consent: required when creating a new account */
-  const consentEl = document.getElementById("suConsent");
-  const consentErr = document.getElementById("suConsentErr");
-  if (names && consentEl && !consentEl.checked) {
-    if (consentErr) consentErr.textContent = "Please agree to the Terms and Privacy Policy to continue.";
-    if (!bad) bad = consentEl;
-  }
-
   if (bad) {
     bad.focus();
     shake();
     return;
   }
-  if (consentEl && consentErr) consentErr.textContent = "";
   if (setPw) {
     setBusy(suGo, suGoLabel, true, "Saving…");
     try {
-      const user = await resetPassword(challengeId, otp.value, pw, remember());
-      window.LLD_TRACK("login", { method: "password_reset", user_role: (user?.role) || role });
-      open((user?.role) || role);
+      await changePassword(pw);
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: "login", method: "otp", user_role: (verifiedUser?.role) || role });
+      open((verifiedUser?.role) || role);
     } catch (err) {
       const pwMsg = err instanceof ApiError ? err.field("password") || err.field("confirmPassword") : null;
       if (pwMsg) setErr(suPw, "suPwErr", pwMsg);
@@ -605,7 +580,8 @@ $("#signupForm").addEventListener("submit", async e => {
     });
     const r = u.role || role;
     if (r !== role) setRole(r, false);
-    window.LLD_TRACK("sign_up", { method: "email", user_role: r });
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: "sign_up", method: "email", user_role: r });
     /* new creators fill in their profile next; new brands finish their brand profile */
     handoff(COPY[r].setup);
   } catch (err) {
@@ -645,7 +621,8 @@ async function afterSignIn(user) {
     verified(user, "other");
     return;
   }
-  window.LLD_TRACK("login", { method: "password", user_role: user.role || role });
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: "login", method: "password", user_role: user.role || role });
   open(user.role);
 }
 

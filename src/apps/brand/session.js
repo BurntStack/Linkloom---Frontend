@@ -87,7 +87,6 @@ async function enterSignedIn() {
     }
     document.documentElement.classList.remove("is-guest");
     w.LLD.store.set(s => {
-      s.session.signedIn = true;
       s.session.firstRun = !!user.needsOnboarding || !user.role;
     }, "signed-in");
     return true;

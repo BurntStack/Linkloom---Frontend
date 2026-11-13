@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /app.html
-Disallow: /brand.html
-
-Sitemap: https://linkloom.in/sitemap.xml

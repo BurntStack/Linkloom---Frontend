@@ -17,23 +17,8 @@ export function destinationOf(input) {
   return m ? { channel: "sms", destination: m[1] } : null;
 }
 
-export const requestOtp = (channel, destination, purpose) =>
-  api("/v1/auth/otp/request/", {
-    method: "POST",
-    body: purpose ? { channel, destination, purpose } : { channel, destination },
-    auth: false,
-  });
-
-/** Resets the password using a password_reset OTP. Returns the signed-in user if the backend issues tokens. */
-export async function resetPassword(challengeId, code, password, remember = true) {
-  const t = await api("/v1/auth/password/reset/", {
-    method: "POST",
-    body: { challengeId, code, password, confirmPassword: password },
-    auth: false,
-  });
-  if (t?.access) saveAuth(t, remember);
-  return t?.user ?? null;
-}
+export const requestOtp = (channel, destination) =>
+  api("/v1/auth/otp/request/", { method: "POST", body: { channel, destination }, auth: false });
 
 export async function verifyOtp(challengeId, code, remember = true) {
   const t = await api("/v1/auth/otp/verify/", {
@@ -116,10 +101,6 @@ export function authMessage(e) {
       return "Your Google account's email isn't verified yet. Verify it with Google, or sign in with a code.";
     case "INVALID_PHONE":
       return "Enter a 10-digit Indian mobile number.";
-    case "REAUTH_REQUIRED":
-      return "Please use the Forgot password? flow to set a new password.";
-    case "TIMEOUT":
-      return "The server is starting up — this can take up to a minute on the free plan. Please wait a moment and try again.";
     default:
       return e.message;
   }

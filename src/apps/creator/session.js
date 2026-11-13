@@ -82,7 +82,6 @@ async function enterSignedIn() {
     }
     document.documentElement.classList.remove("is-guest");
     store.set(s => {
-      s.session.signedIn = true;
       s.session.guest = false;
       s.session.expired = false;
       s.session.firstLogin = !!user.needsOnboarding || !user.role;

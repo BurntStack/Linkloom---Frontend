@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "format": "prettier --write \"src/**/*.{js,jsx,css}\" \"tests/**/*.mjs\"",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,css}\" \"tests/**/*.mjs\"",
     "parity": "node tests/parity/run.mjs",
     "test:journey": "node tests/e2e/journey.mjs",
     "test:onboarding-api": "node tests/e2e/onboarding-api.mjs",
@@ -17,18 +18,14 @@
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "gsap": "3.12.5",
-    "lenis": "1.1.13",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "react-router-dom": "^7.18.5",
-    "zustand": "^5.1.0"
+    "lenis": "1.1.13"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.3.0",
     "pixelmatch": "8.0.0",
     "playwright": "1.64.1",
     "pngjs": "7.0.0",
     "prettier": "3.9.10",
+    "typescript": "7.0.2",
     "vite": "8.3.6"
   }
 }
