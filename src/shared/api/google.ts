@@ -2,7 +2,8 @@
    "Continue with Google" button gets Google's real button laid over it, invisible, at the same size.
    The page keeps its look; the click lands on Google's button. */
 const CLIENT_ID =
-  import.meta.env.VITE_GOOGLE_CLIENT_ID || "591280470035-mamos86blk66gpr7bufpv48ln9dntsef.apps.googleusercontent.com";
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  "591280470035-mamos86blk66gpr7bufpv48ln9dntsef.apps.googleusercontent.com";
 
 interface Gsi {
   accounts: {
@@ -48,7 +49,9 @@ function load(): Promise<Gsi> {
     };
     s.onerror = () => {
       loading = null;
-      reject(new Error("Google sign-in could not load. Check your connection, or sign in with your password."));
+      reject(
+        new Error("Google sign-in could not load. Check your connection, or sign in with your password."),
+      );
     };
     document.head.appendChild(s);
   });
@@ -78,20 +81,52 @@ export function attachGoogle(
   if (parentStyle.position === "static") button.style.position = "relative";
   button.appendChild(host);
   let gone = false;
+  let stop = () => {};
   load()
     .then(g => {
       if (gone) return;
       const width = Math.max(200, Math.min(400, Math.round(button.getBoundingClientRect().width || 320)));
-      g.accounts.id.renderButton(host, { type: "standard", size: "large", width, text: "continue_with", shape: "pill" });
-      /* stretch Google's iframe over the whole designed button */
-      const fit = () => host.querySelectorAll<HTMLElement>("div, iframe").forEach(n => {
-        n.style.width = "100%";
-        n.style.height = "100%";
-        n.style.transform = "scale(1.6)";
-        n.style.transformOrigin = "center";
+      g.accounts.id.renderButton(host, {
+        type: "standard",
+        size: "large",
+        width,
+        text: "continue_with",
+        shape: "pill",
       });
-      setTimeout(fit, 50);
-      setTimeout(fit, 600);
+      /* Centre Google's iframe on the designed button and scale it once, just enough that Google's clickable
+         button covers all of it. (Scaling every nested layer compounded and pushed the real button below the
+         designed one, leaving a few pixels at the bottom edge as the only spot that worked.) The iframe is the
+         button plus Google's padding: 10 px each side, 2 px top and bottom. */
+      const fit = () => {
+        const ifr = host.querySelector<HTMLIFrameElement>("iframe");
+        if (!ifr) return;
+        host.querySelectorAll<HTMLElement>("div").forEach(n => {
+          n.style.position = "static";
+          n.style.transform = "none";
+        });
+        const w = ifr.offsetWidth || width + 20;
+        const h = ifr.offsetHeight || 44;
+        const s =
+          Math.max(host.clientWidth / Math.max(1, w - 20), host.clientHeight / Math.max(1, h - 4)) * 1.04;
+        Object.assign(ifr.style, {
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          margin: "0",
+          transformOrigin: "center",
+          transform: `translate(-50%, -50%) scale(${s.toFixed(3)})`,
+        } as Partial<CSSStyleDeclaration>);
+      };
+      /* Google adds the iframe a moment after renderButton, and the designed button can change size */
+      const mo = new MutationObserver(fit);
+      mo.observe(host, { childList: true, subtree: true });
+      const ro = new ResizeObserver(fit);
+      ro.observe(host);
+      stop = () => {
+        mo.disconnect();
+        ro.disconnect();
+      };
+      fit();
     })
     .catch(e => {
       host.remove();
@@ -99,6 +134,7 @@ export function attachGoogle(
     });
   return () => {
     gone = true;
+    stop();
     host.remove();
   };
 }
