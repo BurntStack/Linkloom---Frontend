@@ -426,6 +426,7 @@
               <div class="seg jobs-seg" role="group" aria-label="Platform">
                 <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${L.icon("ig")}Instagram</button><button type="button" data-plat="youtube">${L.icon("yt")}YouTube</button>
               </div>
+              <div class="jobs-fb-break" aria-hidden="true"></div>
               ${cats.length ? `<div class="jobs-chips-wrap" role="group" aria-label="Category">${cats.map(c => `<button class="chip" type="button" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div>` : ""}
               <div class="jobs-chips-wrap" role="group" aria-label="Minimum budget">${BUDGETS.map(b => `<button class="chip" type="button" data-min="${b}">${budgetLabel(b)}</button>`).join("")}</div>
               <label class="chip jobs-saved-chip" title="Saved jobs only"><input type="checkbox" id="jobsSaved" class="sr-only"><span>${L.icon("bookmark")}Saved</span></label>

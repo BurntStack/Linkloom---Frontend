@@ -329,24 +329,23 @@
 /* toolbar: filter bar on the left, search pinned to the right */
 .jobs-toolbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   min-width: 0;
 }
 .jobs-filterbar {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 8px;
   flex: 1;
   min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 2px;
 }
-.jobs-filterbar::-webkit-scrollbar {
-  display: none;
+/* forces category+budget chips onto a second row under city+platform */
+.jobs-fb-break {
+  width: 100%;
+  height: 0;
+  flex-shrink: 0;
 }
 .jobs-fsel {
   flex: none;
@@ -414,8 +413,7 @@
 }
 .jobs-search {
   position: relative;
-  flex: 0 0 auto;
-  width: clamp(200px, 30vw, 320px);
+  flex: 0 0 190px;
 }
 .jobs-search svg {
   position: absolute;
@@ -520,14 +518,13 @@
   .jobs-toolbar {
     flex-wrap: wrap;
   }
+  .jobs-search {
+    order: 1;
+    flex: 1 1 100%;
+  }
   .jobs-filterbar {
     order: 2;
     flex-basis: 100%;
-  }
-  .jobs-search {
-    order: 1;
-    flex: 1 1 auto;
-    width: auto;
   }
   .jobs-list {
     gap: 16px;
