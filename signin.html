@@ -88,6 +88,9 @@
 
       <!-- sign up: email + Verify, name (+ brand name), mobile + Verify, codes, password, confirm. -->
       <form id="signupForm" novalidate hidden>
+        <!-- dummy pair: Chrome finds these first and stops offering credential suggestions on real fields -->
+        <input type="text" autocomplete="username" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+        <input type="password" autocomplete="new-password" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
         <div class="field" id="suEmailField" hidden>
           <label for="suEmail">Email</label>
           <div class="in-row">
@@ -105,7 +108,7 @@
         </div>
         <div class="field" data-names>
           <label for="suName">Your name</label>
-          <div class="in"><input id="suName" name="name" type="text" autocomplete="name" placeholder="Your name" aria-describedby="suNameErr"></div>
+          <div class="in"><input id="suName" name="displayname" type="text" autocomplete="nickname" placeholder="Your name" aria-describedby="suNameErr"></div>
           <p class="err" id="suNameErr"></p>
         </div>
         <div class="field" data-names data-brand-only hidden>
