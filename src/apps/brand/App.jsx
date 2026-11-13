@@ -56,10 +56,14 @@ export default function App() {
   const { name: rawName, param, _k: renderKey } = rawRoute;
   const guard = window.LLD.getGuard();
   const redirectTo = guard ? guard(rawName) : undefined;
-  if (redirectTo) {
-    window.LLD.go(redirectTo);
-    return null;
-  }
+
+  useEffect(() => {
+    if (!redirectTo) return;
+    if (redirectTo.startsWith("#")) window.LLD.go(redirectTo);
+    else location.replace(redirectTo);
+  }, [redirectTo]);
+
+  if (redirectTo) return null;
 
   const guestRoutes = window.LLD.getGuestRoutes();
   const session = window.LLD_DATA?.session || {};

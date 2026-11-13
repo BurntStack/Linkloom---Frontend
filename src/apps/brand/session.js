@@ -94,13 +94,21 @@ async function enterSignedIn() {
   } catch (e) {
     if (e.status === 401) {
       clearAuth();
-      return enterGuest();
+      return enterGuest(true);
     }
     return new Promise(resolve => failed(() => resolve(enterSignedIn())));
   }
 }
 
-async function enterGuest() {
+async function enterGuest(fromExpiry = false) {
+  if (!fromExpiry) {
+    const hash = location.hash.replace(/^#/, "");
+    if (PASSWORD_SCREENS.has(hash)) {
+      const to = hash === "signup" ? "&join=1" : hash === "forgot" || hash === "reset" ? "&forgot=1" : "";
+      location.replace(`signin.html?role=brand${to}`);
+      return false;
+    }
+  }
   loading("Loading Linkloom…");
   await loadBrandGuest();
   document.documentElement.classList.add("is-guest");
@@ -140,8 +148,7 @@ export function initBrandSession() {
     if (PASSWORD_SCREENS.has(name)) {
       if (s.signedIn) return "#home";
       const to = name === "signup" ? "&join=1" : name === "forgot" || name === "reset" ? "&forgot=1" : "";
-      location.replace(`signin.html?role=brand${to}`);
-      return null;
+      return `signin.html?role=brand${to}`;
     }
     return s.signedIn && s.firstRun && !OPEN_DURING_SETUP.has(name) ? "#setup" : null;
   });
