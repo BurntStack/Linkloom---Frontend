@@ -336,6 +336,7 @@
 .jobs-filterbar {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 8px;
   flex: 1;
   min-width: 0;
@@ -361,7 +362,7 @@
   pointer-events: none;
 }
 .jobs-seg {
-  display: flex;
+  display: inline-flex;
   flex: none;
 }
 .jobs-seg button {
