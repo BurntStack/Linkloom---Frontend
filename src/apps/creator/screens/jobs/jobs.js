@@ -7,7 +7,7 @@
   const S = () => window.LLD_DATA;
   const UI_DEFAULT = {
     q: "",
-    city: "",
+    state: "",
     platform: "",
     category: "",
     minBudget: 0,
@@ -331,14 +331,14 @@
 
   /* ---------- filtering ---------- */
   const BUDGETS = [0, 500000, 1000000, 2000000, 4000000];
-  const CITIES = [
-    "Ahmedabad","Amritsar","Aurangabad","Bangalore","Bhopal","Chandigarh",
-    "Chennai","Coimbatore","Delhi","Faridabad","Ghaziabad","Guwahati",
-    "Gwalior","Howrah","Hyderabad","Indore","Jaipur","Jodhpur","Kanpur",
-    "Kochi","Kolkata","Kota","Lucknow","Ludhiana","Madurai","Meerut",
-    "Mumbai","Mysore","Nagpur","Nashik","Navi Mumbai","Noida","Patna",
-    "Pune","Raipur","Rajkot","Ranchi","Surat","Thiruvananthapuram",
-    "Tiruchirappalli","Vadodara","Varanasi","Vijayawada","Visakhapatnam",
+  const STATES = [
+    "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh",
+    "Chhattisgarh","Delhi","Goa","Gujarat","Haryana","Himachal Pradesh",
+    "Jammu & Kashmir","Jharkhand","Karnataka","Kerala","Ladakh",
+    "Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram",
+    "Nagaland","Odisha","Puducherry","Punjab","Rajasthan","Sikkim",
+    "Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand",
+    "West Bengal",
   ];
   const SORTS = {
     match: "Best match",
@@ -352,11 +352,11 @@
     let list = openJobs().filter(
       j =>
         (!q ||
-          [j.title, j.brand, j.category, j.city, j.format, platName(j.platform)]
+          [j.title, j.brand, j.category, j.state, j.city, j.format, platName(j.platform)]
             .join(" ")
             .toLowerCase()
             .includes(q)) &&
-        (!ui.city || (ui.city === "remote" ? j.remote : j.city === ui.city)) &&
+        (!ui.state || j.remote || j.state === ui.state) &&
         (!ui.platform || j.platform === ui.platform) &&
         (!ui.category || j.category === ui.category) &&
         (!ui.minBudget || j.budget >= ui.minBudget) &&
@@ -375,7 +375,7 @@
     return { list: list.sort(by), hiddenCount };
   }
   const activeCount = ui =>
-    ["q", "city", "platform", "category", "minBudget", "savedOnly"].filter(
+    ["q", "state", "platform", "category", "minBudget", "savedOnly"].filter(
       k => !!(typeof ui[k] === "string" ? ui[k].trim() : ui[k]),
     ).length;
   const budgetLabel = p => (p ? L.inr(p) + "+" : "Any");
@@ -420,8 +420,8 @@
       const s = ensure(),
         ui = s.jobsUI;
       const pool = openJobs();
-      const jobCities = pool.filter(j => !j.remote).map(j => j.city).filter(Boolean);
-      const cities = [...new Set([...CITIES, ...jobCities])].sort();
+      const jobStates = pool.filter(j => !j.remote).map(j => j.state).filter(Boolean);
+      const states = [...new Set([...STATES, ...jobStates])].sort();
       const cats = [...new Set(pool.map(j => j.category))].filter(Boolean).sort();
       const open = pool.length;
       el.innerHTML = `<div class="view-in jobs">
@@ -432,7 +432,7 @@
           </div>
           <div class="jobs-toolbar">
             <div class="jobs-filterbar" role="group" aria-label="Filters">
-              <select class="select jobs-fsel" id="jobsCity" aria-label="City"><option value="">All cities</option>${cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("")}<option value="remote">Remote</option></select>
+              <select class="select jobs-fsel" id="jobsState" aria-label="State"><option value="">All states</option>${states.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("")}</select>
               <div class="seg jobs-seg" role="group" aria-label="Platform">
                 <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${L.icon("ig")}Instagram</button><button type="button" data-plat="youtube">${L.icon("yt")}YouTube</button>
               </div>
@@ -486,7 +486,7 @@
 
       function syncControls() {
         $("#jobsQ").value = ui.q;
-        $("#jobsCity").value = ui.city;
+        $("#jobsState").value = ui.state;
         L.$$("[data-plat]", el).forEach(b =>
           b.setAttribute("aria-pressed", String(b.dataset.plat === ui.platform)),
         );
@@ -547,7 +547,7 @@
         const v = e.target.value;
         qT = setTimeout(() => set("q", v), 140);
       });
-      $("#jobsCity").addEventListener("change", e => set("city", e.target.value));
+      $("#jobsState").addEventListener("change", e => set("state", e.target.value));
       $("#jobsSort").addEventListener("change", e => set("sort", e.target.value));
       $("#jobsSaved").addEventListener("change", e => set("savedOnly", e.target.checked));
       el.firstElementChild.addEventListener("click", e => {
@@ -565,7 +565,7 @@
           settle(t);
         } else if (t.hasAttribute("data-clear")) {
           if (!activeCount(ui)) return;
-          Object.assign(ui, { q: "", city: "", platform: "", category: "", minBudget: 0, savedOnly: false });
+          Object.assign(ui, { q: "", state: "", platform: "", category: "", minBudget: 0, savedOnly: false });
           apply();
           L.toast("Filters cleared", "filter");
           $("#jobsQ").focus();
