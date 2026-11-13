@@ -244,8 +244,8 @@ function paint() {
   $("#skipPw").hidden = !setPw;
   /* email field: shown in signup before email is verified; hidden once verifiedUser is set */
   $("#suEmailField").hidden = mode !== "signup" || !!verifiedUser;
-  /* phone field: shown after email is verified in signup; Verify button hidden (no OTP needed for now) */
-  $("#suPhoneField").hidden = verifiedBy === "other" || (mode === "signup" && !verifiedUser);
+  /* phone field: shown after email/google verified in signup; Verify button hidden */
+  $("#suPhoneField").hidden = mode === "signup" && !verifiedUser;
   $("#suVerify").hidden = mode === "signup";
   goLabel.textContent = COPY[role].btn;
   if (!busy) suGoLabel.textContent = setPw ? "Save password and sign in" : COPY[role].create;
@@ -431,7 +431,7 @@ async function sendEmailCode(resend = false) {
   try {
     const ch = await requestOtp("email", v);
     emailChallengeId = ch.challengeId;
-    emailCooldownEnd = Date.now() + 30000;
+    emailCooldownEnd = Date.now() + (import.meta.env.DEV ? 8000 : 30000);
     emailOtp.value = "";
     setErr(emailOtp, "suEmailOtpErr", "");
     emailOtpField.hidden = false;
@@ -439,6 +439,10 @@ async function sendEmailCode(resend = false) {
     paintEmailResend();
     emailOtp.focus();
   } catch (e) {
+    if (mode === "signup" && isExistsError(e)) {
+      showEmailExists();
+      return;
+    }
     emailVerifyState(emailOtpField.hidden ? "verify" : "change");
     if (emailOtpField.hidden) setErr(suEmail, "suEmailErr", authMessage(e));
     else setErr(emailOtp, "suEmailOtpErr", authMessage(e));
@@ -465,7 +469,7 @@ async function sendCode(resend = false) {
   try {
     const ch = await requestOtp(d.channel, d.destination, mode === "reset" ? "password_reset" : undefined);
     challengeId = ch.challengeId;
-    cooldownEnd = Date.now() + 30000;
+    cooldownEnd = Date.now() + (import.meta.env.DEV ? 8000 : 30000);
     otp.value = "";
     setErr(otp, "suOtpErr", "");
     otpField.hidden = false;
@@ -473,6 +477,10 @@ async function sendCode(resend = false) {
     paintResend();
     otp.focus();
   } catch (e) {
+    if (mode === "signup" && isExistsError(e)) {
+      showMobileExists();
+      return;
+    }
     verifyState(otpField.hidden ? "verify" : "change");
     if (otpField.hidden) setErr(phone, "suPhoneErr", authMessage(e));
     else setErr(otp, "suOtpErr", authMessage(e));
@@ -545,7 +553,10 @@ async function checkEmailCode() {
   clearInterval(emailCooldownTimer);
   emailCodeHelp.textContent = "Checking the code…";
   try {
-    const user = await verifyOtp(emailChallengeId, emailOtp.value, remember());
+    await verifyOtp(emailChallengeId, emailOtp.value, remember());
+    /* Always fetch fresh user data — the otp/verify response user object may have
+       stale needsOnboarding/role for email OTPs; /auth/me/ is always accurate. */
+    const user = await fetchMe();
     if (!isNew(user)) {
       void alreadyRegisteredEmail(user);
       return;
@@ -568,14 +579,33 @@ async function checkEmailCode() {
   }
 }
 
-/** The sign-up code matched a number that already has an account. */
-async function alreadyRegistered() {
+const isExistsError = e =>
+  e instanceof ApiError &&
+  (e.status === 409 ||
+    ["USER_EXISTS", "EMAIL_EXISTS", "PHONE_EXISTS", "ALREADY_REGISTERED",
+     "DUPLICATE_EMAIL", "DUPLICATE_PHONE"].includes(e.code));
+
+function showEmailExists() {
+  const email = suEmail.value.trim();
+  resetVerification();
+  suEmail.value = email;
+  suEmail.setAttribute("aria-invalid", "true");
+  $("#suEmailErr").innerHTML =
+    'This email already has a Linkloom account. <button class="link" type="button" data-to-signin-email>Sign in with your password</button>, or use <button class="link" type="button" data-to-code-email>Forgot password?</button> to sign in with a code.';
+  $("[data-to-signin-email]").addEventListener("click", () => {
+    setMode("signin");
+    idInput.value = email;
+    pwInput.focus();
+  });
+  $("[data-to-code-email]").addEventListener("click", () => {
+    setMode("reset");
+    phone.value = email;
+  });
+  shake();
+}
+
+function showMobileExists() {
   const number = phone.value;
-  /* finish signing out first, so it can't clear a password sign-in made straight after */
-  busy = true;
-  codeHelp.textContent = "Checking…";
-  await signOut();
-  busy = false;
   resetVerification();
   phone.value = number;
   phone.setAttribute("aria-invalid", "true");
@@ -593,27 +623,21 @@ async function alreadyRegistered() {
   shake();
 }
 
+/** The sign-up OTP matched a number that already has an account (post-OTP fallback). */
+async function alreadyRegistered() {
+  busy = true;
+  codeHelp.textContent = "Checking…";
+  await signOut();
+  busy = false;
+  showMobileExists();
+}
+
 async function alreadyRegisteredEmail(user) {
-  const email = suEmail.value.trim();
   busy = true;
   emailCodeHelp.textContent = "Checking…";
   await signOut();
   busy = false;
-  resetVerification();
-  suEmail.value = email;
-  suEmail.setAttribute("aria-invalid", "true");
-  $("#suEmailErr").innerHTML =
-    'This email already has a Linkloom account. <button class="link" type="button" data-to-signin-email>Sign in with your password</button>, or use <button class="link" type="button" data-to-code-email>Forgot password?</button> to sign in with a code.';
-  $("[data-to-signin-email]").addEventListener("click", () => {
-    setMode("signin");
-    idInput.value = email;
-    pwInput.focus();
-  });
-  $("[data-to-code-email]").addEventListener("click", () => {
-    setMode("reset");
-    phone.value = email;
-  });
-  shake();
+  showEmailExists();
 }
 
 /** The person is signed in (code, Google, or an existing session). A new account adds its details and a password. */
@@ -807,6 +831,7 @@ $("#signupForm").addEventListener("submit", async e => {
       role,
       fullName: n,
       ...(brand ? { brandName: b } : { displayName: n }),
+      phone: phone.value.trim() || undefined,
       password: pw,
     });
     const r = u.role || role;
@@ -846,13 +871,15 @@ attachGoogle(
 
 /* ---------- after sign-in: finish sign-up if needed, then open the right dashboard ---------- */
 async function afterSignIn(user) {
-  if (isNew(user)) {
+  /* Always fetch fresh user data — the Google response may have stale needsOnboarding/role */
+  const fresh = await fetchMe().catch(() => user);
+  if (isNew(fresh)) {
     mode = "signup";
-    verified(user, "other");
+    verified(fresh, "other");
     return;
   }
-  window.LLD_TRACK("login", { method: "google", user_role: user.role || role });
-  open(user.role);
+  window.LLD_TRACK("login", { method: "google", user_role: fresh.role || role });
+  open(fresh.role);
 }
 
 function open(r) {

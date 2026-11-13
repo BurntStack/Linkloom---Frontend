@@ -194,6 +194,7 @@ export default function App() {
             <span className="me-t">
               <b data-me-name>{meName}</b>
               <span data-me-handle>{meHandle}</span>
+              <span className="me-role">Creator</span>
             </span>
           </a>
         </aside>

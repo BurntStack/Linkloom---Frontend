@@ -80,6 +80,7 @@ export async function completeSignup(d) {
   const body = { role: d.role, fullName: d.fullName.trim() };
   if (d.role === "brand" && d.brandName) body.brandName = d.brandName.trim();
   if (d.role === "creator" && d.displayName) body.displayName = d.displayName.trim();
+  if (d.phone) body.phone = d.phone.trim();
   if (d.password) {
     body.password = d.password;
     body.confirmPassword = d.password;
@@ -116,6 +117,13 @@ export function authMessage(e) {
       return "Your Google account's email isn't verified yet. Verify it with Google, or sign in with a code.";
     case "INVALID_PHONE":
       return "Enter a 10-digit Indian mobile number.";
+    case "USER_EXISTS":
+    case "EMAIL_EXISTS":
+    case "PHONE_EXISTS":
+    case "ALREADY_REGISTERED":
+    case "DUPLICATE_EMAIL":
+    case "DUPLICATE_PHONE":
+      return "An account with this email or number already exists.";
     case "REAUTH_REQUIRED":
       return "Please use the Forgot password? flow to set a new password.";
     case "TIMEOUT":

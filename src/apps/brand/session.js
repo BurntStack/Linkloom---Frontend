@@ -3,13 +3,11 @@ import { clearAuth, isSignedIn, setSessionLostHandler } from "../../shared/api/c
 import { signOut } from "../../shared/api/auth";
 import { stopLive } from "../../shared/api/realtime";
 import { addSiteLink } from "../signin/handoff";
-import { brandApi, loadBrand, loadBrandGuest } from "./live";
+import { brandApi, loadBrand } from "./live";
 import { registerBrandKyc } from "./kyc";
 
 const w = window;
 const OPEN_DURING_SETUP = new Set(["setup", "kyc"]);
-const PASSWORD_SCREENS = new Set(["login", "signup", "forgot", "reset"]);
-const GUEST_ROUTES = new Set(["home", "creators"]);
 
 /* Writes to #preload while React has not mounted yet. */
 const preload = () => document.getElementById("preload");
@@ -101,25 +99,8 @@ async function enterSignedIn() {
 }
 
 async function enterGuest(fromExpiry = false) {
-  if (!fromExpiry) {
-    const hash = location.hash.replace(/^#/, "");
-    if (PASSWORD_SCREENS.has(hash)) {
-      const to = hash === "signup" ? "&join=1" : hash === "forgot" || hash === "reset" ? "&forgot=1" : "";
-      location.replace(`signin.html?role=brand${to}`);
-      return false;
-    }
-  }
-  loading("Loading Linkloom…");
-  await loadBrandGuest();
-  document.documentElement.classList.add("is-guest");
-  w.LLD.store.set(s => {
-    s.session.signedIn = false;
-    s.session.guest = true;
-    s.me.brand = "Guest";
-    s.me.name = "Not signed in";
-  }, "guest");
-  if (!location.hash || location.hash === "#home" || location.hash === "#login") location.replace("#creators");
-  return true;
+  location.replace(`signin.html?role=brand${fromExpiry ? "&expired=1" : ""}`);
+  return false;
 }
 
 export function initBrandSession() {
@@ -139,18 +120,12 @@ export function initBrandSession() {
     location.href = "signin.html?role=brand&expired=1";
   });
 
-  w.LLD.setGuestRoutes(GUEST_ROUTES);
-  guardClicks();
   addSiteLink();
 
   w.LLD.setRouteGuard(name => {
     const s = w.LLD_DATA.session;
-    if (PASSWORD_SCREENS.has(name)) {
-      if (s.signedIn) return "#home";
-      const to = name === "signup" ? "&join=1" : name === "forgot" || name === "reset" ? "&forgot=1" : "";
-      return `signin.html?role=brand${to}`;
-    }
-    return s.signedIn && s.firstRun && !OPEN_DURING_SETUP.has(name) ? "#setup" : null;
+    if (!s.signedIn) return "signin.html?role=brand";
+    return s.firstRun && !OPEN_DURING_SETUP.has(name) ? "#setup" : null;
   });
 
   let favs = new Set(),

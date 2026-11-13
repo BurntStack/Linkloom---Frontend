@@ -1066,6 +1066,20 @@ img {
   line-height: 20px;
   font-weight: 600;
 }
+.side .me-role {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.1);
+  color: var(--ll-mist);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
 .main {
   min-width: 0;
   display: flex;

@@ -3,13 +3,11 @@ import { clearAuth, isSignedIn, setSessionLostHandler } from "../../shared/api/c
 import { signOut } from "../../shared/api/auth";
 import { stopLive } from "../../shared/api/realtime";
 import { LLD, setRouteGuard, store } from "./core";
-import { setGuestRoutes } from "./core/router";
-import { creatorApi, loadCreator, loadGuest } from "./live/creator";
+import { creatorApi, loadCreator } from "./live/creator";
 import { wireCreatorOffers } from "./live/creator-offers";
 import { addSiteLink } from "../signin/handoff";
 
 const OPEN_DURING_SETUP = new Set(["setup", "login"]);
-const GUEST_ROUTES = new Set(["home", "jobs", "login"]);
 
 /* Writes to #preload while React has not mounted yet. */
 const preload = () => document.getElementById("preload");
@@ -49,28 +47,6 @@ function promptSignIn(why = "Sign in to continue") {
   });
 }
 
-function guardClicks() {
-  document.addEventListener(
-    "click",
-    e => {
-      if (!store.s.session.guest || store.s.session.signedIn) return;
-      const t = e.target;
-      if (t.closest(".sheet, [role=dialog], .nav-site, [data-guest-ok]")) return;
-      const nav = t.closest("a[data-nav], a[href^='#']");
-      if (nav) {
-        const name = (nav.getAttribute("href") || "").replace(/^#/, "").split("-")[0];
-        if (GUEST_ROUTES.has(name) && !(nav.getAttribute("href") || "").includes("-")) return;
-      }
-      if (t.closest("#view .jobs-filters, #view .jobs-search, #view .jobs-sort, #view .jobs-bar, .ui-select, [role=listbox]")) return;
-      const hit = t.closest("a, button, input, select, textarea, label, summary, [data-go], [role=button], [tabindex]");
-      if (!hit || hit.id === "view") return;
-      e.preventDefault();
-      e.stopPropagation();
-      promptSignIn();
-    },
-    true,
-  );
-}
 
 async function enterSignedIn() {
   loading(true);
@@ -99,16 +75,8 @@ async function enterSignedIn() {
 }
 
 async function enterGuest() {
-  loading(true, "Loading Linkloom…");
-  await loadGuest(store);
-  document.documentElement.classList.add("is-guest");
-  store.set(s => {
-    s.session.signedIn = false;
-    s.session.guest = true;
-    s.me.name = "Guest";
-    s.me.handle = "Not signed in";
-  }, "guest");
-  return true;
+  location.replace("signin.html?role=creator");
+  return false;
 }
 
 function hideDemoBits() {
@@ -157,18 +125,13 @@ export function initSession() {
     location.href = "signin.html?role=creator&expired=1";
   });
 
-  setGuestRoutes(GUEST_ROUTES);
   wireCreatorOffers();
-  guardClicks();
   addSiteLink();
 
   setRouteGuard(name => {
     const { signedIn, firstLogin } = store.s.session;
-    if (name === "login") {
-      if (signedIn) return firstLogin ? "#setup" : "#home";
-      return `signin.html?role=creator${/expired/.test(location.hash) ? "&expired=1" : ""}`;
-    }
-    return signedIn && firstLogin && !OPEN_DURING_SETUP.has(name) ? "#setup" : null;
+    if (!signedIn) return "signin.html?role=creator";
+    return firstLogin && !OPEN_DURING_SETUP.has(name) ? "#setup" : null;
   });
 
   store.on(why => {

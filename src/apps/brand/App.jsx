@@ -40,9 +40,7 @@ export default function App() {
   const cartLen = useStore(s => s.cart.length);
   const brand = useStore(s => s.me.brand);
   const logo = useStore(s => s.me.logo);
-  const handle = useStore(s =>
-    [s.me.name, s.me.city].filter(Boolean).join(" · "),
-  );
+  const handle = useStore(s => s.me.city || "");
   const heldInEscrow = useStore(s =>
     s.payments.filter(p => p.status === "held").reduce((sum, p) => sum + (p.amount || 0), 0),
   );
@@ -65,11 +63,8 @@ export default function App() {
 
   if (redirectTo) return null;
 
-  const guestRoutes = window.LLD.getGuestRoutes();
-  const session = window.LLD_DATA?.session || {};
   let name = rawName || "home";
   if (!views[name]) name = "home";
-  if (session.guest && !guestRoutes.has(name)) name = "creators";
 
   const v = views[name];
 
@@ -148,6 +143,7 @@ export default function App() {
             <span className="me-t">
               <b>{brand}</b>
               <span>{handle}</span>
+              <span className="me-role">Brand</span>
             </span>
           </a>
         </aside>
