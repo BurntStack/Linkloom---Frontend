@@ -331,6 +331,15 @@
 
   /* ---------- filtering ---------- */
   const BUDGETS = [0, 500000, 1000000, 2000000, 4000000];
+  const CITIES = [
+    "Ahmedabad","Amritsar","Aurangabad","Bangalore","Bhopal","Chandigarh",
+    "Chennai","Coimbatore","Delhi","Faridabad","Ghaziabad","Guwahati",
+    "Gwalior","Howrah","Hyderabad","Indore","Jaipur","Jodhpur","Kanpur",
+    "Kochi","Kolkata","Kota","Lucknow","Ludhiana","Madurai","Meerut",
+    "Mumbai","Mysore","Nagpur","Nashik","Navi Mumbai","Noida","Patna",
+    "Pune","Raipur","Rajkot","Ranchi","Surat","Thiruvananthapuram",
+    "Tiruchirappalli","Vadodara","Varanasi","Vijayawada","Visakhapatnam",
+  ];
   const SORTS = {
     match: "Best match",
     budget: "Highest budget",
@@ -411,7 +420,8 @@
       const s = ensure(),
         ui = s.jobsUI;
       const pool = openJobs();
-      const cities = [...new Set(pool.filter(j => !j.remote).map(j => j.city))].sort();
+      const jobCities = pool.filter(j => !j.remote).map(j => j.city).filter(Boolean);
+      const cities = [...new Set([...CITIES, ...jobCities])].sort();
       const cats = [...new Set(pool.map(j => j.category))].filter(Boolean).sort();
       const open = pool.length;
       el.innerHTML = `<div class="view-in jobs">
