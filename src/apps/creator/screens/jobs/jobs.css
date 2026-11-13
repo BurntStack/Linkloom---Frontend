@@ -413,7 +413,8 @@
 }
 .jobs-search {
   position: relative;
-  flex: 0 0 190px;
+  flex: 0 0 auto;
+  width: clamp(200px, 30vw, 320px);
 }
 .jobs-search svg {
   position: absolute;

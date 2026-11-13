@@ -73,8 +73,10 @@
   const openBid = id => bidsFor(id).find(b => LIVE.includes(b.status)) || null;
   const isSaved = id => S().saved.includes(id);
   const isHidden = id => S().hiddenJobs.includes(id);
-  const platName = p => (p === "youtube" ? "YouTube" : "Instagram");
-  const glyph = p => L.icon(p === "youtube" ? "yt" : "ig");
+  const PLAT_NAME = { instagram: "Instagram", youtube: "YouTube", twitter: "Twitter", linkedin: "LinkedIn" };
+  const PLAT_ICON = { instagram: "ig", youtube: "yt", twitter: "tw", linkedin: "li" };
+  const platName = p => PLAT_NAME[p] || "Instagram";
+  const glyph = p => L.icon(PLAT_ICON[p] || "ig");
   const where = j => (j.remote ? "Any city · remote" : j.city);
   const todayISO = () => L.today().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   const daysTxt = n => (n < 0 ? "passed" : n === 0 ? "today" : n === 1 ? "1 day left" : n + " days left");
@@ -434,7 +436,7 @@
             <div class="jobs-filterbar" role="group" aria-label="Filters">
               <select class="select jobs-fsel" id="jobsState" aria-label="State"><option value="">All states</option>${states.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("")}</select>
               <div class="seg jobs-seg" role="group" aria-label="Platform">
-                <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${L.icon("ig")}Instagram</button><button type="button" data-plat="youtube">${L.icon("yt")}YouTube</button>
+                <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${L.icon("ig")}Instagram</button><button type="button" data-plat="youtube">${L.icon("yt")}YouTube</button><button type="button" data-plat="twitter">${L.icon("tw")}Twitter</button><button type="button" data-plat="linkedin">${L.icon("li")}LinkedIn</button>
               </div>
               <div class="jobs-fb-break" aria-hidden="true"></div>
               ${cats.length ? `<div class="jobs-chips-wrap" role="group" aria-label="Category">${cats.map(c => `<button class="chip" type="button" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div>` : ""}
