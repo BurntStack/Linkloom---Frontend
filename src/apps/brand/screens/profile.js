@@ -309,7 +309,10 @@
       role: pre ? me.role || "" : "",
       legal: pre ? b.legal || "" : "",
       gstin: pre ? b.gstin || "" : "",
-      address: pre ? b.address || "" : "",
+      line1: pre ? (b.addressObj?.line1 || "") : "",
+      addrCity: pre ? (b.addressObj?.city || "") : "",
+      addrState: pre ? (b.addressObj?.state || "") : "",
+      addrPin: pre ? (b.addressObj?.pincode || "") : "",
       bemail: pre ? b.email || "" : "",
     };
   }
@@ -374,11 +377,10 @@
           const x = v(k);
           if (x != null) D[k] = x;
         });
-      } else
-        ["legal", "gstin", "address", "bemail"].forEach(k => {
-          const x = v(k);
-          if (x != null) D[k] = x;
-        });
+      } else {
+        ["legal", "gstin", "bemail"].forEach(k => { const x = v(k); if (x != null) D[k] = x; });
+        ["line1", "addrCity", "addrState", "addrPin"].forEach(k => { const x = v(k); if (x != null) D[k] = x; });
+      }
     }
     function paint(focus, dir) {
       const s = STEPS[D.step];
@@ -405,7 +407,12 @@
             : `
           ${fld("su", "legal", "Legal name", `<input class="input" id="su-legal" value="${esc(D.legal)}" placeholder="Mirevo Skincare Private Limited">`, "Exactly as registered. It appears on invoices.")}
           ${fld("su", "gstin", 'GSTIN <span class="profile-opt">optional</span>', `<input class="input num profile-gstin" id="su-gstin" maxlength="15" spellcheck="false" autocapitalize="characters" value="${esc(D.gstin)}" placeholder="27AABCM1234F1Z5">`, "Add it to claim input tax credit. Taxes as per confirmed rules.")}
-          ${fld("su", "address", "Billing address", `<textarea class="textarea" id="su-address" rows="3" autocomplete="street-address" placeholder="4th floor, Lodha Supremus, Lower Parel, Mumbai 400013">${esc(D.address)}</textarea>`)}
+          ${fld("su", "line1", "Address line 1", `<input class="input" id="su-line1" autocomplete="address-line1" value="${esc(D.line1)}" placeholder="4th floor, Lodha Supremus, Lower Parel">`, "Street, building and area.")}
+          <div class="profile-two">
+            ${fld("su", "addrCity", "City", `<input class="input" id="su-addrCity" autocomplete="address-level2" value="${esc(D.addrCity)}" placeholder="Mumbai">`)}
+            ${fld("su", "addrPin", "PIN code", `<input class="input num" id="su-addrPin" inputmode="numeric" maxlength="6" autocomplete="postal-code" value="${esc(D.addrPin)}" placeholder="400013">`)}
+          </div>
+          ${fld("su", "addrState", "State", sel("su-addrState", STATES, D.addrState, "Choose state"))}
           ${fld("su", "bemail", "Send invoices to", `<input class="input" id="su-bemail" type="email" spellcheck="false" autocapitalize="off" value="${esc(D.bemail)}" placeholder="accounts@brand.in">`, "Often your accounts team. You can change it later.")}`;
         L.liquid(body);
         wireClear(body);
@@ -461,7 +468,10 @@
         [
           ["legal", V.legal(D.legal)],
           ["gstin", V.gstin(D.gstin)],
-          ["address", V.address(D.address)],
+          ["line1", D.line1.trim() ? "" : "Enter the street and area."],
+          ["addrCity", V.city(D.addrCity)],
+          ["addrState", D.addrState ? "" : "Choose the state or union territory."],
+          ["addrPin", /^\d{6}$/.test(D.addrPin.trim()) ? "" : "Enter a valid 6-digit PIN code."],
           ["bemail", V.email(D.bemail)],
         ].forEach(x => x[1] && e.push(x));
       }
@@ -480,7 +490,12 @@
           name: m.name,
           role: m.role,
         });
-      else Object.assign(D, { legal: b.legal, gstin: b.gstin, address: b.address, bemail: b.email });
+      else Object.assign(D, {
+        legal: b.legal, gstin: b.gstin,
+        line1: "4th floor, Lodha Supremus, Lower Parel",
+        addrCity: "Mumbai", addrState: "Maharashtra", addrPin: "400013",
+        bemail: b.email,
+      });
       paint(false);
       live.textContent = "Filled with sample details";
     });
@@ -521,10 +536,12 @@
             me.name = D.name.trim().replace(/\s+/g, " ");
             me.role = D.role.trim();
             me.logo = D.logo || null;
+            const _ao = { line1: D.line1.trim(), line2: "", city: D.addrCity.trim(), state: D.addrState, pincode: D.addrPin.trim() };
             me.billing = {
               legal: D.legal.trim(),
               gstin: D.gstin.trim().toUpperCase(),
-              address: D.address.trim(),
+              address: [_ao.line1, _ao.city, _ao.state, _ao.pincode].filter(Boolean).join(", "),
+              addressObj: _ao,
               email: D.bemail.trim(),
             };
             if (s.session.email) me.email = s.session.email;
@@ -936,7 +953,12 @@
           <fieldset class="profile-fs" data-billing><legend class="t-h3">Billing</legend>
             ${fld("pe", "legal", "Legal name", `<input class="input" id="pe-legal" value="${esc(bl.legal || "")}">`)}
             ${fld("pe", "gstin", 'GSTIN <span class="profile-opt">optional</span>', `<input class="input num profile-gstin" id="pe-gstin" maxlength="15" spellcheck="false" autocapitalize="characters" value="${esc(bl.gstin || "")}">`)}
-            ${fld("pe", "address", "Billing address", `<textarea class="textarea" id="pe-address" rows="3" autocomplete="street-address">${esc(bl.address || "")}</textarea>`)}
+            ${fld("pe", "adline1", "Address line 1", `<input class="input" id="pe-adline1" autocomplete="address-line1" value="${esc(bl.addressObj?.line1 || "")}" placeholder="Street, building and area">`)}
+            <div class="profile-two">
+              ${fld("pe", "adcity", "City", `<input class="input" id="pe-adcity" autocomplete="address-level2" value="${esc(bl.addressObj?.city || "")}" placeholder="Mumbai">`)}
+              ${fld("pe", "adpin", "PIN code", `<input class="input num" id="pe-adpin" inputmode="numeric" maxlength="6" autocomplete="postal-code" value="${esc(bl.addressObj?.pincode || "")}" placeholder="400013">`)}
+            </div>
+            ${fld("pe", "adstate", "State", sel("pe-adstate", STATES, bl.addressObj?.state || "", "Choose state"))}`
             ${fld("pe", "bemail", "Send invoices to", `<input class="input" id="pe-bemail" type="email" spellcheck="false" autocapitalize="off" value="${esc(bl.email || "")}">`)}
             <p class="t-cap muted">Changes apply to invoices from today. Past invoices keep the details they were issued with.</p>
           </fieldset>
@@ -980,7 +1002,10 @@
               ["name", V.person(v("name"))],
               ["legal", V.legal(v("legal"))],
               ["gstin", V.gstin(v("gstin"))],
-              ["address", V.address(v("address"))],
+              ["adline1", v("adline1").trim() ? "" : "Enter the street and area."],
+              ["adcity", V.city(v("adcity"))],
+              ["adstate", v("adstate") ? "" : "Choose the state or union territory."],
+              ["adpin", /^\d{6}$/.test(v("adpin").trim()) ? "" : "Enter a valid 6-digit PIN code."],
               ["bemail", V.email(v("bemail"))],
             ].forEach(x => x[1] && errs.push(x));
             const an = [...v("about").trim()].length;
@@ -1012,10 +1037,12 @@
               m.name = v("name").trim().replace(/\s+/g, " ");
               m.role = v("role").trim();
               m.logo = pk.get();
+              const _ao2 = { line1: v("adline1").trim(), line2: "", city: v("adcity").trim(), state: v("adstate"), pincode: v("adpin").trim() };
               m.billing = {
                 legal: v("legal").trim(),
                 gstin: v("gstin").trim().toUpperCase(),
-                address: v("address").trim(),
+                address: [_ao2.line1, _ao2.city, _ao2.state, _ao2.pincode].filter(Boolean).join(", "),
+                addressObj: _ao2,
                 email: v("bemail").trim(),
               };
             }, "profile-edited");

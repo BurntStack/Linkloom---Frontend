@@ -453,6 +453,7 @@ function mapMe(b, u) {
       legal: String(b.legalName || ""),
       gstin: String(b.gstin || ""),
       address: addressText(b.billingAddress),
+      addressObj: (b.billingAddress && typeof b.billingAddress === "object") ? b.billingAddress : null,
       email: String(b.billingEmail || ""),
     },
   };
@@ -843,7 +844,7 @@ export const brandApi = {
       industry: me.industry || "",
       legalName: me.billing?.legal || "",
       gstin: me.billing?.gstin || "",
-      billingAddress: me.billing?.address || "",
+      billingAddress: me.billing?.addressObj || {},
       billingEmail: me.billing?.email || "",
     };
     const sc = String(me.billing?.gstin || "").slice(0, 2);
