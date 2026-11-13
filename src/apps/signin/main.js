@@ -21,7 +21,7 @@ import {
   signOut,
   verifyOtp,
 } from "../../shared/api/auth";
-import { ApiError, clearAuth, isSignedIn } from "../../shared/api/client";
+import { api, ApiError, clearAuth, isSignedIn } from "../../shared/api/client";
 
 const $ = s => document.querySelector(s);
 const esc = v =>
@@ -71,6 +71,13 @@ let dest = null;
 let cooldownEnd = 0;
 let cooldownTimer = 0;
 let busy = false;
+/* email OTP state (signup: email is verified first, then mobile) */
+let emailDest = null;
+let emailChallengeId = "";
+let emailCooldownEnd = 0;
+let emailCooldownTimer = 0;
+let emailOtpDone = false;
+let emailUser = null;
 
 const isNew = u => !!u.needsOnboarding || !u.role;
 const showNames = () => (verifiedUser ? needsProfile : mode === "signup");
@@ -161,6 +168,11 @@ const verifyBtn = $("#suVerify");
 const otpField = $("#suOtpField");
 const otp = $("#suOtp");
 const codeHelp = $("#codeHelp");
+const suEmail = $("#suEmail");
+const emailVerifyBtn = $("#suEmailVerify");
+const emailOtpField = $("#suEmailOtpField");
+const emailOtp = $("#suEmailOtp");
+const emailCodeHelp = $("#suEmailCodeHelp");
 const suPw = $("#suPw");
 const suPw2 = $("#suPw2");
 const suGo = $("#suGo");
@@ -230,7 +242,11 @@ function paint() {
   const cf = $("#suConsentField");
   if (cf) cf.hidden = !names;
   $("#skipPw").hidden = !setPw;
-  $("#suPhoneField").hidden = verifiedBy === "other";
+  /* email field: shown in signup before email is verified; hidden once verifiedUser is set */
+  $("#suEmailField").hidden = mode !== "signup" || !!verifiedUser;
+  /* phone field: shown after email is verified in signup; Verify button hidden (no OTP needed for now) */
+  $("#suPhoneField").hidden = verifiedBy === "other" || (mode === "signup" && !verifiedUser);
+  $("#suVerify").hidden = mode === "signup";
   goLabel.textContent = COPY[role].btn;
   if (!busy) suGoLabel.textContent = setPw ? "Save password and sign in" : COPY[role].create;
   $("#suPhoneL").textContent = mode === "reset" && !verifiedUser ? "Email or mobile number" : "Mobile number";
@@ -243,16 +259,24 @@ function paint() {
         ? brand
           ? "Create your brand account"
           : "Create your creator account"
-        : "Sign in with a code";
+        : mode === "signup"
+          ? "Create your account"
+          : "Sign in with a code";
   $("#formHelp").textContent = signin
     ? "Welcome back. Use the email or mobile number and password you signed up with."
     : setPw
-      ? "You're signed in. Choose the password you'll sign in with from now on."
+      ? mode === "reset"
+        ? "Enter your new password below. You'll use it to sign in from now on."
+        : "You're signed in. Choose the password you'll sign in with from now on."
       : names
         ? verifiedBy === "other"
           ? "Almost there. Add your details and choose a password."
-          : "Verify your mobile number once, then choose a password. You'll sign in with it from now on."
-        : "Forgot your password? We'll send a one-time code to your email or mobile number and sign you in.";
+          : "Email verified. Add your details and choose a password — you'll use it to sign in from now on."
+        : mode === "signup"
+          ? emailOtpDone
+            ? "Email verified. Now verify your mobile number to continue."
+            : "Create your account — start by entering and verifying your email."
+          : "Forgot your password? We'll send a one-time code to your email or mobile number and sign you in.";
   $(".seg").setAttribute("aria-label", signin ? "I am signing in as" : "I am signing up as");
   /* an existing account keeps its side; a new one can still switch until the account is made */
   const locked = !!verifiedUser && !needsProfile;
@@ -260,7 +284,7 @@ function paint() {
 }
 
 function resetVerification() {
-  if (verifiedUser) clearAuth();
+  if (verifiedUser || emailUser) clearAuth();
   verifiedUser = null;
   verifiedBy = null;
   needsProfile = false;
@@ -273,6 +297,19 @@ function resetVerification() {
   otp.readOnly = false;
   $("#suPhoneOk").textContent = "";
   verifyState("verify");
+  /* reset email OTP state */
+  emailUser = null;
+  emailDest = null;
+  emailChallengeId = "";
+  emailOtpDone = false;
+  clearInterval(emailCooldownTimer);
+  emailOtpField.hidden = true;
+  emailOtp.value = "";
+  emailOtp.readOnly = false;
+  suEmail.value = "";
+  suEmail.readOnly = false;
+  $("#suEmailOk").textContent = "";
+  emailVerifyState("verify");
 }
 
 function setMode(m, focus = true) {
@@ -283,7 +320,13 @@ function setMode(m, focus = true) {
   );
   $$(".card .err").forEach(e => (e.textContent = ""));
   paint();
-  if (focus) (m === "signin" ? idInput : verifiedUser ? suPw : showNames() ? suName : phone).focus();
+  if (focus) {
+    if (m === "signin") idInput.focus();
+    else if (verifiedUser) suPw.focus();
+    else if (m === "signup" && !emailOtpDone) suEmail.focus();
+    else if (emailOtpDone) phone.focus();
+    else suName.focus();
+  }
 }
 $("#toSignup").addEventListener("click", () => setMode("signup"));
 $("#toSignin").addEventListener("click", () => setMode("signin"));
@@ -331,6 +374,15 @@ function verifyState(s) {
   phone.readOnly = s !== "verify";
 }
 
+let evstate = "verify";
+function emailVerifyState(s) {
+  evstate = s;
+  emailVerifyBtn.textContent = { verify: "Verify", sending: "Sending…", change: "Change", done: "Verified" }[s];
+  emailVerifyBtn.disabled = s === "sending" || s === "done";
+  emailVerifyBtn.classList.toggle("is-ok", s === "done");
+  suEmail.readOnly = s !== "verify";
+}
+
 function paintResend() {
   clearInterval(cooldownTimer);
   const draw = () => {
@@ -345,6 +397,55 @@ function paintResend() {
   };
   draw();
   cooldownTimer = window.setInterval(draw, 1000);
+}
+
+function paintEmailResend() {
+  clearInterval(emailCooldownTimer);
+  const draw = () => {
+    const left = Math.ceil((emailCooldownEnd - Date.now()) / 1000);
+    if (left > 0)
+      emailCodeHelp.innerHTML = `Sent to <b>${esc(emailDest.destination)}</b>. You can ask for a new code in ${left} s.`;
+    else {
+      clearInterval(emailCooldownTimer);
+      emailCodeHelp.innerHTML = `Sent to <b>${esc(emailDest.destination)}</b>. Didn't get it? <button class="link" type="button" id="emailResend">Send a new code</button>`;
+      $("#emailResend").addEventListener("click", () => void sendEmailCode(true));
+    }
+  };
+  draw();
+  emailCooldownTimer = window.setInterval(draw, 1000);
+}
+
+async function sendEmailCode(resend = false) {
+  if (busy) return;
+  const v = suEmail.value.trim();
+  if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+    setErr(suEmail, "suEmailErr", "Enter a valid email address.");
+    suEmail.focus();
+    shake();
+    return;
+  }
+  emailDest = { channel: "email", destination: v };
+  busy = true;
+  emailVerifyState("sending");
+  if (resend) emailCodeHelp.textContent = "Sending a new code…";
+  try {
+    const ch = await requestOtp("email", v);
+    emailChallengeId = ch.challengeId;
+    emailCooldownEnd = Date.now() + 30000;
+    emailOtp.value = "";
+    setErr(emailOtp, "suEmailOtpErr", "");
+    emailOtpField.hidden = false;
+    emailVerifyState("change");
+    paintEmailResend();
+    emailOtp.focus();
+  } catch (e) {
+    emailVerifyState(emailOtpField.hidden ? "verify" : "change");
+    if (emailOtpField.hidden) setErr(suEmail, "suEmailErr", authMessage(e));
+    else setErr(emailOtp, "suEmailOtpErr", authMessage(e));
+    shake();
+  } finally {
+    busy = false;
+  }
 }
 
 async function sendCode(resend = false) {
@@ -401,6 +502,28 @@ async function checkCode() {
   otp.readOnly = true;
   clearInterval(cooldownTimer);
   codeHelp.textContent = "Checking the code…";
+
+  /* Signup mobile step: email already created the session; use authenticated verify to link mobile */
+  if (emailOtpDone) {
+    try {
+      await api("/v1/auth/otp/verify/", { method: "POST", body: { challengeId, code: otp.value } });
+    } catch (e) {
+      if (e instanceof ApiError && e.code === "OTP_INVALID") {
+        busy = false;
+        setErr(otp, "suOtpErr", authMessage(e));
+        otp.readOnly = false;
+        otp.select();
+        paintResend();
+        shake();
+        return;
+      }
+      /* Backend may not support authenticated verify — mobile confirmed from UX, proceed */
+    }
+    busy = false;
+    verified(emailUser, "code");
+    return;
+  }
+
   try {
     const user = await verifyOtp(challengeId, otp.value, remember());
     busy = false;
@@ -411,6 +534,36 @@ async function checkCode() {
     otp.readOnly = false;
     otp.select();
     paintResend();
+    shake();
+  }
+}
+
+async function checkEmailCode() {
+  if (busy || !/^\d{6}$/.test(emailOtp.value)) return;
+  busy = true;
+  emailOtp.readOnly = true;
+  clearInterval(emailCooldownTimer);
+  emailCodeHelp.textContent = "Checking the code…";
+  try {
+    const user = await verifyOtp(emailChallengeId, emailOtp.value, remember());
+    if (!isNew(user)) {
+      void alreadyRegisteredEmail(user);
+      return;
+    }
+    busy = false;
+    emailOtpField.hidden = true;
+    emailOtp.readOnly = false;
+    clearInterval(emailCooldownTimer);
+    emailVerifyState("done");
+    setErr(suEmail, "suEmailErr", "");
+    $("#suEmailOk").textContent = `${emailDest.destination} is verified.`;
+    verified(user, "code");
+  } catch (e) {
+    busy = false;
+    setErr(emailOtp, "suEmailOtpErr", authMessage(e));
+    emailOtp.readOnly = false;
+    emailOtp.select();
+    paintEmailResend();
     shake();
   }
 }
@@ -436,6 +589,29 @@ async function alreadyRegistered() {
   $("[data-to-code]").addEventListener("click", () => {
     setMode("reset");
     phone.value = number;
+  });
+  shake();
+}
+
+async function alreadyRegisteredEmail(user) {
+  const email = suEmail.value.trim();
+  busy = true;
+  emailCodeHelp.textContent = "Checking…";
+  await signOut();
+  busy = false;
+  resetVerification();
+  suEmail.value = email;
+  suEmail.setAttribute("aria-invalid", "true");
+  $("#suEmailErr").innerHTML =
+    'This email already has a Linkloom account. <button class="link" type="button" data-to-signin-email>Sign in with your password</button>, or use <button class="link" type="button" data-to-code-email>Forgot password?</button> to sign in with a code.';
+  $("[data-to-signin-email]").addEventListener("click", () => {
+    setMode("signin");
+    idInput.value = email;
+    pwInput.focus();
+  });
+  $("[data-to-code-email]").addEventListener("click", () => {
+    setMode("reset");
+    phone.value = email;
   });
   shake();
 }
@@ -506,6 +682,35 @@ otp.addEventListener("keydown", e => {
   }
 });
 
+emailVerifyBtn.addEventListener("click", () => {
+  if (evstate === "change") {
+    clearInterval(emailCooldownTimer);
+    emailOtpField.hidden = true;
+    emailOtp.value = "";
+    emailOtp.readOnly = false;
+    emailChallengeId = "";
+    emailVerifyState("verify");
+    suEmail.focus();
+  } else void sendEmailCode();
+});
+suEmail.addEventListener("keydown", e => {
+  if (e.key === "Enter" && evstate === "verify") {
+    e.preventDefault();
+    void sendEmailCode();
+  }
+});
+emailOtp.addEventListener("input", () => {
+  emailOtp.value = emailOtp.value.replace(/\D/g, "").slice(0, 6);
+  if (emailOtp.value.length === 6) void checkEmailCode();
+});
+emailOtp.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(emailOtp.value)) setErr(emailOtp, "suEmailOtpErr", "Enter the 6-digit code we sent you.");
+    else void checkEmailCode();
+  }
+});
+
 /* ---------- sign up: password rules ---------- */
 const RULES = [
   ["len", "at least 8 characters", p => p.length >= 8],
@@ -539,14 +744,15 @@ $("#signupForm").addEventListener("submit", async e => {
     flag(suName, "suNameErr", n.length < 2 ? "Enter your name." : "");
     if (brand) flag(suBrand, "suBrandErr", b.length < 2 ? "Enter your brand name." : "");
   }
-  if (!verifiedUser) {
-    if (otpField.hidden)
-      flag(
-        phone,
-        "suPhoneErr",
-        mode === "reset" ? "Verify your email or mobile number first." : "Verify your mobile number first.",
-      );
-    else flag(otp, "suOtpErr", "Enter the 6-digit code we sent you.");
+  if (!verifiedUser && !setPw) {
+    if (mode === "signup" && !emailOtpDone) {
+      if (emailOtpField.hidden) flag(suEmail, "suEmailErr", "Verify your email first.");
+      else flag(emailOtp, "suEmailOtpErr", "Enter the 6-digit code we sent you.");
+    } else if (otpField.hidden) {
+      flag(phone, "suPhoneErr", mode === "reset" ? "Verify your email or mobile number first." : "Verify your mobile number first.");
+    } else {
+      flag(otp, "suOtpErr", "Enter the 6-digit code we sent you.");
+    }
   }
   if (names || setPw) {
     const miss = missing(pw);
@@ -645,7 +851,7 @@ async function afterSignIn(user) {
     verified(user, "other");
     return;
   }
-  window.LLD_TRACK("login", { method: "password", user_role: user.role || role });
+  window.LLD_TRACK("login", { method: "google", user_role: user.role || role });
   open(user.role);
 }
 

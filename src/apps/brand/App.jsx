@@ -110,7 +110,7 @@ export default function App() {
 
   return (
     <>
-      <div id="app" hidden={isFocus || undefined}>
+      <div id="app" className="app" hidden={isFocus || undefined}>
         <aside className="side" aria-label="Main">
           <a className="sbox brand" href="#home" aria-label="Linkloom home">
             <img src="assets/logo-mark.svg" width="28" height="28" alt="" />
