@@ -310,7 +310,7 @@
       legal: pre ? b.legal || "" : "",
       gstin: pre ? b.gstin || "" : "",
       address: pre ? b.address || "" : "",
-      bemail: pre ? b.email || "" : s.session.email || "",
+      bemail: pre ? b.email || "" : "",
     };
   }
   function renderSetup(el) {

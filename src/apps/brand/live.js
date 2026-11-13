@@ -453,7 +453,7 @@ function mapMe(b, u) {
       legal: String(b.legalName || ""),
       gstin: String(b.gstin || ""),
       address: addressText(b.billingAddress),
-      email: String(b.billingEmail || u.email || ""),
+      email: String(b.billingEmail || ""),
     },
   };
 }
