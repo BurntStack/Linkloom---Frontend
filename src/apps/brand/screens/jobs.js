@@ -414,6 +414,10 @@
     render(el) {
       const u = ui("jobs");
       if (!TABS.some(t => t[0] === u.tab)) u.tab = "all";
+      if (u.platform === undefined) u.platform = "";
+      if (u.category === undefined) u.category = "";
+      if (u.q === undefined) u.q = "";
+      const cats = [...new Set(S().jobs.map(j => j.category))].filter(Boolean).sort();
       const count = t => S().jobs.filter(j => inTab(j, t)).length;
       const summary = () => {
         const n = t => count(t),
@@ -430,8 +434,17 @@
         if (!all.length)
           return `<div class="empty jl-empty"><img src="assets/step-01-envelope.svg" width="160" height="117" alt="">
           <p class="t-h2">No jobs yet.</p><p class="muted">Post a brief and creators who fit will bid on it. It takes about three minutes.</p><a class="lq lq-p" href="#post">Post a job</a></div>`;
-        const list = all.filter(j => inTab(j, u.tab));
+        const q = (u.q || "").trim().toLowerCase();
+        const list = all.filter(j =>
+          inTab(j, u.tab) &&
+          (!q || [j.title, j.category, plat(j.platform), j.format, where(j)].join(" ").toLowerCase().includes(q)) &&
+          (!u.platform || j.platform === u.platform) &&
+          (!u.category || j.category === u.category)
+        );
         if (!list.length) {
+          if (q || u.platform || u.category) {
+            return `<div class="empty jl-empty"><p class="t-h2">No jobs match those filters.</p><p class="muted">Try clearing the platform or category filter.</p><div class="row wrap jl-empty-cta"><button class="lq lq-p" type="button" data-clear>Clear filters</button><a class="lq lq-s" href="#post">Post a job</a></div></div>`;
+          }
           const m = {
             open: ["No open jobs.", "Publish a draft or post a new brief to start getting bids."],
             drafts: ["No drafts.", "Save a job as a draft when the brief is not ready yet."],
@@ -455,12 +468,41 @@
           <div class="jl-head-t"><h1 class="t-h1">Jobs</h1><p class="muted" id="jlSum">${esc(summary())} <span class="sample">Sample data</span></p></div>
           <a class="lq lq-p" href="#post">${ic("plus")}Post a job</a>
         </header>
+        <div class="jl-toolbar">
+          <div class="jl-filterbar" role="group" aria-label="Filters">
+            <div class="seg jl-seg" role="group" aria-label="Platform">
+              <button type="button" data-plat="">All</button><button type="button" data-plat="instagram">${ic("ig")}Instagram</button><button type="button" data-plat="youtube">${ic("yt")}YouTube</button><button type="button" data-plat="twitter">${ic("tw")}Twitter</button><button type="button" data-plat="linkedin">${ic("li")}LinkedIn</button>
+            </div>
+            <div class="jl-fb-break" aria-hidden="true"></div>
+            ${cats.length ? `<div class="jl-chips-wrap" role="group" aria-label="Category">${cats.map(c => `<button class="chip" type="button" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div>` : ""}
+            <button class="btn-q jl-clear" type="button" data-clear>Clear</button>
+          </div>
+          <div class="jl-search">
+            <label class="sr-only" for="jlQ">Search jobs</label>
+            ${ic("search")}
+            <input class="input" id="jlQ" type="search" autocomplete="off" placeholder="Search title, platform, category" value="${esc(u.q)}">
+          </div>
+        </div>
         <div class="chips jl-filter" role="group" aria-label="Show jobs">${tabs()}</div>
         <p class="sr-only" id="jlLive" aria-live="polite"></p>
         <div class="jl-board" id="jlBoard">${board()}</div>
       </div>`;
       L.liquid(el);
       const $ = q => el.querySelector(q);
+      function syncControls() {
+        L.$$("[data-plat]", el).forEach(b =>
+          b.setAttribute("aria-pressed", String(b.dataset.plat === (u.platform || "")))
+        );
+        L.$$("[data-cat]", el).forEach(b =>
+          b.setAttribute("aria-pressed", String(b.dataset.cat === (u.category || "")))
+        );
+        const n = [(u.platform || ""), (u.category || ""), (u.q || "").trim()].filter(Boolean).length;
+        const cb = $(".jl-clear");
+        if (cb) {
+          cb.textContent = n ? `Clear (${n})` : "Clear";
+          cb.setAttribute("aria-disabled", String(!n));
+        }
+      }
       const refresh = (animate, msg) => {
         const mutate = () => {
           $("#jlBoard").innerHTML = board();
@@ -469,12 +511,31 @@
           L.liquid($("#jlBoard"));
         };
         animate ? flip(mutate, () => L.$$(".jl-slip", el)) : mutate();
+        syncControls();
         if (msg) $("#jlLive").textContent = msg;
       };
+      let qT = 0;
+      $("#jlQ").addEventListener("input", e => {
+        clearTimeout(qT);
+        const v = e.target.value;
+        qT = setTimeout(() => { u.q = v; refresh(true); }, 140);
+      });
       el.firstElementChild.addEventListener("click", e => {
         const t = e.target.closest("button");
         if (!t || !el.contains(t)) return;
-        if (t.dataset.tab) {
+        if (t.dataset.plat !== undefined) {
+          u.platform = t.dataset.plat;
+          refresh(true);
+        } else if (t.dataset.cat !== undefined) {
+          u.category = u.category === t.dataset.cat ? "" : t.dataset.cat;
+          refresh(true);
+        } else if (t.hasAttribute("data-clear")) {
+          u.platform = "";
+          u.category = "";
+          u.q = "";
+          $("#jlQ").value = "";
+          refresh(true);
+        } else if (t.dataset.tab) {
           u.tab = t.dataset.tab;
           refresh(true, `Showing ${u.tab === "all" ? "all" : u.tab} jobs`);
           const same = el.querySelector(`.jl-filter [data-tab="${u.tab}"]`);
@@ -482,6 +543,7 @@
         } else if (t.dataset.close) closeJob(t.dataset.close, () => refresh(true, "Job closed"));
         else if (t.dataset.del) deleteJob(t.dataset.del, () => refresh(true, "Job deleted"));
       });
+      syncControls();
       mo("stagger", L.$$(".jl-slip", el));
       if (u.justSaved) {
         const id = u.justSaved;

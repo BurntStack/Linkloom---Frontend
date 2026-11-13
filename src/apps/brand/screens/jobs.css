@@ -437,6 +437,78 @@
   }
 }
 
+/* ---------- toolbar: filter bar + search (mirrors creator jobs) ---------- */
+.jl-toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.jl-filterbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.jl-fb-break {
+  width: 100%;
+  height: 0;
+  flex-shrink: 0;
+}
+.jl-seg {
+  display: inline-flex;
+  flex: none;
+}
+.jl-seg button {
+  flex: 1 1 auto;
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.jl-seg svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.jl-chips-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+.jl-chips-wrap .chip {
+  padding: 0 12px;
+  white-space: nowrap;
+}
+.jl-clear[aria-disabled="true"] {
+  color: var(--ll-slate);
+  pointer-events: none;
+}
+.jl-search {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(200px, 30vw, 320px);
+}
+.jl-search svg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--ll-slate);
+  pointer-events: none;
+}
+.jl-search .input {
+  padding-left: 48px;
+  border-radius: var(--r-full);
+}
+
 /* ---------- brand side additions ---------- */
 .jl-t a {
   color: var(--ll-ink-text);
@@ -642,5 +714,21 @@
   }
   .jl-meta-w {
     flex-basis: 100% !important;
+  }
+  .jl-toolbar {
+    flex-wrap: wrap;
+  }
+  .jl-search {
+    order: 1;
+    flex: 1 1 100%;
+  }
+  .jl-filterbar {
+    order: 2;
+    flex-basis: 100%;
+  }
+}
+@media (pointer: coarse) {
+  .jl-seg button {
+    min-height: 44px;
   }
 }
