@@ -834,7 +834,7 @@
             ${A.rulesHTML("au-rules")}
             ${A.pwField("pw2", "Confirm new password")}
             <p class="auth-avail" data-match aria-live="polite"></p>
-            <p class="t-cap muted"><span class="sample">Sample</span> current password: <b class="num">Mirevo@2026</b>, unless you changed it</p>
+
             <div class="profile-pe-f"><button class="lq lq-p" type="submit" data-save>Update password</button><button class="lq lq-s" type="button" data-cancel>Cancel</button></div>
           </form>`,
         onMount(b, close) {

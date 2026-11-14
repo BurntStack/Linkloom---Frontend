@@ -423,7 +423,7 @@
           </dl>
         </div></div>
         <p class="help">${esc(x.note || "")}. You will get a UTR reference you can quote to your bank.</p>
-        <label class="check earnings-wf-fail"><input type="checkbox" data-fail><span><span class="sample">Sample</span> Make this payout fail, to see what happens</span></label>
+
         <div class="row wrap earnings-wf-acts"><button class="lq lq-p lq-xl" type="button" data-confirm>Confirm and withdraw</button><button class="lq lq-s lq-xl" type="button" data-back>Change</button></div>
       </div>`,
         2,
@@ -431,8 +431,7 @@
       feed(L.$(".earnings-mini-w", box), 120);
       L.$("[data-back]", box).addEventListener("click", () => step1());
       L.$("[data-confirm]", box).addEventListener("click", () => {
-        const fail = L.$("[data-fail]", box).checked;
-        step3(fail);
+        step3(false);
       });
     };
 
