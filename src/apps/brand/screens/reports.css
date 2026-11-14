@@ -53,6 +53,8 @@
   align-items: flex-end;
   gap: 12px 24px;
   flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 .rp-sec-top > div {
   display: flex;

@@ -8,6 +8,8 @@
   align-items: flex-end;
   gap: 24px 40px;
   flex-wrap: wrap;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 .active-head-t {
   display: flex;
@@ -442,6 +444,8 @@
   align-items: flex-end;
   gap: 24px 48px;
   flex-wrap: wrap;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 .work-head-t {
   display: flex;

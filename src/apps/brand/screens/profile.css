@@ -9,6 +9,8 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
   gap: 24px 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 .profile-logo {
   display: grid;
@@ -185,6 +187,8 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 .profile-sec h2.t-h3 {
   display: inline-flex;

@@ -9,6 +9,8 @@
   flex-direction: column;
   gap: 8px;
   padding-top: 8px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 @media (min-width: 901px) {
   .home-when {
@@ -230,6 +232,8 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 .home-sec-h > div {
   display: flex;

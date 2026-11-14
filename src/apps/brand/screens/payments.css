@@ -8,6 +8,8 @@
   align-items: baseline;
   gap: 8px 16px;
   flex-wrap: wrap;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 .earnings-plan {
   margin-left: auto;

@@ -29,6 +29,8 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
   gap: 24px 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--ll-rule);
 }
 /* brand view: a quiet violet wash settles behind the masthead (state, not decoration); it sits outside the box so nothing shifts */
 .profile-mast::before {
